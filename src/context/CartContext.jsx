@@ -4,6 +4,7 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     useEffect(() => {
         const cartItemsFromStorage = localStorage.getItem('cartItems');
@@ -28,6 +29,7 @@ export const CartProvider = ({ children }) => {
         } else {
             setCartItems([...cartItems, { ...product, qty }]);
         }
+        setIsCartOpen(true); // Auto-open cart when adding an item
     };
 
     const removeFromCart = (id) => {
@@ -38,8 +40,23 @@ export const CartProvider = ({ children }) => {
         setCartItems([]);
     };
 
+    const updateQty = (id, delta) => {
+        setCartItems(prevItems => 
+            prevItems.map(item => {
+                if (item._id === id) {
+                    const newQty = item.qty + delta;
+                    return newQty > 0 ? { ...item, qty: newQty } : item;
+                }
+                return item;
+            })
+        );
+    };
+
+    const openCart = () => setIsCartOpen(true);
+    const closeCart = () => setIsCartOpen(false);
+
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, isCartOpen, openCart, closeCart, updateQty }}>
             {children}
         </CartContext.Provider>
     );

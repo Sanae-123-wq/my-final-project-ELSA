@@ -17,7 +17,12 @@ const AiRecipe = () => {
             const data = await api.generateRecipe(prompt);
             setRecipe(data);
         } catch (err) {
-            setError(err.response?.data?.message || 'Something went wrong');
+            const msg = err.message || err.response?.data?.message || 'Something went wrong generating the recipe.';
+            setError(
+                msg.includes('fetch') || msg.includes('Failed to fetch')
+                    ? 'Cannot connect to AI server. Please make sure the backend is running on port 5000.'
+                    : msg
+            );
         } finally {
             setLoading(false);
         }
@@ -55,7 +60,22 @@ const AiRecipe = () => {
 
             {recipe && (
                 <div className="recipe-result">
-                    <h2 className="text-center" style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>{recipe.name}</h2>
+                    <h2 className="text-center" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{recipe.name}</h2>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', color: '#666' }}>
+                        {recipe.prepTime && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>⏲️ Prep:</span>
+                                <strong>{recipe.prepTime}</strong>
+                            </div>
+                        )}
+                        {recipe.bakingTime && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>🔥 Baking:</span>
+                                <strong>{recipe.bakingTime}</strong>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="recipe-grid">
                         <div>

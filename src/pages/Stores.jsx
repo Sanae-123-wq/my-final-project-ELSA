@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import CartContext from '../context/CartContext';
+import CartSidebar from '../components/CartSidebar';
 import { FaSearch, FaMapMarkerAlt, FaShoppingCart, FaStar } from 'react-icons/fa';
 import cakePackImg from '../assets/cake_pack.png';
 import tartPackImg from '../assets/tart_pack.png';
@@ -101,11 +102,11 @@ const Stores = () => {
             image: item.image,
             category: item.ingredients ? 'Pack' : 'Material'
         }, 1);
-        alert(`${item.name} added to cart!`);
     };
 
     return (
-        <div className="container py-12">
+        <div className="container py-12 shop-page-layout">
+            <div className="shop-main-content">
             {/* Header Section */}
             <div className="text-center mb-12">
                 <h1 className="section-title">
@@ -224,6 +225,8 @@ const Stores = () => {
                     )}
                 </div>
             </section>
+            </div>
+            <CartSidebar />
         </div>
     );
 };

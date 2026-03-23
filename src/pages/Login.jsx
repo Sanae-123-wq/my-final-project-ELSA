@@ -15,8 +15,17 @@ const Login = () => {
         setLoading(true);
         setError('');
         try {
-            await login(email, password);
-            navigate('/');
+            const userData = await login(email, password);
+            if (userData.role === 'admin') {
+                navigate('/admin');
+            } else if (userData.role === 'delivery') {
+                navigate('/delivery');
+            } else if (userData.role === 'vendor') {
+                // If there is a vendor dashboard, redirect there, else home
+                navigate('/');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         } finally {

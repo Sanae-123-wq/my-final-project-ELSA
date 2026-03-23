@@ -6,6 +6,7 @@ const Signup = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState('client');
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -16,8 +17,12 @@ const Signup = () => {
         setLoading(true);
         setError('');
         try {
-            await register(name, email, password);
-            navigate('/');
+            const userData = await register(name, email, password, role);
+            if (userData.role === 'vendor') {
+                navigate('/vendor');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed');
         } finally {
@@ -66,6 +71,34 @@ const Signup = () => {
                             placeholder="min 6 characters"
                             required
                         />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Account Type</label>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                            <label style={{ flex: 1, cursor: 'pointer' }}>
+                                <input 
+                                    type="radio" 
+                                    name="role" 
+                                    value="client" 
+                                    checked={role === 'client'} 
+                                    onChange={() => setRole('client')} 
+                                    style={{ marginRight: '8px' }}
+                                />
+                                Client
+                            </label>
+                            <label style={{ flex: 1, cursor: 'pointer' }}>
+                                <input 
+                                    type="radio" 
+                                    name="role" 
+                                    value="vendor" 
+                                    checked={role === 'vendor'} 
+                                    onChange={() => setRole('vendor')}
+                                    style={{ marginRight: '8px' }}
+                                />
+                                Patissier
+                            </label>
+                        </div>
                     </div>
                     <button
                         type="submit"

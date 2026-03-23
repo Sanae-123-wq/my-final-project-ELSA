@@ -35,6 +35,11 @@ export const translations = {
             addToCart: "Add to Cart",
             price: "Price"
         },
+        categories: {
+            "Pastry": "Pastry",
+            "Traditional": "Traditional",
+            "Cake": "Cake"
+        },
         map: {
             title: "Visit Our Patisseries",
             subtitle: "Find the closest ELSA patisserie to you in Agadir"
@@ -108,6 +113,11 @@ export const translations = {
             addToCart: "Ajouter au Panier",
             price: "Prix"
         },
+        categories: {
+            "Pastry": "Pâtisserie",
+            "Traditional": "Traditionnel",
+            "Cake": "Gâteau"
+        },
         map: {
             title: "Visitez Nos Pâtisseries",
             subtitle: "Trouvez la pâtisserie ELSA la plus proche de chez vous à Agadir"
@@ -180,6 +190,11 @@ export const translations = {
             viewDetails: "عرض التفاصيل",
             addToCart: "أضف إلى السلة",
             price: "سعر"
+        },
+        categories: {
+            "Pastry": "معجنات",
+            "Traditional": "تقليدية",
+            "Cake": "كعك"
         },
         map: {
             title: "زوروا مخابزنا",
