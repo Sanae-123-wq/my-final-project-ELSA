@@ -3,38 +3,11 @@ import { useLanguage } from '../context/LanguageContext';
 import CartContext from '../context/CartContext';
 import CartSidebar from '../components/CartSidebar';
 import { FaSearch, FaMapMarkerAlt, FaShoppingCart, FaStar } from 'react-icons/fa';
-import cakePackImg from '../assets/cake_pack.png';
-import tartPackImg from '../assets/tart_pack.png';
-import macaronPackImg from '../assets/macaron_pack.png';
 
 const Stores = () => {
     const { t } = useLanguage();
     const { addToCart } = useContext(CartContext);
     const [searchTerm, setSearchTerm] = useState('');
-
-    const packs = [
-        {
-            _id: 'pack_kika',
-            name: t.ingredientsPacks.kikaPack,
-            price: 25.00,
-            image: cakePackImg,
-            ingredients: ['Flour (1kg)', 'Sugar (500g)', 'Eggs (6pcs)', 'Baking Powder', 'Vanilla Extract']
-        },
-        {
-            _id: 'pack_tarte',
-            name: t.ingredientsPacks.tartePack,
-            price: 35.00,
-            image: tartPackImg,
-            ingredients: ['Pastry Flour (500g)', 'Butter (250g)', 'Icing Sugar', 'Almond Powder', 'Fresh Fruits']
-        },
-        {
-            _id: 'pack_macaron',
-            name: t.ingredientsPacks.macaronPack,
-            price: 45.00,
-            image: macaronPackImg,
-            ingredients: ['Almond Flour', 'Powdered Sugar', 'Egg Whites', 'Food Coloring', 'Ganache Mix']
-        }
-    ];
 
     const stores = [
         {
@@ -131,43 +104,6 @@ const Stores = () => {
                     />
                 </div>
             </div>
-
-            {/* Ingredients Packs Section - Only show if not searching or if search is empty */}
-            {searchTerm === '' && (
-                <section className="featured-packs-section mb-20 animate-fadeIn">
-                    <div className="flex items-center justify-between mb-8">
-                        <h2 className="section-title text-2xl mb-0">{t.storesPage.featuredPacks}</h2>
-                        <div className="h-px bg-primary-light flex-grow ml-8 opacity-30 hidden md-block"></div>
-                    </div>
-                    <div className="pack-grid">
-                        {packs.map((pack) => (
-                            <div key={pack._id} className="pack-card">
-                                <div className="pack-image-container">
-                                    <img src={pack.image} alt={pack.name} className="pack-image" />
-                                </div>
-                                <div className="pack-content">
-                                    <h3 className="pack-name text-xl">{pack.name}</h3>
-                                    <div className="pack-price text-lg">${pack.price.toFixed(2)}</div>
-                                    <div className="pack-ingredients">
-                                        <ul className="text-xs">
-                                            {pack.ingredients.slice(0, 3).map((ing, idx) => (
-                                                <li key={idx}>{ing}</li>
-                                            ))}
-                                            {pack.ingredients.length > 3 && <li>...</li>}
-                                        </ul>
-                                    </div>
-                                    <button
-                                        onClick={() => handleAddToCart(pack)}
-                                        className="btn-primary w-full mt-4 py-2"
-                                    >
-                                        {t.ingredientsPacks.orderNow}
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
 
             {/* Partner Stores Section */}
             <section className="stores-section">

@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AiRecipe from './pages/AiRecipe';
 import Stores from './pages/Stores';
+import Favorites from './pages/Favorites';
 
 import Footer from './components/Footer';
 import { LanguageProvider } from './context/LanguageContext';
@@ -107,6 +108,7 @@ function App() {
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/ai-recipe" element={<AiRecipe />} />
                   <Route path="/stores" element={<Stores />} />
+                  <Route path="/favorites" element={<Favorites />} />
                 </Routes>
               </main>
               <Footer />

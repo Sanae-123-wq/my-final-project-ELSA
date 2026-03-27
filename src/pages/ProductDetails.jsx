@@ -39,11 +39,11 @@ const ProductDetails = () => {
     const [loading, setLoading] = useState(true);
     const { t, language } = useLanguage();
 
-    // Review form state
-    const [reviewName, setReviewName] = useState('');
-    const [reviewRating, setReviewRating] = useState(0);
-    const [reviewComment, setReviewComment] = useState('');
-    const [submittingReview, setSubmittingReview] = useState(false);
+    // Gallery State
+    const [activeImgIndex, setActiveImgIndex] = useState(0);
+    const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+    const [isZooming, setIsZooming] = useState(false);
+    const [touchStart, setTouchStart] = useState(0);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -52,8 +52,8 @@ const ProductDetails = () => {
             try {
                 const data = await api.fetchProductById(id);
                 setProduct(data);
+                setActiveImgIndex(0); // Reset for new product
                 
-                // Fetch all products to filter related products (same category)
                 const allProducts = await api.fetchProducts();
                 const related = allProducts.filter(p => p.category === data.category && p._id !== data._id);
                 setRelatedProducts(related);
@@ -68,44 +68,30 @@ const ProductDetails = () => {
         fetchData();
     }, [id]);
 
+    const handleMouseMove = (e) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+        const x = ((e.pageX - left - window.scrollX) / width) * 100;
+        const y = ((e.pageY - top - window.scrollY) / height) * 100;
+        setZoomPos({ x, y });
+    };
+
+    const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
+    
+    const handleTouchEnd = (e) => {
+        const touchEnd = e.changedTouches[0].clientX;
+        const images = product.images || [product.image];
+        if (touchStart - touchEnd > 50) {
+            // Swipe Left
+            setActiveImgIndex((prev) => (prev + 1) % images.length);
+        } else if (touchStart - touchEnd < -50) {
+            // Swipe Right
+            setActiveImgIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+        }
+    };
+
     const handleAddToCart = () => {
         addToCart(product, Number(qty));
         navigate('/cart');
-    };
-
-    const handleReviewSubmit = async (e) => {
-        e.preventDefault();
-        if (!reviewName || !reviewRating || !reviewComment) {
-            alert('Please fill in all fields and select a rating.');
-            return;
-        }
-
-        setSubmittingReview(true);
-        try {
-            const newReview = await api.addReview(id, {
-                name: reviewName,
-                rating: reviewRating,
-                comment: reviewComment
-            });
-
-            // Update local state instantly
-            setProduct(prev => ({
-                ...prev,
-                reviews: [newReview, ...(prev.reviews || [])]
-            }));
-
-            // Clear form
-            setReviewName('');
-            setReviewRating(0);
-            setReviewComment('');
-            
-            alert('Review submitted successfully!');
-        } catch (error) {
-            console.error('Failed to submit review:', error);
-            alert('Failed to submit review. Please try again.');
-        } finally {
-            setSubmittingReview(false);
-        }
     };
 
     if (loading) return (
@@ -122,140 +108,114 @@ const ProductDetails = () => {
         </div>
     );
 
-    const averageRating = product.reviews?.length > 0 
-        ? (product.reviews.reduce((acc, rev) => acc + rev.rating, 0) / product.reviews.length).toFixed(1)
-        : 0;
+    const images = product.images || [product.image];
 
     return (
         <div className="container" style={{ paddingBottom: '4rem' }}>
             <div className="product-details-container">
-                <div className="product-gallery">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="product-image-main"
-                    />
+                <div className="gallery-column">
+                    <div 
+                        className="main-image-viewport"
+                        onMouseMove={handleMouseMove}
+                        onMouseEnter={() => setIsZooming(true)}
+                        onMouseLeave={() => setIsZooming(false)}
+                        onTouchStart={handleTouchStart}
+                        onTouchEnd={handleTouchEnd}
+                    >
+                        <div 
+                            className="image-zoom-overlay"
+                            style={{
+                                backgroundImage: `url(${images[activeImgIndex]})`,
+                                backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                                opacity: isZooming ? 1 : 0
+                            }}
+                        />
+                        <img
+                            src={images[activeImgIndex]}
+                            alt={product.name}
+                            className={`main-image ${isZooming ? 'zoomed-hidden' : ''}`}
+                        />
+                    </div>
+                    
+                    {images.length > 1 && (
+                        <div className="thumbnail-row">
+                            {images.map((img, idx) => (
+                                <div 
+                                    key={idx}
+                                    className={`thumbnail-box ${idx === activeImgIndex ? 'active' : ''}`}
+                                    onClick={() => setActiveImgIndex(idx)}
+                                >
+                                    <img src={img} alt={`${product.name} ${idx + 1}`} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="detail-content">
                     <span className="category">{t.categories && t.categories[product.category] ? t.categories[product.category] : product.category}</span>
                     <h1>{product[`name_${language}`] || product.name}</h1>
-                    
-                    <div className="product-meta-top">
-                        <div className="stars-info">
-                            <StarRating rating={Math.round(averageRating)} />
-                            <span className="rating-avg">{averageRating}</span>
-                            <span className="review-count">({product.reviews?.length || 0} reviews)</span>
-                        </div>
-                    </div>
-
-                    <p className="detail-price-main">${product.price.toFixed(2)}</p>
 
                     <p className="detail-description">{product[`description_${language}`] || product.description}</p>
+                    
+                    <p className="detail-price-main">${product.price.toFixed(2)}</p>
+
+                    <div className="product-detail-rating">
+                        <StarRating rating={product.rating || 5} />
+                    </div>
+                    
+                    <div className="stock-info-detail">
+                        {product.stock === 0 ? (
+                            <span className="stock-status out">Out of Stock</span>
+                        ) : product.stock <= 10 ? (
+                            <span className="stock-status low">Only {product.stock} left</span>
+                        ) : (
+                            <span className="stock-status in">In Stock</span>
+                        )}
+                    </div>
 
                     <div className="add-to-cart-box-classic">
-                        <div className="qty-control">
+                        <div className={`qty-control ${product.stock === 0 ? 'disabled' : ''}`}>
                             <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Quantity</span>
                             <div className="qty-counter">
-                                <button onClick={() => setQty(Math.max(1, qty - 1))} className="qty-btn">-</button>
-                                <input readOnly type="number" value={qty} className="qty-input" />
-                                <button onClick={() => setQty(qty + 1)} className="qty-btn">+</button>
+                                <button 
+                                    onClick={() => setQty(Math.max(1, qty - 1))} 
+                                    className="qty-btn"
+                                    disabled={product.stock === 0}
+                                >-</button>
+                                <input 
+                                    readOnly 
+                                    type="number" 
+                                    value={qty} 
+                                    className="qty-input" 
+                                />
+                                <button 
+                                    onClick={() => setQty(Math.min(product.stock, qty + 1))} 
+                                    className="qty-btn"
+                                    disabled={product.stock === 0 || qty >= product.stock}
+                                >+</button>
                             </div>
                         </div>
 
-                        <button onClick={handleAddToCart} className="btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem' }}>
-                            Add to Cart
+                        <button 
+                            onClick={handleAddToCart} 
+                            className={`btn-primary ${product.stock === 0 ? 'disabled' : ''}`}
+                            disabled={product.stock === 0}
+                            style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem' }}
+                        >
+                            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                         </button>
                     </div>
 
                     <div style={{ marginTop: '2rem' }}>
-                        <Link to="/" style={{ color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Link to="/shop" style={{ color: '#666', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             &larr; Continue Shopping
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Classic Reviews Section */}
-            <div className="reviews-section-classic fade-in">
-                <div className="reviews-header">
-                    <h2>Customer Reviews ({product.reviews?.length || 0})</h2>
-                    <div className="average-rating-display">
-                        <span className="large-rating">{averageRating}</span>
-                        <div className="stars-vertical">
-                            <StarRating rating={Math.round(averageRating)} />
-                            <span className="total-reviews-count">Based on {product.reviews?.length || 0} reviews</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="reviews-grid">
-                    <div className="review-form-column">
-                        <div className="review-form-classic">
-                            <h3>Write a Review</h3>
-                            <form onSubmit={handleReviewSubmit}>
-                                <div className="form-group">
-                                    <label>Your Name</label>
-                                    <input 
-                                        type="text" 
-                                        value={reviewName} 
-                                        onChange={(e) => setReviewName(e.target.value)}
-                                        placeholder="Enter your name"
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Rating</label>
-                                    <StarRating 
-                                        rating={reviewRating} 
-                                        setRating={setReviewRating} 
-                                        interactive={true} 
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Comment</label>
-                                    <textarea 
-                                        value={reviewComment} 
-                                        onChange={(e) => setReviewComment(e.target.value)}
-                                        placeholder="Share your experience..."
-                                        rows="5"
-                                        required
-                                    ></textarea>
-                                </div>
-                                <button 
-                                    type="submit" 
-                                    className="btn-primary" 
-                                    disabled={submittingReview}
-                                    style={{ width: '100%', marginTop: '1rem' }}
-                                >
-                                    {submittingReview ? 'Submitting...' : 'Post Review'}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div className="reviews-list-column">
-                        <div className="reviews-list-classic">
-                            {product.reviews && product.reviews.length > 0 ? (
-                                product.reviews.map((review) => (
-                                    <div key={review._id} className="review-card-classic slide-up">
-                                        <div className="review-card-header">
-                                            <strong>{review.name}</strong>
-                                            <StarRating rating={review.rating} />
-                                        </div>
-                                        <p className="review-comment-classic">{review.comment}</p>
-                                        <span className="review-date-classic">{new Date(review.date).toLocaleDateString()}</span>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="no-reviews-placeholder">
-                                    <p>No reviews yet. Be the first to review this pastry!</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div style={{ paddingBottom: '2rem' }}></div>
 
             {/* Related Products Section */}
             {relatedProducts.length > 0 && (

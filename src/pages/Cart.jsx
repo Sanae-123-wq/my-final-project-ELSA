@@ -39,7 +39,7 @@ const Cart = () => {
             {cartItems.length === 0 ? (
                 <div className="text-center" style={{ padding: '4rem', background: 'white', borderRadius: '12px' }}>
                     <p style={{ marginBottom: '2rem', fontSize: '1.2rem', color: '#666' }}>Your cart represents a world of untapped potential.</p>
-                    <Link to="/" className="btn-primary">Start Shopping</Link>
+                    <Link to="/shop" className="btn-primary">Start Shopping</Link>
                 </div>
             ) : (
                 <div className="cart-grid">

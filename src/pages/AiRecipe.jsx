@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { api } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
+import { FaSearch } from 'react-icons/fa';
 
 const AiRecipe = () => {
+    const { t } = useLanguage();
     const [prompt, setPrompt] = useState('');
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -37,21 +40,24 @@ const AiRecipe = () => {
 
             <form onSubmit={generateRecipe}>
                 <div className="recipe-form-container">
-                    <input
-                        type="text"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="e.g. 'Gluten-free dark chocolate truffle cake with raspberry coulis'"
-                        className="recipe-input"
-                        required
-                    />
+                    <div className="recipe-input-wrapper">
+                        <FaSearch className="recipe-search-icon" />
+                        <input
+                            type="text"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder={t.aiKitchenPage?.placeholder || "search for recipes"}
+                            className="recipe-input"
+                            required
+                        />
+                    </div>
                     <button
                         type="submit"
                         className="btn-primary"
                         disabled={loading}
                         style={{ minWidth: '200px' }}
                     >
-                        {loading ? 'Creating...' : 'Generate Recipe'}
+                        {loading ? (t.aiKitchenPage?.loading || 'Creating...') : (t.aiKitchenPage?.button || 'Generate Recipe')}
                     </button>
                 </div>
             </form>

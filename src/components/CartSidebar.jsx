@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CartContext from '../context/CartContext';
-import AuthContext from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { FaTimes, FaTrash } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 
 const CartSidebar = () => {
     const { cartItems, removeFromCart, updateQty } = useContext(CartContext);
@@ -12,7 +11,7 @@ const CartSidebar = () => {
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
     const totalPrice = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2);
-    
+
     if (cartItems.length === 0) return null;
 
     return (
@@ -41,8 +40,8 @@ const CartSidebar = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button 
-                                className="item-remove-btn" 
+                            <button
+                                className="item-remove-btn"
                                 onClick={() => removeFromCart(item._id)}
                                 aria-label="Remove item"
                             >
@@ -58,8 +57,8 @@ const CartSidebar = () => {
                     <span>Total</span>
                     <span>${totalPrice}</span>
                 </div>
-                <button 
-                    className="btn-primary checkout-btn" 
+                <button
+                    className="btn-primary checkout-btn"
                     onClick={() => navigate('/cart')}
                 >
                     Checkout

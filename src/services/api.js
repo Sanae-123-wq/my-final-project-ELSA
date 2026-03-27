@@ -189,5 +189,25 @@ export const api = {
             console.error('AI Generation API Error:', error);
             throw error;
         }
+    },
+
+    // --- Reviews ---
+    submitReview: async (reviewData) => {
+        const response = await fetch('http://localhost:5000/api/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reviewData)
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to submit review');
+        }
+        return await response.json();
+    },
+
+    getReviews: async () => {
+        const response = await fetch('http://localhost:5000/api/reviews');
+        if (!response.ok) throw new Error('Failed to fetch reviews');
+        return await response.json();
     }
 };

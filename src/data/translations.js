@@ -26,7 +26,7 @@ export const translations = {
             cart: "Cart",
             login: "Login",
             contact: "Contact Us",
-            address: "123 Baker Street, Sweet City",
+            address: "ELSA Pastry Location",
             rights: "ELSA Pastry Shop. All rights reserved."
         },
         common: {
@@ -58,7 +58,7 @@ export const translations = {
             title: "Baking ",
             titleHighlight: "Essentials",
             subtitle: "Everything you need to bake like a pro: curated packs and professional partner stores.",
-            searchPlaceholder: "Search for materials (e.g. Chocolate, Flour)...",
+            searchPlaceholder: "search for desserts",
             materialsSold: "Materials & Ingredients Sold:",
             noMaterialsFound: "No materials found matching your search.",
             allStores: "All Stores",
@@ -74,7 +74,13 @@ export const translations = {
         shopPage: {
             title: "Full ",
             titleHighlight: "Collection",
-            subtitle: "Explore our complete range of artisanal pastries, cakes, and traditional treats."
+            subtitle: "Explore our complete range of artisanal pastries, cakes, and traditional treats.",
+            searchPlaceholder: "search for desserts"
+        },
+        aiKitchenPage: {
+            placeholder: "search for recipes",
+            button: "Generate Recipe",
+            loading: "Creating..."
         }
     },
     fr: {
@@ -104,7 +110,7 @@ export const translations = {
             cart: "Panier",
             login: "Connexion",
             contact: "Contactez-nous",
-            address: "123 Rue Boulanger, Ville Douce",
+            address: "Emplacement de la Pâtisserie ELSA",
             rights: "Pâtisserie ELSA. Tous droits réservés."
         },
         common: {
@@ -136,7 +142,7 @@ export const translations = {
             title: "Essentiels de ",
             titleHighlight: "Pâtisserie",
             subtitle: "Tout ce dont vous avez besoin pour cuisiner comme un pro : packs sélectionnés et boutiques partenaires.",
-            searchPlaceholder: "Rechercher du matériel (ex: Chocolat, Farine)...",
+            searchPlaceholder: "rechercher des desserts",
             materialsSold: "Matériel et Ingrédients Vendus :",
             noMaterialsFound: "Aucun matériel trouvé correspondant à votre recherche.",
             allStores: "Toutes les Boutiques",
@@ -152,7 +158,13 @@ export const translations = {
         shopPage: {
             title: "Collection ",
             titleHighlight: "Complète",
-            subtitle: "Explorez notre gamme complète de pâtisseries artisanales, de gâteaux et de délices traditionnels."
+            subtitle: "Explorez notre gamme complète de pâtisseries artisanales, de gâteaux et de délices traditionnels.",
+            searchPlaceholder: "rechercher des desserts"
+        },
+        aiKitchenPage: {
+            placeholder: "rechercher des recettes",
+            button: "Générer la Recette",
+            loading: "Création..."
         }
     },
     ar: {
@@ -182,7 +194,7 @@ export const translations = {
             cart: "السلة",
             login: "دخول",
             contact: "اتصل بنا",
-            address: "١٢٣ شارع الخباز، المدينة الحلوة",
+            address: "موقع حلويات إلسا",
             rights: "حلويات إلسا. جميع الحقوق محفوظة."
         },
         common: {
@@ -214,7 +226,7 @@ export const translations = {
             title: "أساسيات ",
             titleHighlight: "الخبز",
             subtitle: "كل ما تحتاجه للخبز كالمحترفين: باقات مختارة ومتاجر شركاء احترافية.",
-            searchPlaceholder: "ابحث عن مواد (مثل الشوكولاتة، الدقيق)...",
+            searchPlaceholder: "ابحث عن الحلويات",
             materialsSold: "المواد والمكونات المتوفرة:",
             noMaterialsFound: "لم يتم العثور على مواد تطابق بحثك.",
             allStores: "جميع المتاجر",
@@ -230,7 +242,13 @@ export const translations = {
         shopPage: {
             title: "المجموعة ",
             titleHighlight: "الكاملة",
-            subtitle: "استكشف مجموعتنا الكاملة من المعجنات الحرفية والكعك والحلويات التقليدية."
+            subtitle: "استكشف مجموعتنا الكاملة من المعجنات الحرفية والكعك والحلويات التقليدية.",
+            searchPlaceholder: "ابحث عن الحلويات"
+        },
+        aiKitchenPage: {
+            placeholder: "ابحث عن وصفات",
+            button: "إنشاء وصفة",
+            loading: "جاري الإنشاء..."
         }
     }
 };

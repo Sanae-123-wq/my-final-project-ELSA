@@ -36,10 +36,9 @@ const LanguageSelector = () => {
                 className={`lang-toggle ${isOpen ? 'active' : ''}`} 
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
+                aria-label="Change Language"
             >
                 <FaGlobe className="globe-icon" />
-                <span className="lang-label">{currentLang.short}</span>
-                <FaChevronDown className={`chevron-icon ${isOpen ? 'rotate' : ''}`} />
             </button>
 
             {isOpen && (
