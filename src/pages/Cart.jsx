@@ -18,17 +18,22 @@ const Cart = () => {
         }
 
         try {
-            await api.createOrder({
-                orderItems: cartItems,
-                totalPrice: Number(totalPrice),
+            const res = await api.createOrder({
+                userId: user.id || user._id,
+                products: cartItems.map(item => ({
+                    productId: item._id,
+                    quantity: item.qty,
+                    price: item.price
+                })),
+                totalAmount: Number(totalPrice),
             });
 
-            alert('Order Placed Successfully! (Simulated)');
+            alert(res.message || 'Order Placed Successfully!');
             clearCart();
             navigate('/');
         } catch (error) {
             console.error(error);
-            alert('Order Failed');
+            alert(error.message || 'Order Failed');
         }
     };
 

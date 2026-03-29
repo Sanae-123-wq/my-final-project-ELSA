@@ -9,7 +9,7 @@ export const translations = {
             logout: "Logout",
             hi: "Hi",
             shop: "Shop",
-            marketplace: "Baking Shop"
+            marketplace: "Sweets Stores"
         },
         hero: {
             title: "Taste the Art of",
@@ -93,7 +93,7 @@ export const translations = {
             logout: "Déconnexion",
             hi: "Salut",
             shop: "Boutique",
-            marketplace: "Boutique Pâtisserie"
+            marketplace: "Magasins de Douceurs"
         },
         hero: {
             title: "Goûtez à l'Art de la",
@@ -177,7 +177,7 @@ export const translations = {
             logout: "تسجيل خروج",
             hi: "مرحباً",
             shop: "المتجر",
-            marketplace: "متجر الخبز"
+            marketplace: "محلات الحلويات"
         },
         hero: {
             title: "تذوق فن",

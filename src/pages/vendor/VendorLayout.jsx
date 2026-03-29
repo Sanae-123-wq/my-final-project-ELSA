@@ -33,6 +33,17 @@ const VendorLayout = () => {
         item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path)
     );
 
+    if (user?.status === 'pending') {
+        return (
+            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#FAF3EB', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ fontSize: '4rem' }}>⏳</div>
+                <h2 style={{ color: '#5C4033', fontFamily: 'Playfair Display, serif' }}>Account Under Review</h2>
+                <p style={{ color: '#8B7355' }}>Your Patissier portal is currently restricted until an administrator approves your account.</p>
+                <button onClick={handleLogout} className="auth-submit-btn" style={{ maxWidth: '200px', padding: '12px 24px', background: '#C1A176', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>
+            </div>
+        );
+    }
+
     return (
         <div className="admin-shell">
             {/* Mobile Overlay */}

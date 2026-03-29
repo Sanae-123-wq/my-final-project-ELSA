@@ -76,12 +76,9 @@ const AdminProducts = () => {
         <div className="admin-page">
             <div className="admin-page-header">
                 <div>
-                    <h1 className="admin-page-title">Manage Products</h1>
+                    <h1 className="admin-page-title">Manage Products (Moderation)</h1>
                     <p className="admin-page-subtitle">{products.length} products in catalog</p>
                 </div>
-                <button className="admin-btn admin-btn-primary" onClick={openCreate}>
-                    + Add New Product
-                </button>
             </div>
 
             {/* Filters */}
@@ -127,7 +124,7 @@ const AdminProducts = () => {
                                 <tr key={product._id}>
                                     <td>
                                         <div className="product-cell">
-                                            <img src={product.image} alt={product.name} className="product-thumb" />
+                                            <img src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`} alt={product.name} className="product-thumb" />
                                             <div>
                                                 <div className="product-cell-name">{product.name}</div>
                                                 <div className="product-cell-desc">{product.description?.slice(0, 50)}...</div>
@@ -148,9 +145,6 @@ const AdminProducts = () => {
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div className="admin-actions">
-                                            <button className="admin-action-btn action-edit" onClick={() => openEdit(product)}>
-                                                ✏️ Edit
-                                            </button>
                                             <button className="admin-action-btn action-delete" onClick={() => handleDelete(product._id)}>
                                                 🗑️ Delete
                                             </button>
@@ -162,80 +156,6 @@ const AdminProducts = () => {
                     </table>
                 </div>
             </div>
-
-            {/* Modal */}
-            {showModal && (
-                <div className="admin-modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="admin-modal" onClick={e => e.stopPropagation()}>
-                        <div className="admin-modal-header">
-                            <h2 className="admin-modal-title">
-                                {currentProduct ? '✏️ Edit Product' : '➕ Add New Product'}
-                            </h2>
-                            <button className="admin-modal-close" onClick={() => setShowModal(false)}>✕</button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="admin-modal-body">
-                            <div className="form-section-title">Basic Information</div>
-                            <div className="admin-form-grid">
-                                <div className="form-group-admin">
-                                    <label>Name (EN) *</label>
-                                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className="admin-input" />
-                                </div>
-                                <div className="form-group-admin">
-                                    <label>Image URL *</label>
-                                    <input type="text" name="image" value={formData.image} onChange={handleChange} required className="admin-input" />
-                                </div>
-                                <div className="form-group-admin">
-                                    <label>Price (MAD) *</label>
-                                    <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required className="admin-input" />
-                                </div>
-                                <div className="form-group-admin">
-                                    <label>Category *</label>
-                                    <select name="category" value={formData.category} onChange={handleChange} className="admin-input">
-                                        <option value="Pastry">Pastry</option>
-                                        <option value="Cake">Cake</option>
-                                        <option value="Traditional">Traditional</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="form-section-title">Multilingual Names</div>
-                            <div className="admin-form-grid">
-                                <div className="form-group-admin">
-                                    <label>🇫🇷 Name (French)</label>
-                                    <input type="text" name="name_fr" value={formData.name_fr || ''} onChange={handleChange} className="admin-input" />
-                                </div>
-                                <div className="form-group-admin">
-                                    <label>🇲🇦 Name (Arabic)</label>
-                                    <input type="text" name="name_ar" value={formData.name_ar || ''} onChange={handleChange} className="admin-input" dir="rtl" />
-                                </div>
-                            </div>
-
-                            <div className="form-section-title">Descriptions</div>
-                            <div className="form-group-admin">
-                                <label>Description (EN)</label>
-                                <textarea name="description" value={formData.description || ''} onChange={handleChange} className="admin-input admin-textarea" />
-                            </div>
-                            <div className="admin-form-grid">
-                                <div className="form-group-admin">
-                                    <label>🇫🇷 Description (French)</label>
-                                    <textarea name="description_fr" value={formData.description_fr || ''} onChange={handleChange} className="admin-input admin-textarea-sm" />
-                                </div>
-                                <div className="form-group-admin">
-                                    <label>🇲🇦 Description (Arabic)</label>
-                                    <textarea name="description_ar" value={formData.description_ar || ''} onChange={handleChange} className="admin-input admin-textarea-sm" dir="rtl" />
-                                </div>
-                            </div>
-
-                            <div className="admin-modal-footer">
-                                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="admin-btn admin-btn-primary" disabled={saving}>
-                                    {saving ? 'Saving...' : currentProduct ? 'Save Changes' : 'Add Product'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

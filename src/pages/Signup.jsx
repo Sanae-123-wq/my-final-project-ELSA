@@ -1,118 +1,291 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import { FaUser, FaStore, FaMotorcycle, FaArrowLeft, FaCheck } from 'react-icons/fa';
+import '../auth.css';
 
 const Signup = () => {
+    const [step, setStep] = useState(1);
+    const [role, setRole] = useState('');
+    
+    // Common Fields
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('client');
+    
+    // Role-specific Fields
+    const [address, setAddress] = useState('');
+    const [shopName, setShopName] = useState('');
+    const [city, setCity] = useState('');
+    const [phone, setPhone] = useState('');
+    const [description, setDescription] = useState('');
+    const [vehicleType, setVehicleType] = useState('bike');
+
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const handleRoleSelect = (selectedRole) => {
+        setRole(selectedRole);
+        setStep(2);
+        setError('');
+    };
+
+    const validateForm = () => {
+        if (!name || !email || !password) return "Please fill out all basic fields";
+        if (password.length < 6) return "Password must be at least 6 characters";
+        
+        if (role === 'client' && !address) return "Address is required";
+        if (role === 'vendor' && (!shopName || !city || !phone || !description)) return "Please fill all pastry chef details";
+        if (role === 'delivery' && (!phone || !vehicleType)) return "Please fill all delivery details";
+        return null;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setLoading(true);
         setError('');
+
+        let extraData = {};
+        if (role === 'client') extraData = { address };
+        if (role === 'vendor') extraData = { shopName, city, phone, description };
+        if (role === 'delivery') extraData = { phone, vehicleType };
+
         try {
-            const userData = await register(name, email, password, role);
-            if (userData.role === 'vendor') {
-                navigate('/vendor');
-            } else {
-                navigate('/');
-            }
+            await register(name, email, password, role, extraData);
+            if (role === 'vendor') navigate('/vendor');
+            else if (role === 'delivery') navigate('/delivery');
+            else navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            console.error(err);
+            setError(err.message || 'Registration failed');
         } finally {
             setLoading(false);
         }
     };
 
+    const roles = [
+        { id: 'client', title: 'Client', icon: <FaUser />, desc: 'Discover and order delicious pastries' },
+        { id: 'vendor', title: 'Pastry Chef', icon: <FaStore />, desc: 'Sell your sweet creations' },
+        { id: 'delivery', title: 'Delivery Person', icon: <FaMotorcycle />, desc: 'Deliver smiles and treats' },
+    ];
+
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h2 style={{ color: 'var(--primary-color)', fontSize: '2.5rem', marginBottom: '0.5rem' }}>Join ELSA</h2>
-                <p style={{ color: '#666', marginBottom: '2rem' }}>Start your culinary adventure today</p>
+        <div className="auth-page-container">
+            <div className="auth-main-card">
+                
+                <div className="auth-header">
+                    <h2>Join ELSA</h2>
+                    <p>{step === 1 ? 'Choose your journey in our pastry marketplace' : 'Complete your profile details'}</p>
+                    
+                    <div className="auth-timeline">
+                        <div className="timeline-line"></div>
+                        <div className="timeline-progress" style={{ width: step === 2 ? '100%' : '0%' }}></div>
+                        
+                        <div className="node-wrapper" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+                            <div className={`timeline-node ${step >= 1 ? 'node-active' : 'node-inactive'}`}>
+                                {step > 1 ? <FaCheck size={14} /> : '1'}
+                            </div>
+                            <span className="node-label">Role</span>
+                        </div>
 
-                {error && <div style={{ background: '#fee2e2', color: '#b91c1c', padding: '0.8rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>{error}</div>}
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label className="form-label">Full Name</label>
-                        <input
-                            type="text"
-                            className="input-field"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="John Doe"
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            className="input-field"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="john@example.com"
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            className="input-field"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="min 6 characters"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Account Type</label>
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                            <label style={{ flex: 1, cursor: 'pointer' }}>
-                                <input 
-                                    type="radio" 
-                                    name="role" 
-                                    value="client" 
-                                    checked={role === 'client'} 
-                                    onChange={() => setRole('client')} 
-                                    style={{ marginRight: '8px' }}
-                                />
-                                Client
-                            </label>
-                            <label style={{ flex: 1, cursor: 'pointer' }}>
-                                <input 
-                                    type="radio" 
-                                    name="role" 
-                                    value="vendor" 
-                                    checked={role === 'vendor'} 
-                                    onChange={() => setRole('vendor')}
-                                    style={{ marginRight: '8px' }}
-                                />
-                                Patissier
-                            </label>
+                        <div className="node-wrapper" style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+                            <div className={`timeline-node ${step >= 2 ? 'node-active' : 'node-inactive'}`}>
+                                2
+                            </div>
+                            <span className="node-label">Details</span>
                         </div>
                     </div>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="btn-primary"
-                        style={{ width: '100%', marginTop: '1rem' }}
-                    >
-                        {loading ? 'Creating Account...' : 'Create Account'}
-                    </button>
+                </div>
 
-                    <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
-                        <p style={{ color: '#666', fontSize: '0.9rem' }}>Already have an account? <Link to="/login" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>Login</Link></p>
-                    </div>
-                </form>
+                <div className="auth-body">
+                    {error && (
+                        <div className="auth-error-banner">
+                            {error}
+                        </div>
+                    )}
+
+                    {step === 1 && (
+                        <div className="fade-enter">
+                            <div className="role-grid">
+                                {roles.map((r) => (
+                                    <div 
+                                        key={r.id}
+                                        onClick={() => handleRoleSelect(r.id)}
+                                        className={`role-card ${role === r.id ? 'selected' : ''}`}
+                                    >
+                                        <div className="role-icon">
+                                            {r.icon}
+                                        </div>
+                                        <div className="role-title">{r.title}</div>
+                                        <div className="role-desc">{r.desc}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="auth-footer">
+                                Already have an account? <Link to="/login">Login here</Link>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="fade-enter">
+                            <button 
+                                type="button" 
+                                onClick={() => setStep(1)}
+                                className="auth-back-btn"
+                            >
+                                <FaArrowLeft style={{ marginRight: '8px' }} /> Back to roles
+                            </button>
+
+                            <form onSubmit={handleSubmit}>
+                                <div className="auth-form-row auth-form-group">
+                                    <div>
+                                        <label className="auth-label">Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="auth-input"
+                                            placeholder="Jane Doe"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="auth-label">Email</label>
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="auth-input"
+                                            placeholder="jane@example.com"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div className="auth-form-group">
+                                    <label className="auth-label">Password</label>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="auth-input"
+                                        placeholder="Min. 6 characters"
+                                        required
+                                    />
+                                </div>
+
+                                {role === 'client' && (
+                                    <div className="auth-form-group fade-enter">
+                                        <label className="auth-label">Delivery Address</label>
+                                        <textarea
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            className="auth-textarea"
+                                            placeholder="123 Sweet Street, Bakery City"
+                                            required
+                                        ></textarea>
+                                    </div>
+                                )}
+
+                                {role === 'vendor' && (
+                                    <div className="dynamic-section fade-enter">
+                                        <div className="dynamic-section-title">Pastry Chef Details</div>
+                                        <div className="auth-form-row auth-form-group">
+                                            <div>
+                                                <label className="auth-label">Shop Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={shopName}
+                                                    onChange={(e) => setShopName(e.target.value)}
+                                                    className="auth-input"
+                                                    placeholder="La Douceur"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="auth-label">City</label>
+                                                <input
+                                                    type="text"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
+                                                    className="auth-input"
+                                                    placeholder="Paris"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="auth-form-group">
+                                            <label className="auth-label">Phone Number</label>
+                                            <input
+                                                type="tel"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                className="auth-input"
+                                                placeholder="+1 234 567 890"
+                                            />
+                                        </div>
+                                        <div className="auth-form-group">
+                                            <label className="auth-label">Short Business Description</label>
+                                            <textarea
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                className="auth-textarea"
+                                                placeholder="Artisan croissanterie..."
+                                                rows="2"
+                                            ></textarea>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {role === 'delivery' && (
+                                    <div className="dynamic-section fade-enter">
+                                        <div className="dynamic-section-title">Delivery Details</div>
+                                        <div className="auth-form-group">
+                                            <label className="auth-label">Phone Number</label>
+                                            <input
+                                                type="tel"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                                className="auth-input"
+                                                placeholder="+1 234 567 890"
+                                            />
+                                        </div>
+                                        <div className="auth-form-group">
+                                            <label className="auth-label">Vehicle Type</label>
+                                            <div className="radio-group">
+                                                {['bike', 'scooter', 'car'].map(type => (
+                                                    <label key={type} className={`radio-btn ${vehicleType === type ? 'selected' : ''}`}>
+                                                        <input 
+                                                            type="radio" 
+                                                            name="vehicle" 
+                                                            className="radio-input-hidden" 
+                                                            value={type}
+                                                            checked={vehicleType === type}
+                                                            onChange={(e) => setVehicleType(e.target.value)}
+                                                        />
+                                                        <span style={{ textTransform: 'capitalize' }}>{type}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button type="submit" disabled={loading} className="auth-submit-btn">
+                                    {loading ? <div className="spinner"></div> : 'Create Account'}
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

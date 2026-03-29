@@ -20,6 +20,14 @@ const AdminDelivery = () => {
         finally { setLoading(false); }
     };
 
+    const handleApprove = async (id) => {
+        if (!window.confirm('Approve this delivery worker?')) return;
+        try {
+            await api.approveUser(id);
+            loadWorkers();
+        } catch (err) { alert(err.message); }
+    };
+
     const handleCreate = async (e) => {
         e.preventDefault();
         setError('');
@@ -76,7 +84,15 @@ const AdminDelivery = () => {
                                     {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
                             </div>
-                            <div className="vendor-card-footer">
+                            <div className="vendor-card-footer" style={{ flexDirection: 'column', gap: '8px' }}>
+                                <span className={`admin-badge ${worker.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
+                                    {worker.status || 'approved'}
+                                </span>
+                                {worker.status === 'pending' && (
+                                    <button className="admin-btn-action admin-btn-success" onClick={() => handleApprove(worker._id)}>
+                                        ✅ Approve Worker
+                                    </button>
+                                )}
                                 <span className={`admin-badge ${statusClass}`}>{status}</span>
                             </div>
                         </div>

@@ -35,6 +35,14 @@ const AdminVendors = () => {
         } finally { setSaving(false); }
     };
 
+    const handleApprove = async (id) => {
+        if (!window.confirm('Approve this chef?')) return;
+        try {
+            await api.approveUser(id);
+            loadVendors();
+        } catch (err) { alert(err.message); }
+    };
+
     const filtered = vendors.filter(v =>
         !searchQuery || v.name.toLowerCase().includes(searchQuery.toLowerCase()) || v.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -71,8 +79,15 @@ const AdminVendors = () => {
                         <div className="vendor-card-avatar">{vendor.name?.charAt(0)?.toUpperCase()}</div>
                         <div className="vendor-card-name">{vendor.name}</div>
                         <div className="vendor-card-email">{vendor.email}</div>
-                        <div className="vendor-card-footer">
-                            <span className="admin-badge badge-info">Patissier</span>
+                        <div className="vendor-card-footer" style={{ flexDirection: 'column', gap: '8px' }}>
+                            <span className={`admin-badge ${vendor.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
+                                {vendor.status || 'approved'}
+                            </span>
+                            {vendor.status === 'pending' && (
+                                <button className="admin-btn-action admin-btn-success" onClick={() => handleApprove(vendor._id)}>
+                                    ✅ Approve Chef
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}

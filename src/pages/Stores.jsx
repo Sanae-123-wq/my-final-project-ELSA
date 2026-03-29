@@ -1,4 +1,5 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import CartContext from '../context/CartContext';
 import CartSidebar from '../components/CartSidebar';
@@ -8,64 +9,36 @@ const Stores = () => {
     const { t } = useLanguage();
     const { addToCart } = useContext(CartContext);
     const [searchTerm, setSearchTerm] = useState('');
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const stores = [
-        {
-            _id: 'store_1',
-            name: 'Agadir Baking Supplies',
-            location: 'Hay Mohammadi, Agadir',
-            image: 'https://images.unsplash.com/photo-1534433880541-1442cf397d74?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=40',
-            rating: 4.8,
-            materials: [
-                { _id: 'mat_1', name: 'Premium Dark Chocolate', price: 15.50, image: 'https://images.unsplash.com/photo-1548907040-4baa42d10919?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_2', name: 'Silicon Cake Mold', price: 22.00, image: 'https://images.unsplash.com/photo-1591115765373-520f765ff793?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_3', name: 'Madagascar Vanilla Pods', price: 12.00, image: 'https://images.unsplash.com/photo-1509358271058-acd22caf935d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' }
-            ]
-        },
-        {
-            _id: 'store_2',
-            name: 'Pâtisserie Pro Materials',
-            location: 'Talborjt, Agadir',
-            image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=40',
-            rating: 4.9,
-            materials: [
-                { _id: 'mat_4', name: 'High-Gluten Flour (5kg)', price: 18.00, image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_5', name: 'Professional Whisk Set', price: 30.00, image: 'https://images.unsplash.com/photo-1595273670150-db0a3d39d44c?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_6', name: 'Edible Gold Leaf', price: 45.00, image: 'https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' }
-            ]
-        },
-        {
-            _id: 'store_3',
-            name: 'Organic Baking Grains',
-            location: 'Anza, Agadir',
-            image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=40',
-            rating: 4.7,
-            materials: [
-                { _id: 'mat_7', name: 'Whole Wheat Flour', price: 10.00, image: 'https://images.unsplash.com/photo-1508315152223-4556447c223a?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_8', name: 'Organic Honey', price: 25.00, image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_9', name: 'Raw Cane Sugar', price: 8.50, image: 'https://images.unsplash.com/photo-1554304899-73347d468161?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' }
-            ]
-        },
-        {
-            _id: 'store_4',
-            name: 'Cake Decor Heaven',
-            location: 'Cité Dakhla, Agadir',
-            image: 'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=40',
-            rating: 4.6,
-            materials: [
-                { _id: 'mat_10', name: 'Natural Food Coloring', price: 12.00, image: 'https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_11', name: 'Piping Bag Set', price: 20.00, image: 'https://images.unsplash.com/photo-1560697529-7236591c0066?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' },
-                { _id: 'mat_12', name: 'Fondant Rollers', price: 18.00, image: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=40' }
-            ]
-        }
-    ];
+    useEffect(() => {
+        const loadStores = async () => {
+            try {
+                const data = await api.fetchStores();
+                setStores(data);
+            } catch (err) {
+                console.error('Error loading stores:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadStores();
+    }, []);
 
     const filteredStores = stores.map(store => ({
         ...store,
-        materials: store.materials.filter(mat =>
+        materials: (store.materials || []).filter(mat =>
             mat.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
-    })).filter(store => store.materials.length > 0);
+    })).filter(store => (store.materials || []).length > 0 || searchTerm === '');
+
+    if (loading) return (
+        <div className="container py-20 text-center">
+            <div className="loader mx-auto mb-4"></div>
+            <p>{t.common?.loading || 'Loading stores...'}</p>
+        </div>
+    );
 
     const handleAddToCart = (item) => {
         addToCart({

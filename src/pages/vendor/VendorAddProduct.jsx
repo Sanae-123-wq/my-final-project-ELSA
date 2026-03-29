@@ -10,6 +10,7 @@ const VendorAddProduct = () => {
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     
+    const [image, setImage] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         name_fr: '',
@@ -18,29 +19,29 @@ const VendorAddProduct = () => {
         category: 'Pastry',
         description: '',
         description_fr: '',
-        description_ar: '',
-        image: ''
+        description_ar: ''
     });
 
-    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleChange = (e) => {
+        if (e.target.name === 'image') {
+            setImage(e.target.files[0]);
+        } else {
+            setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!image) return alert('Please upload a product image.');
         setSubmitting(true);
         try {
-            const productToSubmit = {
-                ...formData,
-                price: parseFloat(formData.price),
-                vendorId: user?._id,
-                approvalStatus: 'pending', // Implicitly or explicitly set to pending
-            };
+            const data = new FormData();
+            Object.keys(formData).forEach(key => data.append(key, formData[key]));
+            data.append('image', image);
+            data.append('vendorId', user?._id);
+            data.append('approvalStatus', 'pending');
 
-            await api.addProduct(productToSubmit);
-            
-            // Record activity log simulating submission
-            if (api.getActivityLog) {
-                // Not calling explicitly but assuming backend handles it or similar to AdminActivity
-            }
+            await api.addProduct(data);
             
             alert('Product submitted successfully! It is now pending approval from an ELSA admin.');
             navigate('/vendor/products');
@@ -102,13 +103,13 @@ const VendorAddProduct = () => {
                         </div>
                     </div>
 
-                    {/* Image */}
+                    {/* Image Upload */}
                     <div className="form-group-admin" style={{ marginBottom: '1.5rem' }}>
-                        <label>Image URL *</label>
-                        <input type="url" className="admin-input" name="image" value={formData.image} onChange={handleChange} placeholder="https://images.unsplash.com/..." required />
-                        {formData.image && (
+                        <label>Product Image (File) *</label>
+                        <input type="file" accept="image/*" className="admin-input" name="image" onChange={handleChange} required />
+                        {image && (
                             <div style={{ marginTop: '1rem', width: '150px', height: '150px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #E6D5C3' }}>
-                                <img src={formData.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.src = 'https://via.placeholder.com/150'} />
+                                <img src={URL.createObjectURL(image)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </div>
                         )}
                     </div>

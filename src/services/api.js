@@ -28,8 +28,15 @@ export const api = {
 
     // --- Products ---
     fetchProducts: async () => {
-        await delay(500);
-        return [...mockProducts];
+        const response = await fetch('http://localhost:5000/api/products');
+        if (!response.ok) throw new Error('Failed to fetch products');
+        return await response.json();
+    },
+
+    fetchStores: async () => {
+        const response = await fetch('http://localhost:5000/api/stores');
+        if (!response.ok) throw new Error('Failed to fetch stores');
+        return await response.json();
     },
 
     fetchProductById: async (id) => {
@@ -39,34 +46,42 @@ export const api = {
         return product;
     },
 
-    addProduct: async (productData) => {
-        await delay(500);
-        const newProduct = {
-            _id: Math.random().toString(36).substr(2, 9),
-            ...productData
-        };
-        mockProducts.push(newProduct);
-        addToLog(`Product "${productData.name}" added to catalog`, 'product');
-        return newProduct;
+    addProduct: async (formData) => {
+        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const response = await fetch('http://localhost:5000/api/products', {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData // FormData should not have Content-Type header manually set
+        });
+        if (!response.ok) throw new Error('Failed to add product');
+        return await response.json();
     },
 
-    updateProduct: async (id, updates) => {
-        await delay(500);
-        const index = mockProducts.findIndex(p => p._id === id);
-        if (index === -1) throw new Error('Product not found');
-        mockProducts[index] = { ...mockProducts[index], ...updates };
-        addToLog(`Product "${updates.name || mockProducts[index].name}" updated`, 'product');
-        return mockProducts[index];
+    updateProduct: async (id, formData) => {
+        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        if (!response.ok) throw new Error('Failed to update product');
+        return await response.json();
     },
 
     deleteProduct: async (id) => {
-        await delay(500);
-        const index = mockProducts.findIndex(p => p._id === id);
-        if (index === -1) throw new Error('Product not found');
-        const name = mockProducts[index].name;
-        mockProducts.splice(index, 1);
-        addToLog(`Product "${name}" deleted from catalog`, 'product');
-        return { success: true };
+        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+            method: 'DELETE',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to delete product');
+        return await response.json();
     },
 
     // --- Reviews ---
@@ -90,72 +105,80 @@ export const api = {
 
     // --- Users & Auth ---
     login: async (email, password) => {
-        await delay(800);
-        const user = mockUsers.find((u) => u.email === email && u.password === password);
-        if (user) {
-            if (user.role === 'admin') addToLog('Admin logged in', 'login', user.name);
-            return user;
-        } else {
-            throw { response: { data: { message: 'Invalid credentials' } } };
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
         }
+        return await response.json();
     },
 
-    register: async (name, email, password, role = 'client') => {
-        await delay(800);
-        const exists = mockUsers.find((u) => u.email === email);
-        if (exists) {
-            throw { response: { data: { message: 'User already exists' } } };
+    register: async (name, email, password, role = 'client', extraData = {}) => {
+        const response = await fetch('http://localhost:5000/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, role, ...extraData })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Registration failed');
         }
-        const newUser = {
-            _id: Math.random().toString(36).substr(2, 9),
-            name,
-            email,
-            password,
-            role,
-            token: `mock-token-${Date.now()}`
-        };
-        mockUsers.push(newUser);
-        addToLog(`New client "${name}" registered`, 'user', 'System');
-        return newUser;
+        return await response.json();
     },
 
     fetchUsers: async () => {
-        await delay(400);
-        return [...mockUsers];
+        const response = await fetch('http://localhost:5000/api/admins/users');
+        if (!response.ok) throw new Error('Failed to fetch users');
+        return await response.json();
     },
     
+    approveUser: async (id) => {
+        const response = await fetch(`http://localhost:5000/api/admins/approve-user/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to approve user');
+        }
+        return await response.json();
+    },
+
     createUser: async (userData) => {
-        await delay(500);
-        const exists = mockUsers.find((u) => u.email === userData.email);
-        if (exists) throw new Error('Email already in use');
-        
-        const newUser = {
-            _id: Math.random().toString(36).substr(2, 9),
-            ...userData,
-            token: `mock-token-${Date.now()}`
-        };
-        mockUsers.push(newUser);
-        addToLog(`${userData.role === 'vendor' ? 'Vendor' : 'Delivery worker'} "${userData.name}" created`, 'user');
-        return newUser;
+        const response = await fetch('http://localhost:5000/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to create user');
+        }
+        return await response.json();
     },
 
     // --- Orders ---
     createOrder: async (orderData) => {
-        await delay(1000);
-        const newOrder = {
-            _id: Math.random().toString(36).substr(2, 9),
-            ...orderData,
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        };
-        mockOrders.push(newOrder);
-        addToLog(`New order received from ${orderData.user?.name || 'client'}`, 'order', 'System');
-        return newOrder;
+        const response = await fetch('http://localhost:5000/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to place order');
+        }
+        return await response.json();
     },
 
     fetchOrders: async () => {
-        await delay(400);
-        return [...mockOrders];
+        const response = await fetch('http://localhost:5000/api/orders');
+        if (!response.ok) throw new Error('Failed to fetch orders');
+        return await response.json();
     },
 
     updateOrderStatus: async (id, status) => {

@@ -31,6 +31,17 @@ const DeliveryLayout = () => {
         return location.pathname.startsWith(path);
     };
 
+    if (user?.status === 'pending') {
+        return (
+            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#FAF3EB', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ fontSize: '4rem' }}>⏳</div>
+                <h2 style={{ color: '#5C4033', fontFamily: 'Playfair Display, serif' }}>Account Under Review</h2>
+                <p style={{ color: '#8B7355' }}>Your Courier portal is restricted until an administrator verifies your application.</p>
+                <button onClick={handleLogout} className="auth-submit-btn" style={{ maxWidth: '200px', padding: '12px 24px', background: '#C1A176', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Sign Out</button>
+            </div>
+        );
+    }
+
     const handleLogout = () => {
         logout();
         navigate('/');

@@ -46,6 +46,16 @@ const AdminUsers = () => {
         } finally { setSaving(false); }
     };
 
+    const handleApproveUser = async (id) => {
+        if (!window.confirm('Are you sure you want to approve this professional account?')) return;
+        try {
+            await api.approveUser(id);
+            loadUsers();
+        } catch (err) {
+            alert(err.message || 'Error approving user');
+        }
+    };
+
     const tabRole = ROLE_MAP[activeTab];
     const tabUsers = users.filter(u => {
         const roleMatch = u.role === tabRole;
@@ -111,13 +121,14 @@ const AdminUsers = () => {
                                 <th>User</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {tabUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="admin-table-empty">
+                                    <td colSpan="5" className="admin-table-empty">
                                         No {ROLE_LABELS[activeTab].toLowerCase()} found.
                                     </td>
                                 </tr>
@@ -135,7 +146,22 @@ const AdminUsers = () => {
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="id-cell">{user._id}</td>
+                                    <td>
+                                        <span className={`admin-badge ${user.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
+                                            {user.status || 'approved'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {user.status === 'pending' && (
+                                            <button 
+                                                className="admin-btn-action admin-btn-success" 
+                                                onClick={() => handleApproveUser(user._id)}
+                                                title="Approve User"
+                                            >
+                                                ✅ Approve
+                                            </button>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
