@@ -12,33 +12,41 @@ const VendorDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // In reality, this would be an endpoint specifically returning vendor stats
-                const allOrders = await api.fetchOrders();
+                const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
+
+                // Fetch vendor's own orders from dedicated endpoint
+                const ordersRes = await fetch('http://localhost:5000/api/orders/vendor-orders', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const allOrders = await ordersRes.json();
+
                 const allProducts = await api.fetchProducts();
 
-                // Mock calculations as if the backend resolved these
-                const myProducts = allProducts.filter(p => p.vendorId === user?._id || p.category === 'Pastry'); // fallback mock logic
-                const activeMyProducts = myProducts.filter(p => p.approvalStatus !== 'pending' && p.approvalStatus !== 'rejected');
+                // Filter products that belong to this vendor
+                const myProducts = allProducts.filter(p =>
+                    p.vendorId?.toString() === user?._id?.toString()
+                );
+                const activeMyProducts = myProducts.filter(p => p.approvalStatus === 'approved' || !p.approvalStatus);
                 const pendingMyProducts = myProducts.filter(p => p.approvalStatus === 'pending');
-                
-                // Mock order metrics
-                const revenue = 8450;
-                const netEarnings = revenue * 0.9; // 10% fee
-                
+
+                // Calculate real revenue from orders
+                const revenue = allOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+                const netEarnings = revenue * 0.9; // 10% platform fee
+
                 setStats({
                     revenue,
                     netEarnings,
-                    activeProducts: activeMyProducts.length || 5, // mock fallback
-                    pendingProducts: pendingMyProducts.length || 2,
-                    totalOrders: 142
+                    activeProducts: activeMyProducts.length,
+                    pendingProducts: pendingMyProducts.length,
+                    totalOrders: allOrders.length
                 });
 
-                // Mock recent orders
-                const myOrders = allOrders.slice(0, 4).map((o, idx) => ({
+                // Show recent orders with real data
+                const myOrders = allOrders.slice(0, 4).map(o => ({
                     ...o,
-                    customerName: `Client ${idx + 1}`,
-                    items: o.items || [{ name: 'Croissant', qty: 2 }],
-                    total: o.totalPrice || 150
+                    customerName: o.userId?.name || 'Customer',
+                    items: o.products?.map(p => ({ name: p.productId?.name || 'Item', qty: p.quantity })) || [],
+                    total: o.totalAmount || 0
                 }));
                 setRecentOrders(myOrders);
             } catch (err) {

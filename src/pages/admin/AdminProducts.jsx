@@ -124,19 +124,19 @@ const AdminProducts = () => {
                                 <tr key={product._id}>
                                     <td>
                                         <div className="product-cell">
-                                            <img src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`} alt={product.name} className="product-thumb" />
+                                            <img src={product.image} alt={product.name} className="product-thumb" style={{ borderRadius: '12px', border: '1.5px solid var(--pat-beige)' }} />
                                             <div>
-                                                <div className="product-cell-name">{product.name}</div>
-                                                <div className="product-cell-desc">{product.description?.slice(0, 50)}...</div>
+                                                <div className="product-cell-name" style={{ fontWeight: '700', color: 'var(--pat-brown)' }}>{product.name}</div>
+                                                <div className="product-cell-desc" style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>{product.description?.slice(0, 50)}...</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span className={`admin-badge ${categoryColors[product.category] || 'badge-neutral'}`}>
+                                        <span className={`order-status-badge status-ready`}>
                                             {product.category}
                                         </span>
                                     </td>
-                                    <td className="price-cell">${Number(product.price).toFixed(2)}</td>
+                                    <td className="price-cell" style={{ fontWeight: '800', color: 'var(--pat-brown)' }}>{Number(product.price).toFixed(2)} MAD</td>
                                     <td>
                                         <div className="langs-cell">
                                             <span className="lang-flag" title="French">🇫🇷</span>
@@ -145,7 +145,11 @@ const AdminProducts = () => {
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div className="admin-actions">
-                                            <button className="admin-action-btn action-delete" onClick={() => handleDelete(product._id)}>
+                                            <button 
+                                                className="admin-action-btn action-delete" 
+                                                style={{ background: '#FEE2E2', color: '#EF4444', borderRadius: '10px', padding: '0.5rem 1rem', border: 'none', fontWeight: '700' }}
+                                                onClick={() => handleDelete(product._id)}
+                                            >
                                                 🗑️ Delete
                                             </button>
                                         </div>

@@ -9,6 +9,8 @@ import Signup from './pages/Signup';
 import AiRecipe from './pages/AiRecipe';
 import Stores from './pages/Stores';
 import Favorites from './pages/Favorites';
+import Notifications from './pages/Notifications';
+import Orders from './pages/Orders';
 
 import Footer from './components/Footer';
 import { LanguageProvider } from './context/LanguageContext';
@@ -109,6 +111,8 @@ function App() {
                   <Route path="/ai-recipe" element={<AiRecipe />} />
                   <Route path="/stores" element={<Stores />} />
                   <Route path="/favorites" element={<Favorites />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/orders" element={<Orders />} />
                 </Routes>
               </main>
               <Footer />

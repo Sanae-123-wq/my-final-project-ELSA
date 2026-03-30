@@ -5,13 +5,16 @@ import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { SocketProvider } from './context/SocketContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <CartProvider>
         <FavoritesProvider>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </FavoritesProvider>
       </CartProvider>
     </AuthProvider>

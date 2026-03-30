@@ -57,12 +57,12 @@ const Cart = () => {
                                         {item.name}
                                     </Link>
                                     <p style={{ color: '#666', marginTop: '0.5rem' }}>
-                                        ${item.price.toFixed(2)} x {item.qty}
+                                        {item.price.toFixed(2)} MAD x {item.qty}
                                     </p>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <div style={{ fontWeight: 'bold', fontSize: '1.3rem', color: 'var(--primary-color)', marginBottom: '0.5rem' }}>
-                                        ${(item.price * item.qty).toFixed(2)}
+                                        {(item.price * item.qty).toFixed(2)} MAD
                                     </div>
                                     <button
                                         onClick={() => removeFromCart(item._id)}
@@ -83,7 +83,7 @@ const Cart = () => {
                         </div>
                         <div className="flex justify-between" style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--dark-color)' }}>
                             <span>Total</span>
-                            <span style={{ color: 'var(--primary-color)' }}>${totalPrice}</span>
+                            <span style={{ color: 'var(--primary-color)' }}>{totalPrice} MAD</span>
                         </div>
                         <button
                             onClick={handleCheckout}

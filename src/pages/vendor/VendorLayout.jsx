@@ -1,5 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { FaBell } from 'react-icons/fa';
+import { useSocket } from '../../context/SocketContext';
 import AuthContext from '../../context/AuthContext';
 import '../../admin.css';
 
@@ -16,6 +18,7 @@ const VendorLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext);
+    const { unreadCount } = useSocket();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
 
@@ -110,7 +113,13 @@ const VendorLayout = () => {
                         </div>
                     </div>
 
-                    <div className="topbar-right" style={{ marginLeft: 'auto' }}>
+                    <div className="topbar-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        {/* Notification Bell */}
+                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F' }}>
+                            <FaBell size={20} />
+                            {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
+                        </Link>
+
                         {/* Profile Dropdown */}
                         <div className="topbar-profile-wrapper">
                             <button className="topbar-profile-btn" onClick={() => setProfileOpen(!profileOpen)}>

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaUser, FaSignOutAlt, FaHeart, FaBars, FaTimes } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaSignOutAlt, FaHeart, FaBars, FaTimes, FaBell } from 'react-icons/fa';
 import { useContext, useState } from 'react';
 import AuthContext from '../context/AuthContext';
 import CartContext from '../context/CartContext';
@@ -7,12 +7,14 @@ import FavoritesContext from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
 import logo from '../assets/logo.png';
 import LanguageSelector from './LanguageSelector';
+import { useSocket } from '../context/SocketContext';
 
 const Navbar = () => {
     const { user, logout } = useContext(AuthContext);
     const { cartItems } = useContext(CartContext);
     const { favorites } = useContext(FavoritesContext);
     const { t } = useLanguage();
+    const { unreadCount } = useSocket();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -44,6 +46,7 @@ const Navbar = () => {
                     <Link to="/shop" className="nav-text-link">{t.navbar.shop}</Link>
                     <Link to="/stores" className="nav-text-link">{t.navbar.marketplace}</Link>
                     <Link to="/ai-recipe" className="nav-text-link">{t.navbar.aiKitchen}</Link>
+                    {user && <Link to="/orders" className="nav-text-link">My Orders</Link>}
                 </div>
 
                 {/* Right Section: Icons (Desktop Only) */}
@@ -54,6 +57,13 @@ const Navbar = () => {
                         <FaHeart size={18} />
                         {favoritesCount > 0 && <span className="badge badge-favorites">{favoritesCount}</span>}
                     </Link>
+
+                    {user && (
+                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications">
+                            <FaBell size={18} />
+                            {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
+                        </Link>
+                    )}
 
                     <Link to="/cart" className="nav-icon-link" aria-label="Shopping Cart">
                         <FaShoppingCart size={20} />
@@ -91,6 +101,7 @@ const Navbar = () => {
                 <Link to="/shop" onClick={closeMenu}>{t.navbar.shop}</Link>
                 <Link to="/stores" onClick={closeMenu}>{t.navbar.marketplace}</Link>
                 <Link to="/ai-recipe" onClick={closeMenu}>{t.navbar.aiKitchen}</Link>
+                {user && <Link to="/orders" onClick={closeMenu}>My Orders</Link>}
                 <Link to="/favorites" onClick={closeMenu}>{t.navbar.favorites}</Link>
                 <Link to="/cart" onClick={closeMenu}>{t.navbar.cart}</Link>
                 {user ? (

@@ -1,5 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { FaBell } from 'react-icons/fa';
+import { useSocket } from '../../context/SocketContext';
 import AuthContext from '../../context/AuthContext';
 import '../../admin.css'; // Reusing the same professional CSS
 
@@ -15,16 +17,9 @@ const DeliveryLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext);
+    const { unreadCount } = useSocket();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [notifOpen, setNotifOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
-    
-    // Notification logic
-    const [notifications, setNotifications] = useState([
-        { id: 1, text: 'New order #ORD_882 is 2.5km away', time: 'Just now', type: 'order', isNew: true },
-        { id: 2, text: 'Order #ORD_123 was successfully delivered', time: '2 hrs ago', type: 'success', isNew: false },
-    ]);
-    const unreadCount = notifications.filter(n => n.isNew).length;
 
     const isActive = (path, exact) => {
         if (exact) return location.pathname === path;
@@ -47,14 +42,6 @@ const DeliveryLayout = () => {
         navigate('/');
     };
 
-    const handleNotifClick = () => {
-        setNotifOpen(!notifOpen);
-        setProfileOpen(false);
-        if (!notifOpen) {
-            // Mark as read when opening
-            setNotifications(notifications.map(n => ({ ...n, isNew: false })));
-        }
-    };
 
     const currentPage = NAV_ITEMS.find(item =>
         item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path)
@@ -128,31 +115,10 @@ const DeliveryLayout = () => {
 
                     <div className="topbar-right" style={{ marginLeft: 'auto' }}>
                         {/* Notifications */}
-                        <div className="topbar-notif-wrapper">
-                            <button className="topbar-icon-btn" onClick={handleNotifClick}>
-                                🔔
-                                {unreadCount > 0 && <span className="topbar-notif-dot"></span>}
-                            </button>
-                            {notifOpen && (
-                                <div className="topbar-dropdown notif-dropdown">
-                                    <div className="dropdown-header">
-                                        <span>Notifications</span>
-                                        <span className="dropdown-badge">{notifications.length}</span>
-                                    </div>
-                                    {notifications.length === 0 ? (
-                                        <div className="notif-item"><div className="notif-text">No notifications</div></div>
-                                    ) : notifications.map(n => (
-                                        <div key={n.id} className="notif-item" style={{ background: n.isNew ? '#FDF9F5' : 'transparent' }}>
-                                            <div className={`notif-dot notif-dot-${n.type === 'order' ? 'warning' : 'success'}`}></div>
-                                            <div>
-                                                <div className="notif-text" style={{ fontWeight: n.isNew ? '600' : '400' }}>{n.text}</div>
-                                                <div className="notif-time">{n.time}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F', position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <FaBell size={20} />
+                            {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
+                        </Link>
 
                         {/* Profile */}
                         <div className="topbar-profile-wrapper">

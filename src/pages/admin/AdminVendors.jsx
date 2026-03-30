@@ -26,7 +26,7 @@ const AdminVendors = () => {
         setError('');
         setSaving(true);
         try {
-            await api.createUser({ ...formData, role: 'vendor' });
+            await api.register(formData.name, formData.email, formData.password, 'vendor');
             setShowModal(false);
             setFormData({ name: '', email: '', password: '', role: 'vendor' });
             loadVendors();

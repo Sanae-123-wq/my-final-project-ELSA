@@ -16,18 +16,12 @@ const VendorProducts = () => {
     const loadMyProducts = async () => {
         setLoading(true);
         try {
-            // In a real app, backend would filter this automatically or via query param
-            const data = await api.fetchProducts();
+            const allProducts = await api.fetchProducts();
             
-            // Mock: Only keep products that are 'ours' (vendorId match or 'appended' ones during session)
-            // Since mock products don't have vendorId originally, we pretend some are ours for demo.
-            let myProds = data.filter(p => p.vendorId === user?._id || p.category === 'Pastry');
-            
-            // Inject varied approval statuses for demo if missing
-            myProds = myProds.map((p, idx) => ({
-                ...p,
-                approvalStatus: p.approvalStatus || (idx % 4 === 0 ? 'pending' : idx % 7 === 0 ? 'rejected' : 'approved')
-            }));
+            // Filter products belonging to this vendor
+            const myProds = allProducts.filter(p => 
+                p.vendorId?.toString() === user?._id?.toString()
+            );
 
             setProducts(myProds);
         } catch (err) {
@@ -56,12 +50,15 @@ const VendorProducts = () => {
     );
 
     const getStatusBadge = (status) => {
-        switch(status) {
-            case 'approved': return <span className="admin-badge badge-success">Approved</span>;
-            case 'pending': return <span className="admin-badge badge-neutral">Pending Review</span>;
-            case 'rejected': return <span className="admin-badge badge-danger">Rejected</span>;
-            default: return <span className="admin-badge badge-success">Approved</span>;
-        }
+        const statusClass = status === 'approved' ? 'status-delivered' : 
+                          status === 'rejected' ? 'status-pending' : 
+                          'status-preparing'; // for pending review
+        
+        const label = status === 'approved' ? 'Approved' : 
+                     status === 'rejected' ? 'Rejected' : 
+                     'Pending Review';
+
+        return <span className={`order-status-badge ${statusClass}`}>{label}</span>;
     };
 
     if (loading) return <div className="admin-loading"><div className="admin-spinner"></div><p>Loading your catalog...</p></div>;

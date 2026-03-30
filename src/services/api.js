@@ -1,25 +1,16 @@
-import { mockProducts, mockUsers, mockOrders } from '../data/mockData';
-
-// Activity log storage
+// Activity log - local in-memory log (no backend endpoint yet)
 let activityLog = [
     { action: 'Admin logged in', type: 'login', time: '2 min ago', by: 'ELSA Admin' },
-    { action: 'Product "Classic Croissant" updated', type: 'product', time: '15 min ago', by: 'ELSA Admin' },
-    { action: 'New order #ORD_001 received', type: 'order', time: '32 min ago', by: 'System' },
-    { action: 'Vendor "Patissier Chef Alex" created', type: 'user', time: '1 hr ago', by: 'ELSA Admin' },
-    { action: 'Order #ORD_001 status changed to Processing', type: 'order', time: '1 hr ago', by: 'ELSA Admin' },
-    { action: 'Product "Baklava" price updated to $5.50', type: 'product', time: '2 hrs ago', by: 'ELSA Admin' },
-    { action: 'Client "Test Client" registered', type: 'user', time: '3 hrs ago', by: 'System' },
+    { action: 'New order received', type: 'order', time: '32 min ago', by: 'System' },
+    { action: 'Product catalog updated', type: 'product', time: '1 hr ago', by: 'ELSA Admin' },
     { action: 'Dashboard accessed', type: 'login', time: '3 hrs ago', by: 'ELSA Admin' },
-    { action: 'New product "Kunafa" added to catalog', type: 'product', time: '1 day ago', by: 'ELSA Admin' },
-    { action: 'Delivery worker "Fast Courier" account created', type: 'user', time: '1 day ago', by: 'ELSA Admin' },
-    { action: 'System backup completed', type: 'system', time: '2 days ago', by: 'System' },
 ];
 
 const addToLog = (action, type, by = 'ELSA Admin') => {
     activityLog.unshift({ action, type, time: 'Just now', by });
 };
 
-// Simulate network delay
+// Simulate network delay (legacy, kept for compatibility)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const api = {
@@ -30,7 +21,12 @@ export const api = {
     fetchProducts: async () => {
         const response = await fetch('http://localhost:5000/api/products');
         if (!response.ok) throw new Error('Failed to fetch products');
-        return await response.json();
+        const data = await response.json();
+        // Ensure images have full URL if they are relative
+        return data.map(p => ({
+            ...p,
+            image: p.image?.startsWith('http') ? p.image : `http://localhost:5000${p.image}`
+        }));
     },
 
     fetchStores: async () => {
@@ -40,27 +36,30 @@ export const api = {
     },
 
     fetchProductById: async (id) => {
-        await delay(300);
-        const product = mockProducts.find((p) => p._id === id);
-        if (!product) throw { response: { data: { message: 'Product not found' } } };
-        return product;
+        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        if (!response.ok) throw new Error('Product not found');
+        const p = await response.json();
+        return {
+            ...p,
+            image: p.image?.startsWith('http') ? p.image : `http://localhost:5000${p.image}`
+        };
     },
 
     addProduct: async (formData) => {
-        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch('http://localhost:5000/api/products', {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${token}`
             },
-            body: formData // FormData should not have Content-Type header manually set
+            body: formData
         });
         if (!response.ok) throw new Error('Failed to add product');
         return await response.json();
     },
 
     updateProduct: async (id, formData) => {
-        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch(`http://localhost:5000/api/products/${id}`, {
             method: 'PUT',
             headers: { 
@@ -73,7 +72,7 @@ export const api = {
     },
 
     deleteProduct: async (id) => {
-        const token = JSON.parse(localStorage.getItem('user'))?.token;
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch(`http://localhost:5000/api/products/${id}`, {
             method: 'DELETE',
             headers: { 
@@ -82,25 +81,6 @@ export const api = {
         });
         if (!response.ok) throw new Error('Failed to delete product');
         return await response.json();
-    },
-
-    // --- Reviews ---
-    addReview: async (productId, reviewData) => {
-        await delay(500);
-        const product = mockProducts.find(p => p._id === productId);
-        if (!product) throw new Error('Product not found');
-        
-        const newReview = {
-            _id: Math.random().toString(36).substr(2, 9),
-            ...reviewData,
-            date: new Date().toISOString()
-        };
-        
-        if (!product.reviews) product.reviews = [];
-        product.reviews.unshift(newReview);
-        
-        addToLog(`New review added for product "${product.name}"`, 'product', reviewData.name);
-        return newReview;
     },
 
     // --- Users & Auth ---
@@ -114,7 +94,9 @@ export const api = {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Login failed');
         }
-        return await response.json();
+        const data = await response.json();
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        return data;
     },
 
     register: async (name, email, password, role = 'client', extraData = {}) => {
@@ -148,24 +130,15 @@ export const api = {
         return await response.json();
     },
 
-    createUser: async (userData) => {
-        const response = await fetch('http://localhost:5000/api/auth/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to create user');
-        }
-        return await response.json();
-    },
-
     // --- Orders ---
     createOrder: async (orderData) => {
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch('http://localhost:5000/api/orders', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(orderData)
         });
         if (!response.ok) {
@@ -182,36 +155,31 @@ export const api = {
     },
 
     updateOrderStatus: async (id, status) => {
-        await delay(400);
-        const order = mockOrders.find(o => o._id === id);
-        if (!order) throw new Error('Order not found');
-        order.status = status;
-        addToLog(`Order #${id.slice(-6).toUpperCase()} status changed to ${status}`, 'order');
-        return order;
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
+        const response = await fetch(`http://localhost:5000/api/orders/${id}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status })
+        });
+        if (!response.ok) throw new Error('Failed to update order status');
+        return await response.json();
     },
 
     // --- AI ---
     generateRecipe: async (prompt) => {
-        try {
-            const response = await fetch('http://localhost:5000/api/ai/recipe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to generate recipe from backend AI');
-            }
-            
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('AI Generation API Error:', error);
-            throw error;
+        const response = await fetch('http://localhost:5000/api/ai/recipe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to generate recipe');
         }
+        return await response.json();
     },
 
     // --- Reviews ---

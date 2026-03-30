@@ -33,7 +33,7 @@ const AdminDelivery = () => {
         setError('');
         setSaving(true);
         try {
-            await api.createUser({ ...formData, role: 'delivery' });
+            await api.register(formData.name, formData.email, formData.password, 'delivery');
             setShowModal(false);
             setFormData({ name: '', email: '', password: '' });
             loadWorkers();

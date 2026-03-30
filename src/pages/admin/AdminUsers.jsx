@@ -37,7 +37,7 @@ const AdminUsers = () => {
         setError('');
         setSaving(true);
         try {
-            await api.createUser(formData);
+            await api.register(formData.name, formData.email, formData.password, formData.role);
             setShowModal(false);
             setFormData({ name: '', email: '', password: '', role: 'vendor' });
             loadUsers();

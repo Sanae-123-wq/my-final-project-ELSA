@@ -1,45 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { mockProducts, mockPacks } from '../data/mockData';
 import { FaSearch, FaTimes, FaUtensils, FaBoxOpen, FaBirthdayCake } from 'react-icons/fa';
 
 const HomeSearch = () => {
     const { t, language } = useLanguage();
     const [query, setQuery] = useState('');
+    const [allProducts, setAllProducts] = useState([]);
     const [results, setResults] = useState({ products: [], packs: [], recipes: [] });
     const [isOpen, setIsOpen] = useState(false);
     const searchRef = useRef(null);
+
+    // Fetch products once on mount
+    useEffect(() => {
+        fetch('http://localhost:5000/api/products')
+            .then(res => res.json())
+            .then(data => setAllProducts(data.map(p => ({
+                ...p,
+                image: p.image?.startsWith('http') ? p.image : `http://localhost:5000${p.image}`
+            }))))
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         if (query.length > 1) {
             const lowerQuery = query.toLowerCase();
 
-            const filteredProducts = mockProducts.filter(p =>
-                p.name.toLowerCase().includes(lowerQuery) ||
-                p.category.toLowerCase().includes(lowerQuery)
+            const filteredProducts = allProducts.filter(p =>
+                p.name?.toLowerCase().includes(lowerQuery) ||
+                p.category?.toLowerCase().includes(lowerQuery)
             );
 
-            const filteredPacks = mockPacks.filter(p => {
-                const name = language === 'ar' ? p.name_ar : (language === 'fr' ? p.name_fr : p.name);
-                return name.toLowerCase().includes(lowerQuery);
-            });
-
-            // Mock recipe search (just link to AI Kitchen if it matches keywords)
+            // Show AI kitchen link for recipe-related keywords
             const recipeKeywords = ['recipe', 'cake', 'bread', 'pastry', 'kika', 'tart', 'macaron', 'recette', 'وصفة'];
             const showRecipe = recipeKeywords.some(k => k.includes(lowerQuery) || lowerQuery.includes(k));
 
             setResults({
                 products: filteredProducts,
-                packs: filteredPacks,
-                recipes: showRecipe ? [{ id: 'ai-gen', name: t.navbar.aiKitchen, icon: <FaUtensils /> }] : []
+                packs: [],
+                recipes: showRecipe ? [{ id: 'ai-gen', name: t.navbar?.aiKitchen || 'AI Kitchen', icon: <FaUtensils /> }] : []
             });
             setIsOpen(true);
         } else {
             setResults({ products: [], packs: [], recipes: [] });
             setIsOpen(false);
         }
-    }, [query, t, language]);
+    }, [query, t, language, allProducts]);
 
     // Close dropdown when clicking outside
     useEffect(() => {

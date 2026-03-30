@@ -5,22 +5,31 @@ html {
 }
 
 :root {
-  --primary-color: #B08968;
-  --primary-dark: #7F5539;
-  --primary-light: #E6CCB2;
-  --secondary-color: #FAEDCD;
-  --accent-color: #CCD5AE;
-  --dark-color: #5C4033;
-  --cream-color: #FEFAE0;
-  --text-main: #333333;
-  --text-light: #666666;
+  /* Patisserie Premium Palette */
+  --pat-cream: #FFF8F0;
+  --pat-beige: #F5E6D3;
+  --pat-brown: #8B5E3C;
+  --pat-gold: #D97706;
+  --pat-shadow: 0 10px 30px rgba(139, 94, 60, 0.1);
+  --pat-shadow-hover: 0 15px 45px rgba(139, 94, 60, 0.18);
+  --pat-radius: 16px;
+  
+  --primary-color: #8B5E3C;
+  --primary-dark: #5C4033;
+  --primary-light: #F5E6D3;
+  --secondary-color: #FFF8F0;
+  --accent-color: #D97706;
+  --dark-color: #3D2B1F;
+  --cream-color: #FFF8F0;
+  --text-main: #3D2B1F;
+  --text-light: #9A7B66;
   --white: #ffffff;
   --error: #ef4444;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --radius: 12px;
-  --transition: all 0.3s ease;
+  --shadow-sm: 0 1px 3px rgba(139, 94, 60, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(139, 94, 60, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(139, 94, 60, 0.1);
+  --radius: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Classic Reviews Section */
@@ -3538,6 +3547,280 @@ img {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ==========================================================================
+   ELSA PATISSERIE PREMIUM UI SYSTEM
+   ========================================================================== */
+
+/* Notifications section */
+.notifications-section {
+    padding: 2rem 0 5rem;
+    background: var(--pat-cream);
+    min-height: 80vh;
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.notif-card-premium {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--pat-radius);
+    box-shadow: var(--pat-shadow);
+    transition: var(--transition);
+    border: 1px solid rgba(245, 230, 211, 0.3);
+    cursor: pointer;
+    position: relative;
+}
+
+.notif-card-premium:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--pat-shadow-hover);
+}
+
+.notif-card-premium.unread {
+    border-left: 5px solid var(--pat-gold);
+    background: linear-gradient(to right, #FFFBF5, #FFFFFF);
+}
+
+.notif-card-premium.unread .notif-message {
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.notif-card-premium.read {
+    opacity: 0.75;
+}
+
+.notif-premium-icon {
+    width: 54px;
+    height: 54px;
+    background: var(--pat-beige);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--pat-brown);
+    flex-shrink: 0;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.notif-premium-content {
+    flex-grow: 1;
+}
+
+.notif-message {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.notif-time {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* My Orders section */
+.my-orders-section {
+    padding: 3rem 0 6rem;
+}
+
+.orders-premium-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2.5rem;
+}
+
+.order-card-premium {
+    background: white;
+    border-radius: var(--pat-radius);
+    padding: 1.75rem;
+    box-shadow: var(--pat-shadow);
+    transition: var(--transition);
+    border: 1px solid rgba(245, 230, 211, 0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+.order-card-premium:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--pat-shadow-hover);
+}
+
+.order-premium-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1.5px dashed var(--pat-beige);
+}
+
+.order-premium-id {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--pat-brown);
+    letter-spacing: 0.02em;
+}
+
+.order-status-badge {
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-pending { background: #F1F5F9; color: #64748B; }
+.status-preparing { background: #FFF7ED; color: #EA580C; }
+.status-ready { background: #EFF6FF; color: #2563EB; }
+.status-picked { background: #FAF5FF; color: #9333EA; }
+.status-delivered { background: #F0FDF4; color: #16A34A; }
+
+.order-premium-products {
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+}
+
+.order-premium-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.order-premium-item-name {
+    font-weight: 500;
+}
+
+.order-premium-item-qty {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.order-premium-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+.order-premium-total {
+    text-align: right;
+}
+
+.total-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: block;
+}
+
+.total-value {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--pat-brown);
+}
+
+/* Navbar Badge Refresh */
+.badge-notifications {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--pat-gold);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+    z-index: 10;
+}
+
+/* --- Notification & Reclamation System Premium Styles --- */
+
+:root {
+  --cream-light: #FAF7F2;
+  --cream-dark: #F3ECE5;
+  --brown-dark-accent: #3D2B1F;
+  --brown-medium: #5D4332;
+  --orange-accent: #E67E22;
+  --shadow-soft-lg: 0 10px 40px -10px rgba(139, 94, 60, 0.15);
+}
+
+.bg-cream-light { background-color: var(--cream-light); }
+.text-brown-dark { color: var(--brown-dark-accent); }
+.text-brown { color: var(--brown-medium); }
+.bg-orange-accent { background-color: var(--orange-accent); }
+
+.shadow-soft {
+  box-shadow: 0 4px 20px -2px rgba(139, 94, 60, 0.05);
+}
+
+/* Notification Badge in Navbar */
+.badge-notifications {
+  background: var(--orange-accent) !important;
+  animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+}
+
+/* Base Utility for Premium Cards */
+.premium-card {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid rgba(139, 94, 60, 0.05);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft-lg);
+}
+
+/* Icons styling for notifications */
+.icon-container.preparing { background-color: #FFF3E0; color: #E67E22; }
+.icon-container.ready { background-color: #E8F5E9; color: #2E7D32; }
+.icon-container.picked { background-color: #E3F2FD; color: #1565C0; }
+.icon-container.delivered { background-color: #F3E5F5; color: #7B1FA2; }
+.icon-container.reclamation { background-color: #FFEBEE; color: #C62828; }
+
+/* Scrollbar for notification list */
+.notifications-list::-webkit-scrollbar {
+  width: 6px;
+}
+.notifications-list::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 10px;
+}
+
+/* --- End of Notification Styles --- */
 
 @keyframes slideUp {
   from { transform: translateY(30px); opacity: 0; }

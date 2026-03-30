@@ -1,5 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { FaBell } from 'react-icons/fa';
+import { useSocket } from '../../context/SocketContext';
 import AuthContext from '../../context/AuthContext';
 import '../../admin.css';
 
@@ -19,9 +21,9 @@ const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext);
+    const { unreadCount } = useSocket();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [notifOpen, setNotifOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
 
     const isActive = (path, exact) => {
@@ -38,11 +40,6 @@ const AdminLayout = () => {
         item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path)
     );
 
-    const notifications = [
-        { id: 1, text: 'New order #ord_123 received', time: '2 min ago', type: 'order' },
-        { id: 2, text: 'Product "Croissant" is low in stock', time: '15 min ago', type: 'warning' },
-        { id: 3, text: 'New client registered: Sara M.', time: '1 hr ago', type: 'user' },
-    ];
 
     return (
         <div className="admin-shell">
@@ -152,30 +149,10 @@ const AdminLayout = () => {
 
                     <div className="topbar-right">
                         {/* Notifications */}
-                        <div className="topbar-notif-wrapper">
-                            <button className="topbar-icon-btn" onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false); }}>
-                                🔔
-                                <span className="topbar-notif-dot"></span>
-                            </button>
-                            {notifOpen && (
-                                <div className="topbar-dropdown notif-dropdown">
-                                    <div className="dropdown-header">
-                                        <span>Notifications</span>
-                                        <span className="dropdown-badge">{notifications.length}</span>
-                                    </div>
-                                    {notifications.map(n => (
-                                        <div key={n.id} className="notif-item">
-                                            <div className={`notif-dot notif-dot-${n.type}`}></div>
-                                            <div>
-                                                <div className="notif-text">{n.text}</div>
-                                                <div className="notif-time">{n.time}</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <div className="dropdown-footer">View all notifications</div>
-                                </div>
-                            )}
-                        </div>
+                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F', position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <FaBell size={20} />
+                            {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
+                        </Link>
 
                         {/* Profile */}
                         <div className="topbar-profile-wrapper">

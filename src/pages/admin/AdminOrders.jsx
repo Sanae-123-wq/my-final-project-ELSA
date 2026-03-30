@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 
-const STATUS_OPTIONS = ['pending', 'processing', 'out_for_delivery', 'delivered'];
+const STATUS_OPTIONS = ['pending', 'preparing', 'ready', 'picked', 'delivered'];
 const STATUS_CONFIG = {
-    pending: { label: 'Pending', cls: 'badge-warning' },
-    processing: { label: 'Processing', cls: 'badge-info' },
-    out_for_delivery: { label: 'Out for Delivery', cls: 'badge-primary' },
-    delivered: { label: 'Delivered', cls: 'badge-success' },
+    pending:   { label: 'Pending',     cls: 'status-pending' },
+    preparing: { label: 'Preparing',   cls: 'status-preparing' },
+    ready:     { label: 'Ready',       cls: 'status-ready' },
+    picked:    { label: 'Picked Up',   cls: 'status-picked' },
+    delivered: { label: 'Delivered',   cls: 'status-delivered' },
 };
 
 const AdminOrders = () => {
@@ -88,14 +89,14 @@ const AdminOrders = () => {
                 <div className="admin-table-wrap">
                     <table className="admin-table admin-table-full">
                         <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Client</th>
-                                <th>Date</th>
-                                <th>Items</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Update Status</th>
+                            <tr style={{ background: 'var(--pat-cream)', borderBottom: '1.5px solid var(--pat-beige)' }}>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Order ID</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Client</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Date</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Items</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Total</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Status</th>
+                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Update</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -126,9 +127,9 @@ const AdminOrders = () => {
                                                 </div>
                                             </td>
                                             <td className="date-cell">{new Date(order.createdAt).toLocaleDateString('en-GB')}</td>
-                                            <td>{order.items?.length || 0} items</td>
-                                            <td className="price-cell">${order.totalPrice?.toFixed(2)}</td>
-                                            <td><span className={`admin-badge ${sc.cls}`}>{sc.label}</span></td>
+                                            <td>{order.products?.length || order.items?.length || 0} items</td>
+                                            <td className="price-cell" style={{ fontWeight: '800', color: 'var(--pat-brown)' }}>{order.totalAmount?.toFixed(2) || order.totalPrice?.toFixed(2)} MAD</td>
+                                            <td><span className={`order-status-badge ${sc.cls}`}>{sc.label}</span></td>
                                             <td>
                                                 <select
                                                     className="admin-select-sm"

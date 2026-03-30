@@ -69,7 +69,7 @@ const AdminDashboard = () => {
                 const [products, users, orders] = await Promise.all([
                     api.fetchProducts(), api.fetchUsers(), api.fetchOrders()
                 ]);
-                const revenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+                const revenue = orders.reduce((sum, o) => sum + (o.totalAmount || o.totalPrice || 0), 0);
                 setStats({
                     products: products.length,
                     users: users.filter(u => u.role === 'client').length,
@@ -91,10 +91,11 @@ const AdminDashboard = () => {
     }, []);
 
     const statusConfig = {
-        pending: { label: 'Pending', cls: 'badge-warning' },
-        processing: { label: 'Processing', cls: 'badge-info' },
-        out_for_delivery: { label: 'Out for Delivery', cls: 'badge-primary' },
-        delivered: { label: 'Delivered', cls: 'badge-success' },
+        pending:   { label: 'Pending',   cls: 'status-pending' },
+        preparing: { label: 'Preparing', cls: 'status-preparing' },
+        ready:     { label: 'Ready',     cls: 'status-ready' },
+        picked:    { label: 'Picked Up', cls: 'status-picked' },
+        delivered: { label: 'Delivered', cls: 'status-delivered' },
     };
 
     if (loading) return (
@@ -132,7 +133,7 @@ const AdminDashboard = () => {
                 <div className="admin-stat-card stat-revenue">
                     <div className="stat-card-left">
                         <div className="stat-card-label">Total Revenue</div>
-                        <div className="stat-card-value">${Number(stats.revenue).toLocaleString()}</div>
+                        <div className="stat-card-value">{Number(stats.revenue).toFixed(0)} MAD</div>
                         <div className="stat-card-trend trend-up">↑ 8.5% this month</div>
                     </div>
                     <div className="stat-card-right">
@@ -209,8 +210,8 @@ const AdminDashboard = () => {
                                         <tr key={order._id}>
                                             <td className="order-id-cell">#{order._id.slice(-6).toUpperCase()}</td>
                                             <td>{order.user?.name || '—'}</td>
-                                            <td className="font-semibold">${order.totalPrice?.toFixed(2)}</td>
-                                            <td><span className={`admin-badge ${sc.cls}`}>{sc.label}</span></td>
+                                            <td className="font-semibold" style={{ color: 'var(--pat-brown)', fontWeight: '800' }}>{(order.totalAmount || order.totalPrice)?.toFixed(2)} MAD</td>
+                                            <td><span className={`order-status-badge ${sc.cls}`}>{sc.label}</span></td>
                                         </tr>
                                     );
                                 })}

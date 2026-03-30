@@ -32,7 +32,7 @@ const CartSidebar = () => {
                             <div className="item-details">
                                 <h4>{item[`name_${language}`] || item.name}</h4>
                                 <div className="item-price-qty">
-                                    <span className="price">${item.price.toFixed(2)}</span>
+                                    <span className="price">{item.price.toFixed(2)} MAD</span>
                                     <div className="qty-controls">
                                         <button onClick={() => updateQty(item._id, -1)} aria-label="Decrease quantity">−</button>
                                         <span className="qty">{item.qty}</span>
@@ -55,7 +55,7 @@ const CartSidebar = () => {
             <div className="shop-sidebar-footer">
                 <div className="sidebar-total">
                     <span>Total</span>
-                    <span>${totalPrice}</span>
+                    <span>{totalPrice} MAD</span>
                 </div>
                 <button
                     className="btn-primary checkout-btn"
