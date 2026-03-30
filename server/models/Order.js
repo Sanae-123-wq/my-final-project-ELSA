@@ -10,6 +10,7 @@ const orderSchema = new mongoose.Schema({
     },
   ],
   totalAmount: { type: Number, required: true },
+  deliveryId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
     enum: ['pending', 'preparing', 'ready', 'picked', 'delivered', 'cancelled'],
