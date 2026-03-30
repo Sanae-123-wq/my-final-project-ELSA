@@ -9,12 +9,17 @@ const productSchema = new mongoose.Schema({
   description_ar: { type: String },
   price: { type: Number, required: true },
   image: { type: String },
-  category: { type: String, required: true },
+  category: { 
+    type: String, 
+    required: true,
+    enum: ['Cake', 'Pastry', 'Bread', 'Traditional', 'Cookies', 'Chocolate', 'Healthy', 'Pack']
+  },
   stock: { type: Number, default: 0 },
   isAvailable: { type: Boolean, default: true },
   vendorId: { type: String },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
 
-  approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' },
 
 }, { timestamps: true });
 
