@@ -20,7 +20,7 @@ export const generateRecipe = async (req, res) => {
         if (isMockMode || isMissingKey) {
             console.log(`[AI Kitchen] Using MOCK MODE ${isMissingKey ? '(API Key missing)' : ''}`);
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
-            
+
             const mockRecipe = {
                 name: `Artisanal ${prompt.charAt(0).toUpperCase() + prompt.slice(1)}`,
                 prepTime: "20 mins",
@@ -97,10 +97,10 @@ JSON Structure:
 
         if (openRouterResponse.data.choices && openRouterResponse.data.choices.length > 0) {
             let aiText = openRouterResponse.data.choices[0].message.content;
-            
+
             // Clean up possible markdown json blocks
             aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
-            
+
             try {
                 const recipeData = JSON.parse(aiText);
                 return res.status(200).json(recipeData);
@@ -118,14 +118,14 @@ JSON Structure:
         console.error('Error generating recipe:', errorData || error.message);
 
         if (statusCode === 401) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'Invalid AI API Key. Please check the AI_KEY in your server/.env file or enable MOCK_AI=true for testing.',
-                details: errorData 
+                details: errorData
             });
         }
 
-        res.status(500).json({ 
-            message: 'Error generating recipe with AI', 
+        res.status(500).json({
+            message: 'Error generating recipe with AI',
             error: error.message,
             suggestion: 'If this persists, try enabling MOCK_AI=true in your .env file.'
         });
