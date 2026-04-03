@@ -18,10 +18,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// GET all products (with optional category filter)
+// GET all products (with optional category or store filter)
 router.get('/', async (req, res) => {
   try {
-    const filter = req.query.category ? { category: req.query.category } : {};
+    const filter = {};
+    if (req.query.category) filter.category = req.query.category;
+    if (req.query.storeId) filter.storeId = req.query.storeId;
+    
     const products = await Product.find(filter);
     res.json(products);
   } catch (err) {

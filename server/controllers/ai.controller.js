@@ -1,8 +1,18 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
+import RecipeHistory from '../models/RecipeHistory.js';
 
-dotenv.config();
+// ─── Helper: Save recipe to history (non-blocking) ───
+const saveToHistory = async (prompt, recipe, userId = null) => {
+    try {
+        await RecipeHistory.create({ prompt, recipe, userId });
+        console.log(`[AI Kitchen] ✅ Recipe saved to history: "${recipe.name}"`);
+    } catch (err) {
+        // Log but never block the response
+        console.error('[AI Kitchen] ⚠️ Failed to save recipe to history:', err.message);
+    }
+};
 
+// ─── POST /api/ai/recipe — Generate a recipe via AI or Mock ───
 export const generateRecipe = async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -16,6 +26,8 @@ export const generateRecipe = async (req, res) => {
         // Check for Mock Mode or missing API Key
         const isMockMode = process.env.MOCK_AI === 'true';
         const isMissingKey = !process.env.AI_KEY || process.env.AI_KEY.includes('YOUR_');
+
+        console.log(`[AI Kitchen] MOCK_AI="${process.env.MOCK_AI}" | AI_KEY=${process.env.AI_KEY ? 'SET ✅' : 'MISSING ❌'} | Mode: ${isMockMode || isMissingKey ? 'MOCK' : 'LIVE AI'}`);
 
         if (isMockMode || isMissingKey) {
             console.log(`[AI Kitchen] Using MOCK MODE ${isMissingKey ? '(API Key missing)' : ''}`);
@@ -44,6 +56,10 @@ export const generateRecipe = async (req, res) => {
                     "Let it cool completely on a wire rack before serving with a touch of ELSA elegance."
                 ]
             };
+
+            // Save mock recipe to history
+            await saveToHistory(prompt, mockRecipe);
+
             return res.status(200).json(mockRecipe);
         }
 
@@ -103,6 +119,10 @@ JSON Structure:
 
             try {
                 const recipeData = JSON.parse(aiText);
+
+                // Save AI recipe to history
+                await saveToHistory(prompt, recipeData);
+
                 return res.status(200).json(recipeData);
             } catch (parseError) {
                 console.error("Failed to parse AI response as JSON:", aiText);
@@ -129,5 +149,41 @@ JSON Structure:
             error: error.message,
             suggestion: 'If this persists, try enabling MOCK_AI=true in your .env file.'
         });
+    }
+};
+
+// ─── GET /api/ai/history — Fetch all recipe history ───
+export const getRecipeHistory = async (req, res) => {
+    try {
+        // Optional limit via query param (default: 50)
+        const limit = parseInt(req.query.limit) || 50;
+
+        const history = await RecipeHistory.find()
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean();
+
+        res.status(200).json(history);
+    } catch (error) {
+        console.error('[AI Kitchen] Error fetching recipe history:', error.message);
+        res.status(500).json({ message: 'Failed to fetch recipe history' });
+    }
+};
+
+// ─── DELETE /api/ai/history/:id — Delete a recipe from history ───
+export const deleteRecipeHistory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await RecipeHistory.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: 'Recipe not found in history' });
+        }
+
+        console.log(`[AI Kitchen] 🗑️ Deleted recipe from history: "${deleted.recipe?.name}"`);
+        res.status(200).json({ message: 'Recipe deleted from history', id });
+    } catch (error) {
+        console.error('[AI Kitchen] Error deleting recipe:', error.message);
+        res.status(500).json({ message: 'Failed to delete recipe from history' });
     }
 };

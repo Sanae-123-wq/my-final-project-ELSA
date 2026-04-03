@@ -1,6 +1,6 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import path from 'path';
 import fs from 'fs';
@@ -22,7 +22,6 @@ import reclamationRoutes from './routes/reclamation.routes.js';
 import http from 'http';
 import { initSocket } from './socket.js';
 
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
