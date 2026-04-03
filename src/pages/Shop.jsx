@@ -10,6 +10,7 @@ import { FaFilter, FaSearch } from 'react-icons/fa';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
+    const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,20 +25,25 @@ const Shop = () => {
     const [filters, setFilters] = useState({
         categories: initialCategory ? [initialCategory] : [],
         maxPrice: 100,
-        vendor: '',
+        storeId: '',
         isNew: false,
         isPopular: false,
         favoritesOnly: false
     });
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const data = await api.fetchProducts();
-                setProducts(data);
+                const [productsData, storesData] = await Promise.all([
+                    api.fetchProducts(),
+                    api.fetchStores()
+                ]);
+                
+                setProducts(productsData);
+                setStores(storesData);
 
-                if (data.length > 0) {
-                    const max = Math.max(...data.map(p => p.price || 0));
+                if (productsData.length > 0) {
+                    const max = Math.max(...productsData.map(p => p.price || 0));
                     setFilters(prev => ({ ...prev, maxPrice: max }));
                 }
 
@@ -48,7 +54,7 @@ const Shop = () => {
             }
         };
 
-        fetchProducts();
+        fetchData();
     }, []);
 
     // Derived data for filters
@@ -56,9 +62,7 @@ const Shop = () => {
         return [...new Set(products.map(p => p.category))];
     }, [products]);
 
-    const allVendors = useMemo(() => {
-        return [...new Set(products.map(p => p.vendorName).filter(Boolean))];
-    }, [products]);
+
 
     const globalMaxPrice = useMemo(() => {
         return products.length > 0 ? Math.max(...products.map(p => p.price || 0)) : 100;
@@ -66,7 +70,7 @@ const Shop = () => {
 
     // Filtering logic
     const displayedProducts = useMemo(() => {
-        return products.filter(product => {
+        const filtered = products.filter(product => {
             // Search filter
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
@@ -87,8 +91,8 @@ const Shop = () => {
             if (product.price > filters.maxPrice) {
                 return false;
             }
-            // Vendor filter
-            if (filters.vendor && product.vendorName !== filters.vendor) {
+            // Store filter
+            if (filters.storeId && product.storeId !== filters.storeId) {
                 return false;
             }
             // Attribute: New
@@ -105,6 +109,9 @@ const Shop = () => {
             }
             return true;
         });
+
+        // Sort: "New" products always appear first
+        return filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
     }, [products, filters, favorites, searchTerm, language]);
 
     const handleReset = () => {
@@ -112,7 +119,7 @@ const Shop = () => {
         setFilters({
             categories: [],
             maxPrice: globalMaxPrice,
-            vendor: '',
+            storeId: '',
             isNew: false,
             isPopular: false,
             favoritesOnly: false
@@ -123,7 +130,7 @@ const Shop = () => {
         searchTerm !== '' ||
         filters.categories.length > 0 ||
         filters.maxPrice < globalMaxPrice ||
-        filters.vendor ||
+        filters.storeId ||
         filters.isNew ||
         filters.isPopular ||
         filters.favoritesOnly;
@@ -138,7 +145,7 @@ const Shop = () => {
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}
                 categories={allCategories}
-                vendors={allVendors}
+                stores={stores}
                 filters={filters}
                 setFilters={setFilters}
                 maxPrice={globalMaxPrice}

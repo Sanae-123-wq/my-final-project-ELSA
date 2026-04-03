@@ -18,7 +18,7 @@ const ProductCard = ({ product }) => {
     const images = product.images || [product.image];
 
     const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
-    
+
     const handleTouchEnd = (e) => {
         const touchEnd = e.changedTouches[0].clientX;
         if (touchStart - touchEnd > 40) {
@@ -32,14 +32,14 @@ const ProductCard = ({ product }) => {
 
     return (
         <div className="product-card">
-            <div 
+            <div
                 className="product-image"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
                 {product.isNew && <div className="product-badge new">New</div>}
-                <button 
-                    className={`product-wishlist ${favored ? 'active' : ''}`} 
+                <button
+                    className={`product-wishlist ${favored ? 'active' : ''}`}
                     aria-label={favored ? "Remove from Favorites" : "Add to Favorites"}
                     onClick={(e) => {
                         e.preventDefault();
@@ -48,7 +48,7 @@ const ProductCard = ({ product }) => {
                 >
                     {favored ? <FaHeart /> : <FaRegHeart />}
                 </button>
-                
+
                 <Link to={`/product/${product._id}`}>
                     <img
                         src={images[activeImgIndex]}
@@ -61,7 +61,7 @@ const ProductCard = ({ product }) => {
                 {images.length > 1 && (
                     <div className="card-thumbnails">
                         {images.map((img, idx) => (
-                            <div 
+                            <div
                                 key={idx}
                                 className={`card-dot ${idx === activeImgIndex ? 'active' : ''}`}
                                 style={{ backgroundImage: `url(${img})` }}
@@ -74,7 +74,7 @@ const ProductCard = ({ product }) => {
                     </div>
                 )}
             </div>
-            
+
             <div className="product-info">
                 <span className="category">{t.categories && t.categories[product.category] ? t.categories[product.category] : product.category}</span>
                 <Link to={`/product/${product._id}`}>
@@ -89,13 +89,13 @@ const ProductCard = ({ product }) => {
                     </div>
                     <span className="review-count">({product.numReviews || 0})</span>
                 </div>
-                
+
                 <div className="product-bottom">
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="price-tag">
                             ${product.price ? product.price.toFixed(2) : '0.00'}
                         </div>
-                        
+
                         <div className="stock-status-inline" style={{ marginTop: '4px' }}>
                             {product.stock === 0 ? (
                                 <span className="stock-msg out">Out of Stock</span>
@@ -107,12 +107,12 @@ const ProductCard = ({ product }) => {
                         </div>
                     </div>
 
-                    <button 
-                        className={`btn-cart ${product.stock === 0 ? 'disabled' : ''}`} 
-                        aria-label="Add to Cart" 
+                    <button
+                        className={`btn-cart ${product.stock === 0 ? 'disabled' : ''}`}
+                        aria-label="Add to Cart"
                         disabled={product.stock === 0}
-                        onClick={(e) => { 
-                            e.preventDefault(); 
+                        onClick={(e) => {
+                            e.preventDefault();
                             if (product.stock > 0) addToCart(product, 1);
                         }}
                     >

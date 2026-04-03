@@ -5,7 +5,7 @@ const ProductFilters = ({
     isOpen,
     onClose,
     categories, 
-    vendors, 
+    stores, 
     filters, 
     setFilters, 
     maxPrice,
@@ -94,29 +94,33 @@ const ProductFilters = ({
                                 if (!isOpen) e.currentTarget.nextElementSibling.classList.add('show');
                             }}
                         >
-                            <span>{filters.vendor || (t.common?.allStores || 'All Stores')}</span>
+                            <span>
+                                {filters.storeId 
+                                    ? stores.find(s => s._id === filters.storeId)?.name || 'Unknown Store'
+                                    : (t.common?.allStores || 'All Stores')}
+                            </span>
                             <span className="dropdown-arrow-icon">▼</span>
                         </button>
                         <div className="custom-options-list">
                             <div 
-                                className={`custom-option ${!filters.vendor ? 'selected' : ''}`}
+                                className={`custom-option ${!filters.storeId ? 'selected' : ''}`}
                                 onClick={() => {
-                                    setFilters({ ...filters, vendor: '' });
+                                    setFilters({ ...filters, storeId: '' });
                                     document.querySelectorAll('.custom-options-list').forEach(l => l.classList.remove('show'));
                                 }}
                             >
                                 {t.common?.allStores || 'All Stores'}
                             </div>
-                            {vendors.map(vendor => (
+                            {stores.map(store => (
                                 <div 
-                                    key={vendor} 
-                                    className={`custom-option ${filters.vendor === vendor ? 'selected' : ''}`}
+                                    key={store._id} 
+                                    className={`custom-option ${filters.storeId === store._id ? 'selected' : ''}`}
                                     onClick={() => {
-                                        setFilters({ ...filters, vendor });
+                                        setFilters({ ...filters, storeId: store._id });
                                         document.querySelectorAll('.custom-options-list').forEach(l => l.classList.remove('show'));
                                     }}
                                 >
-                                    {vendor}
+                                    {store.name}
                                 </div>
                             ))}
                         </div>

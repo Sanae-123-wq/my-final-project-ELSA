@@ -53,11 +53,11 @@ const ProductDetails = () => {
                 const data = await api.fetchProductById(id);
                 setProduct(data);
                 setActiveImgIndex(0); // Reset for new product
-                
+
                 const allProducts = await api.fetchProducts();
                 const related = allProducts.filter(p => p.category === data.category && p._id !== data._id);
                 setRelatedProducts(related);
-                
+
                 setLoading(false);
             } catch (error) {
                 console.error(error);
@@ -76,7 +76,7 @@ const ProductDetails = () => {
     };
 
     const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
-    
+
     const handleTouchEnd = (e) => {
         const touchEnd = e.changedTouches[0].clientX;
         const images = product.images || [product.image];
@@ -114,7 +114,7 @@ const ProductDetails = () => {
         <div className="container" style={{ paddingBottom: '4rem' }}>
             <div className="product-details-container">
                 <div className="gallery-column">
-                    <div 
+                    <div
                         className="main-image-viewport"
                         onMouseMove={handleMouseMove}
                         onMouseEnter={() => setIsZooming(true)}
@@ -122,7 +122,7 @@ const ProductDetails = () => {
                         onTouchStart={handleTouchStart}
                         onTouchEnd={handleTouchEnd}
                     >
-                        <div 
+                        <div
                             className="image-zoom-overlay"
                             style={{
                                 backgroundImage: `url(${images[activeImgIndex]})`,
@@ -136,11 +136,11 @@ const ProductDetails = () => {
                             className={`main-image ${isZooming ? 'zoomed-hidden' : ''}`}
                         />
                     </div>
-                    
+
                     {images.length > 1 && (
                         <div className="thumbnail-row">
                             {images.map((img, idx) => (
-                                <div 
+                                <div
                                     key={idx}
                                     className={`thumbnail-box ${idx === activeImgIndex ? 'active' : ''}`}
                                     onClick={() => setActiveImgIndex(idx)}
@@ -157,13 +157,13 @@ const ProductDetails = () => {
                     <h1>{product[`name_${language}`] || product.name}</h1>
 
                     <p className="detail-description">{product[`description_${language}`] || product.description}</p>
-                    
+
                     <p className="detail-price-main">${product.price.toFixed(2)}</p>
 
                     <div className="product-detail-rating">
                         <StarRating rating={product.rating || 5} />
                     </div>
-                    
+
                     <div className="stock-info-detail">
                         {product.stock === 0 ? (
                             <span className="stock-status out">Out of Stock</span>
@@ -178,27 +178,27 @@ const ProductDetails = () => {
                         <div className={`qty-control ${product.stock === 0 ? 'disabled' : ''}`}>
                             <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Quantity</span>
                             <div className="qty-counter">
-                                <button 
-                                    onClick={() => setQty(Math.max(1, qty - 1))} 
+                                <button
+                                    onClick={() => setQty(Math.max(1, qty - 1))}
                                     className="qty-btn"
                                     disabled={product.stock === 0}
                                 >-</button>
-                                <input 
-                                    readOnly 
-                                    type="number" 
-                                    value={qty} 
-                                    className="qty-input" 
+                                <input
+                                    readOnly
+                                    type="number"
+                                    value={qty}
+                                    className="qty-input"
                                 />
-                                <button 
-                                    onClick={() => setQty(Math.min(product.stock, qty + 1))} 
+                                <button
+                                    onClick={() => setQty(Math.min(product.stock, qty + 1))}
                                     className="qty-btn"
                                     disabled={product.stock === 0 || qty >= product.stock}
                                 >+</button>
                             </div>
                         </div>
 
-                        <button 
-                            onClick={handleAddToCart} 
+                        <button
+                            onClick={handleAddToCart}
                             className={`btn-primary ${product.stock === 0 ? 'disabled' : ''}`}
                             disabled={product.stock === 0}
                             style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem' }}

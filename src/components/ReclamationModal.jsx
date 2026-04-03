@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaExclamationCircle } from 'react-icons/fa';
+import './ReclamationModal.css';
 
-const ReclamationModal = ({ isOpen, onClose, orderId, orderNumber }) => {
+const ReclamationModal = ({ isOpen, onClose, onSuccess, orderId, orderNumber }) => {
     const [message, setMessage] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -28,6 +29,7 @@ const ReclamationModal = ({ isOpen, onClose, orderId, orderNumber }) => {
 
             setSuccess(true);
             setTimeout(() => {
+                if (onSuccess) onSuccess(orderId);
                 onClose();
                 setSuccess(false);
                 setMessage('');
@@ -43,60 +45,59 @@ const ReclamationModal = ({ isOpen, onClose, orderId, orderNumber }) => {
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-brown-dark/20 backdrop-blur-sm">
+            <div className="reclamation-overlay">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+                    className="reclamation-modal"
                 >
-                    <div className="p-6 border-b border-brown/5 flex justify-between items-center bg-cream/30">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange/10 rounded-lg text-orange">
+                    <div className="reclamation-header">
+                        <div className="reclamation-header-left">
+                            <div className="reclamation-header-icon">
                                 <FaExclamationCircle size={20} />
                             </div>
-                            <h2 className="text-xl font-bold text-brown-dark font-display">Report a Problem</h2>
+                            <h2 className="reclamation-title">Report a Problem</h2>
                         </div>
-                        <button onClick={onClose} className="p-2 hover:bg-brown/5 rounded-full text-brown/40 transition-colors">
+                        <button onClick={onClose} className="reclamation-close-btn">
                             <FaTimes size={20} />
                         </button>
                     </div>
 
-                    <div className="p-6">
+                    <div className="reclamation-body">
                         {success ? (
                             <motion.div 
                                 initial={{ opacity: 0, scale: 0.5 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="text-center py-8"
+                                className="reclamation-success"
                             >
-                                <div className="text-5xl mb-4">✅</div>
-                                <h3 className="text-xl font-bold text-brown-dark mb-2">Complaint Submitted</h3>
-                                <p className="text-brown/60">We've received your message and will get back to you shortly.</p>
+                                <span className="reclamation-success-icon">✅</span>
+                                <h3 className="reclamation-success-title">Complaint Submitted</h3>
+                                <p className="reclamation-success-text">We've received your message and our team will get back to you shortly.</p>
                             </motion.div>
                         ) : (
                             <form onSubmit={handleSubmit}>
-                                <div className="mb-4 p-4 bg-orange/5 rounded-xl border border-orange/10">
-                                    <p className="text-sm text-brown/60">
-                                        Order Reference: <span className="font-bold text-brown-dark">#{orderNumber}</span>
-                                    </p>
+                                <div className="reclamation-order-ref">
+                                    <span>Order Reference:</span>
+                                    <span className="reclamation-order-ref-bold">#{orderNumber}</span>
                                 </div>
 
                                 {error && (
-                                    <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
+                                    <div className="reclamation-error">
                                         <FaExclamationCircle className="shrink-0" />
                                         {error}
                                     </div>
                                 )}
 
-                                <div className="mb-6">
-                                    <label className="block text-sm font-bold text-brown-dark mb-2 ml-1">
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <label className="reclamation-label">
                                         What happened?
                                     </label>
                                     <textarea
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
-                                        className="w-full h-32 p-4 rounded-2xl border border-brown/10 focus:border-orange focus:ring-2 focus:ring-orange/20 transition-all outline-none resize-none text-brown bg-cream-light/30"
-                                        placeholder="Tell us more about the issue (missing item, damaged cake, etc.)"
+                                        className="reclamation-textarea"
+                                        placeholder="Tell us more about the issue (missing item, damaged cake, late delivery, etc.)"
                                         required
                                     ></textarea>
                                 </div>
@@ -104,7 +105,7 @@ const ReclamationModal = ({ isOpen, onClose, orderId, orderNumber }) => {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-full py-4 bg-brown-dark text-white rounded-2xl font-bold hover:bg-brown transition-all shadow-lg shadow-brown/20 disabled:opacity-50"
+                                    className="reclamation-submit-btn"
                                 >
                                     {submitting ? 'Submitting...' : 'Send Complaint'}
                                 </button>

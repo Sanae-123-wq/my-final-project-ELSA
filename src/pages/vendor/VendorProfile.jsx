@@ -43,7 +43,7 @@ const VendorProfile = () => {
                     
                     <form onSubmit={handleSave} style={{ padding: '1.25rem' }}>
                         <div className="form-group-admin" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #E6CCB2, #B08968)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', border: '4px solid #F0EBE3' }}>
+                            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #E6CCB2, #5C4033)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', border: '4px solid #F0EBE3' }}>
                                 {user?.name?.charAt(0) || 'P'}
                             </div>
                             <div>
@@ -117,3 +117,5 @@ const VendorProfile = () => {
 };
 
 export default VendorProfile;
+
+

@@ -1,27 +1,37 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
+import { FaChartBar, FaUsers, FaShoppingBag, FaDollarSign, FaBox, FaArrowUp, FaArrowRight, FaCalendarAlt, FaHistory, FaCheckCircle, FaUserShield, FaBicycle, FaUtensils } from 'react-icons/fa';
+import './AdminDashboard.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 // Simple bar chart component (no external library needed)
-const BarChart = ({ data, color = '#B08968', label }) => {
+const PremiumBarChart = ({ data, color = '#D97706' }) => {
     const max = Math.max(...data.map(d => d.value), 1);
     return (
-        <div className="admin-chart-wrap">
-            <div className="admin-bar-chart">
-                {data.map((d, i) => (
-                    <div key={i} className="admin-bar-col">
-                        <div className="admin-bar-value">{d.value}</div>
-                        <div
-                            className="admin-bar"
-                            style={{ height: `${(d.value / max) * 100}%`, background: color }}
+        <div className="ad-chart-container thin-scrollbar">
+            {data.map((d, i) => {
+                const height = (d.value / max) * 100;
+                return (
+                    <div key={i} className="ad-chart-bar-wrap">
+                        <div 
+                            className="ad-chart-bar" 
+                            style={{ 
+                                height: `${height}%`, 
+                                background: `linear-gradient(to top, ${color}, ${color}CC)`,
+                                boxShadow: i % 2 === 0 ? '0 4px 15px rgba(217,119,6,0.1)' : 'none'
+                            }}
                             title={`${d.label}: ${d.value}`}
-                        ></div>
-                        <div className="admin-bar-label">{d.label}</div>
+                        >
+                            <div style={{ position: 'absolute', top: '-25px', left: '50%', transform: 'translateX(-50%)', fontSize: '0.7rem', fontWeight: 800, color: '#5C4033' }}>
+                                {d.value > 1000 ? `${(d.value/1000).toFixed(1)}k` : d.value}
+                            </div>
+                        </div>
+                        <div className="ad-chart-label">{d.label}</div>
                     </div>
-                ))}
-            </div>
+                );
+            })}
         </div>
     );
 };
@@ -99,169 +109,183 @@ const AdminDashboard = () => {
     };
 
     if (loading) return (
-        <div className="admin-loading">
-            <div className="admin-spinner"></div>
-            <p>Loading dashboard...</p>
+        <div className="flex justify-center items-center min-h-screen">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-gold)', borderBottomColor: 'var(--pat-gold)' }}></div>
+            <p className="ml-4 font-bold text-brown text-xl">Initializing Admin Intelligence...</p>
         </div>
     );
 
     return (
-        <div className="admin-page">
-            <div className="admin-page-header">
-                <div>
-                    <h1 className="admin-page-title">Dashboard Overview</h1>
-                    <p className="admin-page-subtitle">Welcome back! Here's what's happening at ELSA Pâtisserie.</p>
+        <div className="ad-container inner-admin-page">
+            <div className="ad-header">
+                <div className="ad-title-group">
+                    <h1>Admin Pulse</h1>
+                    <p>Orchestrating platform performance and ecosystem growth</p>
                 </div>
-                <div className="admin-page-date">
-                    📅 {new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-            </div>
-
-            {/* Summary Cards */}
-            <div className="admin-stats-grid">
-                <div className="admin-stat-card stat-orders">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Total Orders</div>
-                        <div className="stat-card-value">{stats.orders}</div>
-                        <div className="stat-card-trend trend-up">↑ 12% this month</div>
-                    </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">📦</div>
-                        <Sparkline data={[3,7,5,11,8,14,10,16]} color="#B08968" />
-                    </div>
-                </div>
-                <div className="admin-stat-card stat-revenue">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Total Revenue</div>
-                        <div className="stat-card-value">{Number(stats.revenue).toFixed(0)} MAD</div>
-                        <div className="stat-card-trend trend-up">↑ 8.5% this month</div>
-                    </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">💰</div>
-                        <Sparkline data={[1200,2100,1600,2900,2100,3200,2750,3600]} color="#7F5539" />
-                    </div>
-                </div>
-                <div className="admin-stat-card stat-clients">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Total Clients</div>
-                        <div className="stat-card-value">{stats.clients}</div>
-                        <div className="stat-card-trend trend-up">↑ 3 new this week</div>
-                    </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">👥</div>
-                        <Sparkline data={[1,2,2,3,3,4,4,5]} color="#CCD5AE" />
-                    </div>
-                </div>
-                <div className="admin-stat-card stat-products">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Total Products</div>
-                        <div className="stat-card-value">{stats.products}</div>
-                        <div className="stat-card-trend trend-neutral">— No change</div>
-                    </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">🥐</div>
-                        <Sparkline data={[12,12,13,14,14,15,15,15]} color="#E6CCB2" />
-                    </div>
+                <div className="ad-date-badge">
+                    <FaCalendarAlt /> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </div>
             </div>
 
-            {/* Charts Row */}
-            <div className="admin-charts-row">
-                <div className="admin-card admin-card-lg">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Monthly Orders</h3>
-                        <span className="admin-card-badge">2025</span>
+            {/* Top Stat Cards */}
+            <div className="ad-stats-grid">
+                <div className="ad-stat-card stat-rev">
+                    <div className="ad-stat-content">
+                        <h4>Platform Revenue</h4>
+                        <div className="ad-stat-value">{Number(stats.revenue).toLocaleString()} <span style={{fontSize: '1rem'}}>MAD</span></div>
+                        <div className="ad-trend trend-up"><FaArrowUp /> 8.4% growth</div>
                     </div>
-                    <BarChart data={monthlySales} color="#B08968" />
+                    <div className="ad-stat-visual">
+                        <div className="ad-icon-box"><FaDollarSign /></div>
+                        <Sparkline data={[1200,2100,1600,2900,2100,3200,2750,3600]} color="#D97706" />
+                    </div>
                 </div>
-                <div className="admin-card admin-card-sm">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Revenue (MAD)</h3>
-                        <span className="admin-card-badge">2025</span>
+
+                <div className="ad-stat-card stat-ord">
+                    <div className="ad-stat-content">
+                        <h4>Total Orders</h4>
+                        <div className="ad-stat-value">{stats.orders}</div>
+                        <div className="ad-trend trend-up"><FaArrowUp /> 12.2% growth</div>
                     </div>
-                    <BarChart data={monthlyRevenue} color="#7F5539" />
+                    <div className="ad-stat-visual">
+                        <div className="ad-icon-box"><FaShoppingBag /></div>
+                        <Sparkline data={[3,7,5,11,8,14,10,16]} color="#16A34A" />
+                    </div>
+                </div>
+
+                <div className="ad-stat-card stat-usr">
+                    <div className="ad-stat-content">
+                        <h4>Active Clients</h4>
+                        <div className="ad-stat-value">{stats.clients}</div>
+                        <div className="ad-trend trend-neutral">Stably scaled</div>
+                    </div>
+                    <div className="ad-stat-visual">
+                        <div className="ad-icon-box"><FaUsers /></div>
+                        <Sparkline data={[1,2,2,3,3,4,4,5]} color="#2563EB" />
+                    </div>
+                </div>
+
+                <div className="ad-stat-card stat-prd">
+                    <div className="ad-stat-content">
+                        <h4>Catalog Size</h4>
+                        <div className="ad-stat-value">{stats.products}</div>
+                        <div className="ad-trend trend-neutral">Quality focused</div>
+                    </div>
+                    <div className="ad-stat-visual">
+                        <div className="ad-icon-box"><FaBox /></div>
+                        <Sparkline data={[12,12,13,14,14,15,15,15]} color="#DC2626" />
+                    </div>
                 </div>
             </div>
 
-            {/* Bottom Row: Recent Orders + Activity Log */}
-            <div className="admin-bottom-row">
-                {/* Recent Orders */}
-                <div className="admin-card admin-card-orders">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Recent Orders</h3>
-                        <Link to="/admin/orders" className="admin-card-link">View All →</Link>
+            {/* Performance Charts */}
+            <div className="ad-main-grid">
+                <div className="ad-panel">
+                    <div className="ad-panel-header">
+                        <div className="ad-panel-title"><FaChartBar /> Order Velocity</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#D97706' }}>LAST 12 MONTHS</div>
                     </div>
-                    <div className="admin-table-wrap">
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Client</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentOrders.length === 0 ? (
-                                    <tr><td colSpan="4" className="admin-table-empty">No orders yet.</td></tr>
-                                ) : recentOrders.map(order => {
-                                    const sc = statusConfig[order.status] || { label: order.status, cls: 'badge-neutral' };
-                                    return (
-                                        <tr key={order._id}>
-                                            <td className="order-id-cell">#{order._id.slice(-6).toUpperCase()}</td>
-                                            <td>{order.user?.name || '—'}</td>
-                                            <td className="font-semibold" style={{ color: 'var(--pat-brown)', fontWeight: '800' }}>{(order.totalAmount || order.totalPrice)?.toFixed(2)} MAD</td>
-                                            <td><span className={`order-status-badge ${sc.cls}`}>{sc.label}</span></td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                    <PremiumBarChart data={monthlySales} color="#5C4033" />
                 </div>
 
-                {/* Activity Log */}
-                <div className="admin-card admin-card-activity">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Activity Log</h3>
-                        <Link to="/admin/activity" className="admin-card-link">View All →</Link>
+                <div className="ad-panel">
+                    <div className="ad-panel-header">
+                        <div className="ad-panel-title"><FaHistory /> Platform Activity</div>
+                        <Link to="/admin/activity" style={{ color: '#D97706', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}>Live Logs</Link>
                     </div>
-                    <div className="activity-list">
+                    <div className="ad-list">
                         {activityLog.length === 0 ? (
-                            <p className="admin-empty-text">No recent activity.</p>
+                            <p style={{ textAlign: 'center', padding: '2rem', opacity: 0.5 }}>No recent activity alerts.</p>
                         ) : activityLog.map((log, i) => (
-                            <div key={i} className="activity-item">
-                                <div className={`activity-dot dot-${log.type}`}></div>
-                                <div className="activity-content">
-                                    <div className="activity-text">{log.action}</div>
-                                    <div className="activity-time">{log.time}</div>
+                            <div key={i} className="ad-list-item">
+                                <div className="ad-list-icon">
+                                    {log.type === 'order' ? '🛒' : log.type === 'login' ? '👤' : '🛠️'}
+                                </div>
+                                <div className="ad-list-info">
+                                    <div className="ad-list-primary">{log.action}</div>
+                                    <div className="ad-list-secondary">{log.time} • by {log.by}</div>
                                 </div>
                             </div>
                         ))}
                     </div>
+                    
+                    <div className="ad-actions-grid">
+                        <Link to="/admin/users" className="ad-action-card">
+                            <FaUserShield className="ad-action-btn-icon" />
+                            <span className="ad-action-label">User Rights</span>
+                        </Link>
+                        <Link to="/admin/products" className="ad-action-card">
+                            <FaUtensils className="ad-action-btn-icon" />
+                            <span className="ad-action-label">Catalog</span>
+                        </Link>
+                    </div>
+                </div>
+            </div>
 
-                    {/* Quick Stats */}
-                    <div className="admin-quick-stats">
-                        <div className="quick-stat">
-                            <span className="quick-stat-icon">👨‍🍳</span>
-                            <div>
-                                <div className="quick-stat-value">{stats.vendors}</div>
-                                <div className="quick-stat-label">Vendors</div>
-                            </div>
+            {/* Recent Orders Flow */}
+            <div className="ad-panel">
+                <div className="ad-panel-header">
+                    <div className="ad-panel-title"><FaShoppingBag /> Distribution Stream</div>
+                    <Link to="/admin/orders" className="ad-date-badge" style={{ textDecoration: 'none', color: '#D97706', border: 'none' }}>Full Log <FaArrowRight /></Link>
+                </div>
+                <div className="ao-card" style={{ boxShadow: 'none', border: 'none' }}>
+                    <table className="ao-table">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Client</th>
+                                <th>Revenue</th>
+                                <th>Flow Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {recentOrders.map(order => {
+                                const sc = statusConfig[order.status] || { label: order.status, cls: 'tag-pending' };
+                                return (
+                                    <tr key={order._id} className="ao-row">
+                                        <td className="ao-td">
+                                            <div className="ao-order-id">#{order._id.slice(-8).toUpperCase()}</div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div className="ao-username">{order.user?.name || 'Guest'}</div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div className="ad-list-value">{(order.totalAmount || order.totalPrice)?.toFixed(2)} MAD</div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <span className={`ao-status-tag tag-${order.status}`}>
+                                                {order.status === 'delivered' ? <FaCheckCircle /> : <FaHistory />}
+                                                {sc.label}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Ecosystem Breakdown */}
+                <div style={{ marginTop: '2.5rem', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', paddingTop: '2rem', borderTop: '1px dashed rgba(139,94,60,0.1)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div className="ad-icon-box" style={{ background: '#FFF7ED', color: '#D97706' }}><FaUtensils /></div>
+                        <div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#5C4033' }}>{stats.vendors}</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF' }}>GOURMET VENDORS</div>
                         </div>
-                        <div className="quick-stat">
-                            <span className="quick-stat-icon">🚚</span>
-                            <div>
-                                <div className="quick-stat-value">{stats.delivery}</div>
-                                <div className="quick-stat-label">Delivery</div>
-                            </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div className="ad-icon-box" style={{ background: '#F0FDF4', color: '#16A34A' }}><FaBicycle /></div>
+                        <div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#5C4033' }}>{stats.delivery}</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF' }}>LOGISTICS STAFF</div>
                         </div>
-                        <div className="quick-stat">
-                            <span className="quick-stat-icon">🛒</span>
-                            <div>
-                                <div className="quick-stat-value">{stats.orders}</div>
-                                <div className="quick-stat-label">Orders</div>
-                            </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div className="ad-icon-box" style={{ background: '#EFF6FF', color: '#2563EB' }}><FaShoppingBag /></div>
+                        <div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#5C4033' }}>{stats.orders}</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#9CA3AF' }}>SYSTEM ORDERS</div>
                         </div>
                     </div>
                 </div>
@@ -271,3 +295,5 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
+

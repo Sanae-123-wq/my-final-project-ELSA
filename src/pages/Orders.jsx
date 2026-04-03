@@ -9,6 +9,8 @@ const Orders = () => {
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const { t } = useLanguage();
 
     useEffect(() => {
@@ -137,8 +139,12 @@ const Orders = () => {
                                         </button>
                                     )}
                                     <button 
-                                        className="flex-1"
-                                        style={{ padding: '0.75rem', borderRadius: '12px', background: 'var(--pat-brown)', color: 'white', fontWeight: '700', fontSize: '0.85rem', border: 'none' }}
+                                        onClick={() => {
+                                            setSelectedOrderDetails(order);
+                                            setIsDetailsModalOpen(true);
+                                        }}
+                                        className="flex-1 hover:scale-105"
+                                        style={{ padding: '0.75rem', borderRadius: '12px', background: 'var(--pat-brown)', color: 'white', fontWeight: '700', fontSize: '0.85rem', border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}
                                     >
                                         Details
                                     </button>
@@ -164,6 +170,63 @@ const Orders = () => {
                 orderId={selectedOrder?._id}
                 orderNumber={selectedOrder?._id?.toString()?.slice(-6)?.toUpperCase()}
             />
+
+            {/* Premium Details Modal */}
+            <AnimatePresence>
+                {isDetailsModalOpen && selectedOrderDetails && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="premium-modal-overlay"
+                        onClick={() => setIsDetailsModalOpen(false)}
+                    >
+                        <motion.div 
+                            initial={{ y: 50, opacity: 0 }} 
+                            animate={{ y: 0, opacity: 1 }} 
+                            exit={{ y: 50, opacity: 0 }} 
+                            className="premium-modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="premium-modal-header">
+                                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.5rem', color: 'var(--pat-brown)', fontWeight: 'bold' }}>
+                                    Order #{selectedOrderDetails._id.toString().slice(-6).toUpperCase()}
+                                </h3>
+                                <button className="premium-modal-close" onClick={() => setIsDetailsModalOpen(false)}>&times;</button>
+                            </div>
+                            <div className="premium-modal-body">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                                    <span style={{ color: 'var(--text-light)', fontWeight: '600' }}>Status:</span>
+                                    <span className={`order-status-badge status-${selectedOrderDetails.status}`}>
+                                        {getStatusLabel(selectedOrderDetails.status)}
+                                    </span>
+                                </div>
+                                <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--pat-beige)', paddingBottom: '0.5rem' }}>Products</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                                    {selectedOrderDetails.products.map((item, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            {item.productId?.image && (
+                                                <img src={item.productId.image} alt={item.productId.name} style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' }} />
+                                            )}
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontWeight: '700', color: 'var(--pat-brown)' }}>{item.productId?.name || 'Deleted Product'}</div>
+                                                <div style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>{item.price} MAD × {item.quantity}</div>
+                                            </div>
+                                            <div style={{ fontWeight: '800' }}>
+                                                {item.price * item.quantity} MAD
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '2px dashed var(--pat-beige)', fontSize: '1.2rem', fontWeight: '800', color: 'var(--pat-brown)' }}>
+                                    <span>Total:</span>
+                                    <span>{selectedOrderDetails.totalAmount} MAD</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

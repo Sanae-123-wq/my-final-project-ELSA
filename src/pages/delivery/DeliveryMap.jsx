@@ -54,7 +54,7 @@ const DeliveryMap = () => {
                             {/* Active Delivery Destination */}
                             <div style={{ position: 'absolute', top: '70%', left: '40%', transform: 'translate(-50%, -50%)', zIndex: 4 }}>
                                 <div style={{ fontSize: '2rem', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))' }}>📦</div>
-                                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '-4px', background: '#B08968', color: 'white', padding: '4px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '700', whiteSpace: 'nowrap', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>ORD_882 Dropoff</div>
+                                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '-4px', background: '#5C4033', color: 'white', padding: '4px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: '700', whiteSpace: 'nowrap', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>ORD_882 Dropoff</div>
                             </div>
 
                             {/* Route Line Mock */}
@@ -82,7 +82,7 @@ const DeliveryMap = () => {
                                 </div>
                                 <div>
                                     <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#374151' }}>En Route to ORD_882</div>
-                                    <div style={{ fontSize: '0.75rem', color: '#B08968', fontWeight: '600' }}>ETA: 8 mins (1.5 km left)</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#5C4033', fontWeight: '600' }}>ETA: 8 mins (1.5 km left)</div>
                                 </div>
                             </div>
                             <button className="admin-btn admin-btn-secondary" style={{ padding: '0.4rem 1rem' }}>Open external Maps ↗</button>
@@ -95,3 +95,5 @@ const DeliveryMap = () => {
 };
 
 export default DeliveryMap;
+
+

@@ -39,7 +39,7 @@ const DeliveryProfile = () => {
                         <h3 className="admin-card-title">Personal Information</h3>
                     </div>
                     <div className="settings-profile-section" style={{ borderBottom: '1px solid #F0EBE3', paddingBottom: '1.5rem', marginBottom: '0.5rem' }}>
-                        <div className="settings-avatar" style={{ background: 'linear-gradient(135deg, #E6CCB2, #B08968)', color: '#3D2314' }}>
+                        <div className="settings-avatar" style={{ background: 'linear-gradient(135deg, #E6CCB2, #5C4033)', color: '#3D2314' }}>
                             {user?.name?.charAt(0) || 'L'}
                         </div>
                         <div>
@@ -136,3 +136,5 @@ const DeliveryProfile = () => {
 };
 
 export default DeliveryProfile;
+
+

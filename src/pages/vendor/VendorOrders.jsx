@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { api } from '../../services/api';
 import AuthContext from '../../context/AuthContext';
+import { FaSearch, FaShoppingBag, FaUser, FaBoxOpen, FaClock, FaCheckCircle, FaTruck, FaMapMarkerAlt } from 'react-icons/fa';
+import './VendorOrders.css';
 
 const VendorOrders = () => {
     const { user } = useContext(AuthContext);
@@ -54,7 +56,8 @@ const VendorOrders = () => {
                 body: JSON.stringify({ status: newStatus })
             });
 
-            if (!res.ok) throw new Error('Failed to update status');
+            const updatedBody = await res.json();
+            if (!res.ok) throw new Error(updatedBody.message || 'Failed to update status');
 
             setOrders(orders.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
         } catch (err) {
@@ -80,98 +83,130 @@ const VendorOrders = () => {
     );
 
     return (
-        <div className="admin-page">
-            <div className="admin-page-header">
-                <div>
-                    <h1 className="admin-page-title" style={{ fontFamily: "'Playfair Display', serif", color: 'var(--pat-brown)' }}>📦 Customer Orders</h1>
-                    <p className="admin-page-subtitle">Manage orders containing your pastry products</p>
+        <div className="vo-container inner-admin-page">
+            <div className="vo-header">
+                <div className="vo-title-section">
+                    <h1><FaShoppingBag /> Customer Orders</h1>
+                    <p>Track and manage your pastry orders in real-time</p>
                 </div>
-            </div>
-
-            <div className="admin-card" style={{ borderRadius: 'var(--pat-radius)', boxShadow: 'var(--pat-shadow)' }}>
-                <div className="admin-filters-row">
+                <div className="vo-search-bar">
+                    <FaSearch className="vo-search-icon" />
                     <input 
                         type="text" 
-                        placeholder="Search by Order ID or Customer..." 
-                        className="admin-input" 
-                        style={{ maxWidth: '300px', borderRadius: '12px' }}
+                        placeholder="Search by ID or Customer..." 
+                        className="vo-search-input" 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+            </div>
 
-                <div className="admin-table-wrap">
-                    <table className="admin-table admin-table-full">
-                        <thead>
-                            <tr style={{ background: 'var(--pat-cream)', borderBottom: '1.5px solid var(--pat-beige)' }}>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Order Info</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Customer</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Your Items</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Status</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredOrders.map(order => (
-                                <tr key={order._id} style={{ borderBottom: '1px solid rgba(245, 230, 211, 0.5)' }}>
-                                    <td>
-                                        <div style={{ fontWeight: '700', color: 'var(--pat-brown)', letterSpacing: '0.02em', fontSize: '0.9rem' }}>#{order._id.substring(0, 8).toUpperCase()}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '4px' }}>{new Date(order.createdAt || Date.now()).toLocaleDateString()}</div>
-                                    </td>
-                                    <td>
-                                        <div style={{ fontWeight: '600', color: 'var(--dark-color)' }}>{order.customerName}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>📞 {order.phone}</div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            {order.items.map((item, idx) => (
-                                                <div key={idx} style={{ marginBottom: '2px', fontSize: '0.85rem' }}>
-                                                    <span style={{ fontWeight: '700', color: 'var(--pat-gold)' }}>{item.qty}x</span> {item.name}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div style={{ fontWeight: '800', color: 'var(--pat-brown)', marginTop: '6px', fontSize: '0.9rem' }}>{order.totalForVendor.toFixed(2)} MAD</div>
-                                    </td>
-                                    <td>{getStatusBadge(order.status)}</td>
-                                    <td>
-                                        <div className="admin-actions">
-                                            {order.status === 'pending' && (
-                                                <button 
-                                                    className="admin-btn-primary" 
-                                                    style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', borderRadius: '10px' }}
-                                                    onClick={() => handleUpdateStatus(order._id, 'preparing')}
-                                                >
-                                                    Start Preparing
-                                                </button>
-                                            )}
-                                            {order.status === 'preparing' && (
-                                                <button 
-                                                    className="admin-btn-primary" 
-                                                    style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', borderRadius: '10px', background: 'var(--pat-gold)' }}
-                                                    onClick={() => handleUpdateStatus(order._id, 'ready')}
-                                                >
-                                                    Mark Ready
-                                                </button>
-                                            )}
-                                            {order.status === 'ready' && (
-                                                <span style={{ fontSize: '0.8rem', color: 'var(--pat-gold)', fontWeight: 'bold' }}>Awaiting Pickup</span>
-                                            )}
-                                            {order.status === 'picked' && (
-                                                <span style={{ fontSize: '0.8rem', color: '#8b5cf6', fontWeight: 'bold' }}>Out for Delivery</span>
-                                            )}
-                                            {order.status === 'delivered' && (
-                                                <span style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 'bold' }}>Completed</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="vo-card">
+                <div className="vo-table-header">
+                    <div className="vo-th">Order Info</div>
+                    <div className="vo-th">Customer</div>
+                    <div className="vo-th">Your Items</div>
+                    <div className="vo-th">Status</div>
+                    <div className="vo-th">Actions</div>
                 </div>
+
+                {filteredOrders.length === 0 ? (
+                    <div className="vo-empty">
+                        <span className="vo-empty-icon">📂</span>
+                        <h3 className="vo-empty-title">No orders found</h3>
+                        <p className="vo-empty-text">When customers buy your products, they will appear here.</p>
+                    </div>
+                ) : (
+                    <div className="vo-table-body">
+                        {filteredOrders.map(order => (
+                            <div key={order._id} className="vo-row">
+                                {/* Order Info */}
+                                <div>
+                                    <div className="vo-order-id">#{order._id.substring(0, 8).toUpperCase()}</div>
+                                    <div className="vo-order-date">
+                                        <FaClock style={{ fontSize: '0.7rem', marginRight: '4px' }} />
+                                        {new Date(order.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                </div>
+
+                                {/* Customer info */}
+                                <div>
+                                    <div className="vo-customer-name">
+                                        <FaUser style={{ fontSize: '0.8rem', marginRight: '6px', color: 'rgba(92, 64, 51, 0.4)' }} />
+                                        {order.customerName}
+                                    </div>
+                                    <a href={`tel:${order.phone}`} className="vo-customer-contact">
+                                        📞 {order.phone !== 'N/A' ? order.phone : 'Contact info hidden'}
+                                    </a>
+                                </div>
+
+                                {/* Items */}
+                                <div>
+                                    <div className="vo-items-list">
+                                        {order.items.map((item, idx) => (
+                                            <div key={idx} className="vo-item">
+                                                <span className="vo-item-qty">{item.qty}x</span>
+                                                <span>{item.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="vo-total">
+                                        {order.totalForVendor.toLocaleString()} MAD
+                                    </div>
+                                </div>
+
+                                {/* Status */}
+                                <div>
+                                    <span className={`vo-badge vo-badge-${order.status}`}>
+                                        {order.status === 'ready' && <FaCheckCircle style={{ marginRight: '6px' }} />}
+                                        {order.status === 'picked' && <FaTruck style={{ marginRight: '6px' }} />}
+                                        {order.status}
+                                    </span>
+                                </div>
+
+                                {/* Actions */}
+                                <div>
+                                    {order.status === 'pending' && (
+                                        <button 
+                                            className="vo-btn vo-btn-primary" 
+                                            onClick={() => handleUpdateStatus(order._id, 'preparing')}
+                                        >
+                                            <FaClock /> Start Prep
+                                        </button>
+                                    )}
+                                    {order.status === 'preparing' && (
+                                        <button 
+                                            className="vo-btn vo-btn-gold" 
+                                            onClick={() => handleUpdateStatus(order._id, 'ready')}
+                                        >
+                                            <FaCheckCircle /> Mark Ready
+                                        </button>
+                                    )}
+                                    {order.status === 'ready' && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontSize: '0.85rem', fontWeight: '800' }}>
+                                            <FaMapMarkerAlt /> Awaiting Delivery
+                                        </div>
+                                    )}
+                                    {order.status === 'picked' && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7C3AED', fontSize: '0.85rem', fontWeight: '800' }}>
+                                            <FaTruck /> In Transit
+                                        </div>
+                                    )}
+                                    {order.status === 'delivered' && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4B5563', fontSize: '0.85rem', fontWeight: '800' }}>
+                                            <FaCheckCircle /> Completed
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
 };
 
 export default VendorOrders;
+
+

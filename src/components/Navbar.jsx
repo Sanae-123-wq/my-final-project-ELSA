@@ -30,33 +30,55 @@ const Navbar = () => {
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const closeMenu = () => setIsMenuOpen(false);
 
+    const isClientOrGuest = !user || user.role === 'client';
+
     return (
         <nav className="navbar">
             <div className="container nav-container">
                 {/* Left Section: Logo */}
                 <div className="nav-left">
-                    <Link to="/" className="nav-logo" onClick={closeMenu}>
+                    <Link to={isClientOrGuest ? "/" : `/${user.role}`} className="nav-logo" onClick={closeMenu}>
                         <img src={logo} alt="ELSA Logo" className="logo-img" />
                     </Link>
                 </div>
 
                 {/* Center Section: Main Navigation (Desktop Only) */}
                 <div className="nav-center">
-                    <Link to="/" className="nav-text-link">{t.navbar.home}</Link>
-                    <Link to="/shop" className="nav-text-link">{t.navbar.shop}</Link>
-                    <Link to="/stores" className="nav-text-link">{t.navbar.marketplace}</Link>
-                    <Link to="/ai-recipe" className="nav-text-link">{t.navbar.aiKitchen}</Link>
-                    {user && <Link to="/orders" className="nav-text-link">My Orders</Link>}
+                    {isClientOrGuest ? (
+                        <>
+                            <Link to="/" className="nav-text-link">{t.navbar.home}</Link>
+                            <Link to="/shop" className="nav-text-link">{t.navbar.shop}</Link>
+                            <Link to="/stores" className="nav-text-link">{t.navbar.marketplace}</Link>
+                            <Link to="/ai-recipe" className="nav-text-link">{t.navbar.aiKitchen}</Link>
+                            {user && <Link to="/orders" className="nav-text-link">My Orders</Link>}
+                        </>
+                    ) : (
+                        <>
+                            <Link to={`/${user.role}`} className="nav-text-link">Dashboard</Link>
+                            {user.role === 'admin' && <Link to="/admin/products" className="nav-text-link">Manage Products</Link>}
+                            {user.role === 'vendor' && <Link to="/vendor/products" className="nav-text-link">My Products</Link>}
+                            {user.role === 'delivery' && <Link to="/delivery/available" className="nav-text-link">Available Orders</Link>}
+                        </>
+                    )}
                 </div>
 
                 {/* Right Section: Icons (Desktop Only) */}
                 <div className="nav-right">
                     <LanguageSelector />
 
-                    <Link to="/favorites" className="nav-icon-link" aria-label="Favorites">
-                        <FaHeart size={18} />
-                        {favoritesCount > 0 && <span className="badge badge-favorites">{favoritesCount}</span>}
-                    </Link>
+                    {isClientOrGuest && (
+                        <>
+                            <Link to="/favorites" className="nav-icon-link" aria-label="Favorites">
+                                <FaHeart size={18} />
+                                {favoritesCount > 0 && <span className="badge badge-favorites">{favoritesCount}</span>}
+                            </Link>
+
+                            <Link to="/cart" className="nav-icon-link" aria-label="Shopping Cart">
+                                <FaShoppingCart size={20} />
+                                {cartCount > 0 && <span className="badge">{cartCount}</span>}
+                            </Link>
+                        </>
+                    )}
 
                     {user && (
                         <Link to="/notifications" className="nav-icon-link" aria-label="Notifications">
@@ -64,11 +86,6 @@ const Navbar = () => {
                             {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
                         </Link>
                     )}
-
-                    <Link to="/cart" className="nav-icon-link" aria-label="Shopping Cart">
-                        <FaShoppingCart size={20} />
-                        {cartCount > 0 && <span className="badge">{cartCount}</span>}
-                    </Link>
 
                     {user ? (
                         <div className="nav-user-box">
@@ -97,13 +114,23 @@ const Navbar = () => {
 
             {/* Mobile Menu Overlay */}
             <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
-                <Link to="/" onClick={closeMenu}>{t.navbar.home}</Link>
-                <Link to="/shop" onClick={closeMenu}>{t.navbar.shop}</Link>
-                <Link to="/stores" onClick={closeMenu}>{t.navbar.marketplace}</Link>
-                <Link to="/ai-recipe" onClick={closeMenu}>{t.navbar.aiKitchen}</Link>
-                {user && <Link to="/orders" onClick={closeMenu}>My Orders</Link>}
-                <Link to="/favorites" onClick={closeMenu}>{t.navbar.favorites}</Link>
-                <Link to="/cart" onClick={closeMenu}>{t.navbar.cart}</Link>
+                {isClientOrGuest ? (
+                    <>
+                        <Link to="/" onClick={closeMenu}>{t.navbar.home}</Link>
+                        <Link to="/shop" onClick={closeMenu}>{t.navbar.shop}</Link>
+                        <Link to="/stores" onClick={closeMenu}>{t.navbar.marketplace}</Link>
+                        <Link to="/ai-recipe" onClick={closeMenu}>{t.navbar.aiKitchen}</Link>
+                        {user && <Link to="/orders" onClick={closeMenu}>My Orders</Link>}
+                        <Link to="/favorites" onClick={closeMenu}>{t.navbar.favorites}</Link>
+                        <Link to="/cart" onClick={closeMenu}>{t.navbar.cart}</Link>
+                    </>
+                ) : (
+                    <>
+                        <Link to={`/${user.role}`} onClick={closeMenu}>Dashboard</Link>
+                        <Link to="/notifications" onClick={closeMenu}>Notifications</Link>
+                    </>
+                )}
+                
                 {user ? (
                     <>
                         <span className="mobile-welcome">{t.navbar.hi}, {user.name}</span>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaInstagram, FaTiktok, FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaStar, FaQuoteLeft } from 'react-icons/fa';
+import { FaInstagram, FaTiktok, FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaStar, FaQuoteLeft, FaFacebookF } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import logo from '../assets/logo.png';
 
@@ -62,7 +62,9 @@ const Footer = () => {
                             </li>
                         </ul>
                         <div className="social-links">
+                            <a href="https://www.facebook.com/profile.php?id=61574299620680" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook"><FaFacebookF /></a>
                             <a href="https://www.instagram.com/elsa.pastry1?igsh=cmhjN2xoZDN3Nmht" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://www.tiktok.com/@elsapastr" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="TikTok"><FaTiktok /></a>
                             <a href="https://wa.me/212771398616" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="WhatsApp"><FaWhatsapp /></a>
                         </div>
                     </div>

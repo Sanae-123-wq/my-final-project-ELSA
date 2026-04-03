@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { api } from '../../services/api';
 import AuthContext from '../../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const VendorProducts = () => {
     const { user } = useContext(AuthContext);
@@ -17,9 +18,9 @@ const VendorProducts = () => {
         setLoading(true);
         try {
             const allProducts = await api.fetchProducts();
-            
+
             // Filter products belonging to this vendor
-            const myProds = allProducts.filter(p => 
+            const myProds = allProducts.filter(p =>
                 p.vendorId?.toString() === user?._id?.toString()
             );
 
@@ -43,20 +44,20 @@ const VendorProducts = () => {
         }
     };
 
-    const filteredProducts = products.filter(p => 
-        (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-         p.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    const filteredProducts = products.filter(p =>
+        (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (filterStatus === 'all' || p.approvalStatus === filterStatus)
     );
 
     const getStatusBadge = (status) => {
-        const statusClass = status === 'approved' ? 'status-delivered' : 
-                          status === 'rejected' ? 'status-pending' : 
-                          'status-preparing'; // for pending review
-        
-        const label = status === 'approved' ? 'Approved' : 
-                     status === 'rejected' ? 'Rejected' : 
-                     'Pending Review';
+        const statusClass = status === 'approved' ? 'status-delivered' :
+            status === 'rejected' ? 'status-pending' :
+                'status-preparing'; // for pending review
+
+        const label = status === 'approved' ? 'Approved' :
+            status === 'rejected' ? 'Rejected' :
+                'Pending Review';
 
         return <span className={`order-status-badge ${statusClass}`}>{label}</span>;
     };
@@ -74,16 +75,16 @@ const VendorProducts = () => {
 
             <div className="admin-card">
                 <div className="admin-filters-row">
-                    <input 
-                        type="text" 
-                        placeholder="Search your products..." 
-                        className="admin-input" 
+                    <input
+                        type="text"
+                        placeholder="Search your products..."
+                        className="admin-input"
                         style={{ maxWidth: '300px' }}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <select 
-                        className="admin-input" 
+                    <select
+                        className="admin-input"
                         style={{ width: 'auto' }}
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
@@ -106,42 +107,51 @@ const VendorProducts = () => {
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {filteredProducts.map(product => (
-                                <tr key={product._id} style={{ opacity: product.approvalStatus === 'rejected' ? 0.6 : 1 }}>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <div className="product-image-cell">
-                                                <img src={product.image} alt={product.name} />
+                        <tbody component={motion.tbody}>
+                            <AnimatePresence>
+                                {filteredProducts.map((product, index) => (
+                                    <motion.tr
+                                        key={product._id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                                        style={{ opacity: product.approvalStatus === 'rejected' ? 0.6 : 1 }}
+                                    >
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                <div className="product-image-cell">
+                                                    <img src={product.image} alt={product.name} />
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontWeight: '600', color: '#3D2314' }}>{product.name}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>ID: {product._id.substring(0, 8)}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div style={{ fontWeight: '600', color: '#3D2314' }}>{product.name}</div>
-                                                <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>ID: {product._id.substring(0, 8)}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{product.category}</td>
-                                    <td style={{ fontWeight: '600' }}>{product.price.toFixed(2)} MAD</td>
-                                    <td>
-                                        {getStatusBadge(product.approvalStatus)}
-                                        {product.approvalStatus === 'rejected' && (
-                                            <div style={{ fontSize: '0.7rem', color: '#ef4444', marginTop: '4px' }}>Incomplete details</div>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <div className="admin-actions">
-                                            {product.approvalStatus !== 'rejected' && (
-                                                <button className="admin-action-btn action-edit" title="Edit Product">✏️</button>
+                                        </td>
+                                        <td>{product.category}</td>
+                                        <td style={{ fontWeight: '600' }}>{product.price.toFixed(2)} MAD</td>
+                                        <td>
+                                            {getStatusBadge(product.approvalStatus)}
+                                            {product.approvalStatus === 'rejected' && (
+                                                <div style={{ fontSize: '0.7rem', color: '#ef4444', marginTop: '4px' }}>Incomplete details</div>
                                             )}
-                                            <button 
-                                                className="admin-action-btn action-delete" 
-                                                title="Delete Product"
-                                                onClick={() => handleDelete(product._id)}
-                                            >🗑️</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td>
+                                            <div className="admin-actions">
+                                                {product.approvalStatus !== 'rejected' && (
+                                                    <button className="admin-action-btn action-edit" title="Edit Product">✏️</button>
+                                                )}
+                                                <button
+                                                    className="admin-action-btn action-delete"
+                                                    title="Delete Product"
+                                                    onClick={() => handleDelete(product._id)}
+                                                >🗑️</button>
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </AnimatePresence>
                             {filteredProducts.length === 0 && (
                                 <tr>
                                     <td colSpan="5">

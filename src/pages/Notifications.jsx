@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSocket } from '../context/SocketContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCookie, FaCheckCircle, FaTruck, FaBoxOpen, FaInfoCircle, FaExclamationTriangle, FaClock } from 'react-icons/fa';
+import ReclamationModal from '../components/ReclamationModal';
 
 const Notifications = () => {
     const { notifications, markAsRead, fetchNotifications } = useSocket();
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportOrderProps, setReportOrderProps] = useState({ id: null, number: null });
+    const [reportedOrders, setReportedOrders] = useState([]);
 
     useEffect(() => {
         fetchNotifications();
@@ -69,13 +73,38 @@ const Notifications = () => {
                                         <p className="notif-message">
                                             {notif.message}
                                         </p>
-                                        <div className="notif-time">
+                                        <div className="notif-time" style={{ marginTop: '0.2rem' }}>
                                             <FaClock size={12} />
                                             {formatDate(notif.createdAt)}
                                         </div>
                                     </div>
+                                    
+                                    {(notif.type === 'picked' || notif.type === 'delivered') && notif.orderId && (
+                                        <>
+                                            {reportedOrders.includes(notif.orderId) ? (
+                                                <div style={{ background: '#fef3c7', color: '#b45309', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                    <FaExclamationTriangle size={12} />
+                                                    Issue Reported
+                                                </div>
+                                            ) : (
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setReportOrderProps({ id: notif.orderId, number: notif.orderId.toString().slice(-6).toUpperCase() });
+                                                        setIsReportOpen(true);
+                                                    }}
+                                                    className="report-btn-inline hover:scale-105"
+                                                    style={{ background: '#fee2e2', color: '#dc2626', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '700', border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                                                >
+                                                    <FaExclamationTriangle size={12} />
+                                                    Report Issue
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+
                                     {!notif.isRead && (
-                                        <div style={{ width: '10px', height: '10px', background: 'var(--pat-gold)', borderRadius: '50%', boxShadow: '0 0 10px var(--pat-gold)', marginTop: '0.5rem' }}></div>
+                                        <div style={{ width: '10px', height: '10px', background: 'var(--pat-gold)', borderRadius: '50%', boxShadow: '0 0 10px var(--pat-gold)', flexShrink: 0 }}></div>
                                     )}
                                 </motion.div>
                             ))
@@ -94,6 +123,14 @@ const Notifications = () => {
                     </AnimatePresence>
                 </div>
             </div>
+
+            <ReclamationModal 
+                isOpen={isReportOpen} 
+                onClose={() => setIsReportOpen(false)}
+                onSuccess={(id) => setReportedOrders(prev => [...prev, id])}
+                orderId={reportOrderProps.id}
+                orderNumber={reportOrderProps.number}
+            />
         </div>
     );
 };

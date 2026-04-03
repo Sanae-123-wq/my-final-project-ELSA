@@ -7,8 +7,8 @@ const AdminAnalytics = () => {
     const maxRevenue = Math.max(...monthlyRevenue);
 
     const categoryData = [
-        { label: 'Pastry', value: 45, color: '#B08968' },
-        { label: 'Cake', value: 30, color: '#7F5539' },
+        { label: 'Pastry', value: 45, color: '#5C4033' },
+        { label: 'Cake', value: 30, color: '#5C4033' },
         { label: 'Traditional', value: 25, color: '#CCD5AE' },
     ];
 
@@ -142,3 +142,5 @@ const AdminAnalytics = () => {
 };
 
 export default AdminAnalytics;
+
+

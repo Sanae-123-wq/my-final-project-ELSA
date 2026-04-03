@@ -1,15 +1,26 @@
-import { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import '../auth.css';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useContext(AuthContext);
+    const { user, login, loading: authLoading } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user && !authLoading) {
+            if (user.role === 'admin') navigate('/admin');
+            else if (user.role === 'vendor') navigate('/vendor');
+            else if (user.role === 'delivery') navigate('/delivery');
+            else navigate('/');
+        }
+    }, [user, authLoading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,10 +28,15 @@ const Login = () => {
         setError('');
         try {
             const userData = await login(email, password);
-            if (userData.role === 'admin') navigate('/admin');
-            else if (userData.role === 'vendor') navigate('/vendor');
-            else if (userData.role === 'delivery') navigate('/delivery');
-            else navigate('/');
+            
+            // Redirect based on role
+            const origin = location.state?.from?.pathname || (
+                userData.role === 'admin' ? '/admin' :
+                userData.role === 'vendor' ? '/vendor' :
+                userData.role === 'delivery' ? '/delivery' : '/'
+            );
+            
+            navigate(origin);
         } catch (err) {
             setError(err.message || 'Login failed');
         } finally {

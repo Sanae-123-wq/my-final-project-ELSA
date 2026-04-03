@@ -38,7 +38,7 @@ const VendorLayout = () => {
 
     if (user?.status === 'pending') {
         return (
-            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#FAF3EB', flexDirection: 'column', gap: '20px' }}>
+            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#faeece', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ fontSize: '4rem' }}>⏳</div>
                 <h2 style={{ color: '#5C4033', fontFamily: 'Playfair Display, serif' }}>Account Under Review</h2>
                 <p style={{ color: '#8B7355' }}>Your Patissier portal is currently restricted until an administrator approves your account.</p>
@@ -115,7 +115,7 @@ const VendorLayout = () => {
 
                     <div className="topbar-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '20px' }}>
                         {/* Notification Bell */}
-                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F' }}>
+                        <Link to="/vendor/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#5C4033' }}>
                             <FaBell size={20} />
                             {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
                         </Link>
@@ -155,3 +155,5 @@ const VendorLayout = () => {
 };
 
 export default VendorLayout;
+
+

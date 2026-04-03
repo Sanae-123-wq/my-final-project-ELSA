@@ -182,6 +182,22 @@ export const api = {
         return await response.json();
     },
 
+    // Fetch all saved recipe history (most recent first)
+    fetchRecipeHistory: async () => {
+        const response = await fetch('http://localhost:5000/api/ai/history');
+        if (!response.ok) throw new Error('Failed to fetch recipe history');
+        return await response.json();
+    },
+
+    // Delete a single recipe from history by ID
+    deleteRecipeHistoryItem: async (id) => {
+        const response = await fetch(`http://localhost:5000/api/ai/history/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) throw new Error('Failed to delete recipe');
+        return await response.json();
+    },
+
     // --- Reviews ---
     submitReview: async (reviewData) => {
         const response = await fetch('http://localhost:5000/api/reviews', {

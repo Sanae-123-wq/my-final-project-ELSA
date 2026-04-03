@@ -2,6 +2,8 @@ import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
 import { api } from '../../services/api';
+import { FaCoins, FaBox, FaConciergeBell, FaPlus, FaArrowRight, FaChartLine, FaHistory, FaTools, FaFileInvoiceDollar } from 'react-icons/fa';
+import './VendorDashboard.css';
 
 const VendorDashboard = () => {
     const { user } = useContext(AuthContext);
@@ -58,86 +60,100 @@ const VendorDashboard = () => {
         fetchDashboardData();
     }, [user]);
 
-    if (loading) return <div className="admin-loading"><div className="admin-spinner"></div><p>Loading your kitchen...</p></div>;
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-gold)', borderBottomColor: 'var(--pat-gold)' }}></div>
+            <p className="ml-4 font-bold text-brown">Heating up the ovens...</p>
+        </div>
+    );
 
     return (
-        <div className="admin-page">
-            <div className="admin-page-header">
-                <div>
-                    <h1 className="admin-page-title">Bienvenue, Patissier {user?.name?.split(' ')[0] || 'Chef'}! 🌾</h1>
-                    <p className="admin-page-subtitle">Here is an overview of your patisserie sales and performance.</p>
+        <div className="vd-container inner-admin-page">
+            <div className="vd-header">
+                <div className="vd-welcome">
+                    <h1>Bienvenue, Chef {user?.name?.split(' ')[0] || 'Patissier'}! 👨‍🍳</h1>
+                    <p>Here's a curated look at your boutique's performance this week.</p>
                 </div>
-                <Link to="/vendor/add-product" className="admin-btn admin-btn-primary">+ Create New Pastry</Link>
+                <Link to="/vendor/add-product" className="vd-cta-btn">
+                    <FaPlus /> New Creation
+                </Link>
             </div>
 
-            {/* Dashboard Stats */}
-            <div className="admin-stats-grid">
-                <div className="admin-stat-card stat-revenue">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Net Earnings (After 10% Fee)</div>
-                        <div className="stat-card-value">{stats.netEarnings.toFixed(2)} MAD</div>
-                        <div className="stat-card-trend trend-up">Gross: {stats.revenue} MAD</div>
+            {/* Premium Stat Cards */}
+            <div className="vd-stats-grid">
+                <div className="vd-stat-card">
+                    <div className="vd-stat-info">
+                        <div className="vd-stat-label">Net Revenue</div>
+                        <div className="vd-stat-value">{stats.netEarnings.toLocaleString()} MAD</div>
+                        <div className="vd-stat-trend vd-trend-up">
+                            <FaChartLine /> After 10% platform fee
+                        </div>
                     </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">💰</div>
-                    </div>
-                </div>
-                <div className="admin-stat-card stat-orders">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Total Orders</div>
-                        <div className="stat-card-value">{stats.totalOrders}</div>
-                        <div className="stat-card-trend trend-up">↑ 12% from last month</div>
-                    </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">📦</div>
+                    <div className="vd-stat-icon-box">
+                        <FaCoins />
                     </div>
                 </div>
-                <div className="admin-stat-card stat-products">
-                    <div className="stat-card-left">
-                        <div className="stat-card-label">Active Products</div>
-                        <div className="stat-card-value">{stats.activeProducts}</div>
-                        <div className="stat-card-trend trend-neutral">{stats.pendingProducts} pending approval</div>
+
+                <div className="vd-stat-card">
+                    <div className="vd-stat-info">
+                        <div className="vd-stat-label">Total Orders</div>
+                        <div className="vd-stat-value">{stats.totalOrders}</div>
+                        <div className="vd-stat-trend vd-trend-up">
+                            <FaChartLine /> ↑ 12% vs last month
+                        </div>
                     </div>
-                    <div className="stat-card-right">
-                        <div className="stat-card-icon">🥐</div>
+                    <div className="vd-stat-icon-box">
+                        <FaBox />
+                    </div>
+                </div>
+
+                <div className="vd-stat-card">
+                    <div className="vd-stat-info">
+                        <div className="vd-stat-label">Boutique Catalog</div>
+                        <div className="vd-stat-value">{stats.activeProducts}</div>
+                        <div className="vd-stat-trend vd-trend-neutral">
+                            {stats.pendingProducts} awaiting approval
+                        </div>
+                    </div>
+                    <div className="vd-stat-icon-box">
+                        <FaConciergeBell />
                     </div>
                 </div>
             </div>
 
-            <div className="admin-bottom-row">
-                <div className="admin-card admin-card-orders">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Recent Orders</h3>
-                        <Link to="/vendor/orders" className="admin-card-link">View All →</Link>
+            <div className="vd-main-grid">
+                {/* Recent Orders Panel */}
+                <div className="vd-panel">
+                    <div className="vd-panel-header">
+                        <h3 className="vd-panel-title"><FaHistory /> Recent Requests</h3>
+                        <Link to="/vendor/orders" className="vd-panel-link">Explore all orders →</Link>
                     </div>
-                    <div className="admin-table-wrap">
+                    <div className="vd-panel-body">
                         {recentOrders.length === 0 ? (
-                            <div className="admin-empty-state"><p>No orders yet.</p></div>
+                            <div style={{ padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                <p>No orders yet. Your first client is just around the corner!</p>
+                            </div>
                         ) : (
-                            <table className="admin-table">
+                            <table className="vd-recent-table">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer</th>
-                                        <th>Your Items</th>
+                                        <th>Ref</th>
+                                        <th>Client</th>
                                         <th>Status</th>
-                                        <th>Total</th>
+                                        <th>Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {recentOrders.map(order => (
                                         <tr key={order._id}>
-                                            <td className="order-id-cell">{order._id.substring(0, 8)}</td>
-                                            <td>{order.customerName}</td>
-                                            <td style={{ fontSize: '0.85rem', color: '#6b7280' }}>
-                                                {order.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
-                                            </td>
+                                            <td><span className="vd-order-id">#{order._id.substring(0, 6).toUpperCase()}</span></td>
+                                            <td style={{ fontWeight: 700 }}>{order.customerName}</td>
                                             <td>
-                                                <span className={`admin-badge badge-${order.status === 'delivered' ? 'success' : order.status === 'pending' ? 'neutral' : 'warning'}`}>
+                                                <span className={`vd-badge vd-badge-${order.status === 'delivered' ? 'delivered' : order.status === 'pending' ? 'pending' : 'warning'}`}>
                                                     {order.status}
                                                 </span>
                                             </td>
-                                            <td style={{ fontWeight: '600', color: '#3D2314' }}>{order.total} MAD</td>
+                                            <td style={{ fontWeight: 800 }}>{order.total} MAD</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -146,19 +162,37 @@ const VendorDashboard = () => {
                     </div>
                 </div>
 
-                <div className="admin-card admin-card-activity">
-                    <div className="admin-card-header">
-                        <h3 className="admin-card-title">Quick Actions</h3>
+                {/* Quick Actions Panel */}
+                <div className="vd-panel">
+                    <div className="vd-panel-header">
+                        <h3 className="vd-panel-title"><FaTools /> Kitchen Tools</h3>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
-                        <Link to="/vendor/add-product" className="admin-btn admin-btn-secondary" style={{ justifyContent: 'center' }}>
-                            ➕ Add New Product
+                    <div className="vd-actions-list">
+                        <Link to="/vendor/add-product" className="vd-action-btn">
+                            <div className="vd-action-icon"><FaPlus /></div>
+                            <div className="vd-action-text">
+                                <span className="vd-action-title">Add Product</span>
+                                <span className="vd-action-desc">Publish a new recipe</span>
+                            </div>
+                            <FaArrowRight style={{ fontSize: '0.8rem', color: '#E5E7EB' }} />
                         </Link>
-                        <Link to="/vendor/earnings" className="admin-btn admin-btn-secondary" style={{ justifyContent: 'center' }}>
-                            📊 View Earnings Report
+
+                        <Link to="/vendor/earnings" className="vd-action-btn">
+                            <div className="vd-action-icon"><FaFileInvoiceDollar /></div>
+                            <div className="vd-action-text">
+                                <span className="vd-action-title">Earnings</span>
+                                <span className="vd-action-desc">Financial statements</span>
+                            </div>
+                            <FaArrowRight style={{ fontSize: '0.8rem', color: '#E5E7EB' }} />
                         </Link>
-                        <Link to="/vendor/products" className="admin-btn admin-btn-secondary" style={{ justifyContent: 'center' }}>
-                            👀 Review Pending Approvals
+
+                        <Link to="/vendor/products" className="vd-action-btn">
+                            <div className="vd-action-icon"><FaConciergeBell /></div>
+                            <div className="vd-action-text">
+                                <span className="vd-action-title">Pending Items</span>
+                                <span className="vd-action-desc">Admin review status</span>
+                            </div>
+                            <FaArrowRight style={{ fontSize: '0.8rem', color: '#E5E7EB' }} />
                         </Link>
                     </div>
                 </div>

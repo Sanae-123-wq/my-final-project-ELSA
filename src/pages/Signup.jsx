@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { FaUser, FaStore, FaMotorcycle, FaArrowLeft, FaCheck } from 'react-icons/fa';
@@ -21,10 +21,20 @@ const Signup = () => {
     const [description, setDescription] = useState('');
     const [vehicleType, setVehicleType] = useState('bike');
 
-    const { register } = useContext(AuthContext);
+    const { user, register, loading: authLoading } = useContext(AuthContext);
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user && !authLoading) {
+            if (user.role === 'admin') navigate('/admin');
+            else if (user.role === 'vendor') navigate('/vendor');
+            else if (user.role === 'delivery') navigate('/delivery');
+            else navigate('/');
+        }
+    }, [user, authLoading, navigate]);
 
     const handleRoleSelect = (selectedRole) => {
         setRole(selectedRole);

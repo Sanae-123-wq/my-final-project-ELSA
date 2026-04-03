@@ -26,9 +26,14 @@ const DeliveryLayout = () => {
         return location.pathname.startsWith(path);
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     if (user?.status === 'pending') {
         return (
-            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#FAF3EB', flexDirection: 'column', gap: '20px' }}>
+            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#faeece', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ fontSize: '4rem' }}>⏳</div>
                 <h2 style={{ color: '#5C4033', fontFamily: 'Playfair Display, serif' }}>Account Under Review</h2>
                 <p style={{ color: '#8B7355' }}>Your Courier portal is restricted until an administrator verifies your application.</p>
@@ -36,11 +41,6 @@ const DeliveryLayout = () => {
             </div>
         );
     }
-
-    const handleLogout = () => {
-        logout();
-        navigate('/');
-    };
 
 
     const currentPage = NAV_ITEMS.find(item =>
@@ -115,7 +115,7 @@ const DeliveryLayout = () => {
 
                     <div className="topbar-right" style={{ marginLeft: 'auto' }}>
                         {/* Notifications */}
-                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F', position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <Link to="/delivery/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#5C4033', position: 'relative', display: 'flex', alignItems: 'center' }}>
                             <FaBell size={20} />
                             {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
                         </Link>
@@ -155,3 +155,5 @@ const DeliveryLayout = () => {
 };
 
 export default DeliveryLayout;
+
+

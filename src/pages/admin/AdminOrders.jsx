@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { FaSearch, FaShoppingBag, FaUser, FaClock, FaBoxOpen, FaInfoCircle, FaMapMarkerAlt, FaHistory, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import './AdminOrders.css';
 
 const STATUS_OPTIONS = ['pending', 'preparing', 'ready', 'picked', 'delivered'];
 const STATUS_CONFIG = {
@@ -21,17 +23,15 @@ const AdminOrders = () => {
 
     const loadOrders = async () => {
         setLoading(true);
-        try { setOrders(await api.fetchOrders()); }
-        catch (err) { console.error(err); }
+        try { 
+            const data = await api.fetchOrders();
+            setOrders(data); 
+        }
+        catch (err) { console.error('Error loading orders:', err); }
         finally { setLoading(false); }
     };
 
-    const handleStatusChange = async (id, newStatus) => {
-        try {
-            await api.updateOrderStatus(id, newStatus);
-            loadOrders();
-        } catch (err) { console.error(err); }
-    };
+    // Note: status update functionality has been removed for Admin role per project policy.
 
     const filtered = orders.filter(o => {
         const matchesStatus = filterStatus === 'all' || o.status === filterStatus;
@@ -47,127 +47,176 @@ const AdminOrders = () => {
         return acc;
     }, {});
 
-    if (loading) return <div className="admin-loading"><div className="admin-spinner"></div><p>Loading orders...</p></div>;
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-gold)', borderBottomColor: 'var(--pat-gold)' }}></div>
+            <p className="ml-4 font-bold text-brown">Auditing order logs...</p>
+        </div>
+    );
 
     return (
-        <div className="admin-page">
-            <div className="admin-page-header">
-                <div>
-                    <h1 className="admin-page-title">Manage Orders</h1>
-                    <p className="admin-page-subtitle">{orders.length} total orders</p>
+        <div className="ao-container inner-admin-page">
+            <div className="ao-header">
+                <div className="ao-title-section">
+                    <h1><FaShoppingBag /> Order Registry</h1>
+                    <p>Comprehensive overview of platform order flow and volume</p>
                 </div>
             </div>
 
-            {/* Status summary pills */}
-            <div className="order-status-pills">
-                <button className={`status-pill ${filterStatus === 'all' ? 'active' : ''}`} onClick={() => setFilterStatus('all')}>
-                    All <span className="pill-count">{orders.length}</span>
+            {/* Status Navigation */}
+            <div className="ao-status-nav thin-scrollbar">
+                <button 
+                    className={`ao-nav-btn ${filterStatus === 'all' ? 'active' : ''}`} 
+                    onClick={() => setFilterStatus('all')}
+                >
+                    All Orders <span className="ao-count">{orders.length}</span>
                 </button>
                 {STATUS_OPTIONS.map(s => (
-                    <button key={s} className={`status-pill status-pill-${s.replace('_','-')} ${filterStatus === s ? 'active' : ''}`} onClick={() => setFilterStatus(s)}>
-                        {STATUS_CONFIG[s].label} <span className="pill-count">{orderCounts[s]}</span>
+                    <button 
+                        key={s} 
+                        className={`ao-nav-btn ${filterStatus === s ? 'active' : ''}`} 
+                        onClick={() => setFilterStatus(s)}
+                    >
+                        {STATUS_CONFIG[s].label} <span className="ao-count">{orderCounts[s]}</span>
                     </button>
                 ))}
             </div>
 
             {/* Search */}
-            <div className="admin-filters-row" style={{ marginBottom: '1rem' }}>
-                <div className="admin-search-box">
-                    <span>🔍</span>
+            <div className="ao-filters">
+                <div className="ao-search-wrap">
+                    <FaSearch className="ao-search-icon" />
                     <input
                         type="text"
-                        placeholder="Search by order ID or client name..."
+                        placeholder="Search by ID, Client name or Email..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="admin-search-input"
+                        className="ao-search-input"
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div className="admin-card">
-                <div className="admin-table-wrap">
-                    <table className="admin-table admin-table-full">
-                        <thead>
-                            <tr style={{ background: 'var(--pat-cream)', borderBottom: '1.5px solid var(--pat-beige)' }}>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Order ID</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Client</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Date</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Items</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Total</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Status</th>
-                                <th style={{ color: 'var(--pat-brown)', fontWeight: '700' }}>Update</th>
+            <div className="ao-card">
+                <table className="ao-table">
+                    <thead>
+                        <tr>
+                            <th>Ref ID</th>
+                            <th>Client Profile</th>
+                            <th>Placement Date</th>
+                            <th>Volume</th>
+                            <th>Revenue</th>
+                            <th>Lifecycle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filtered.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" style={{ padding: '4rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📂</div>
+                                    <h3 style={{ fontWeight: 800, color: '#5C4033' }}>No orders found</h3>
+                                    <p>Try adjusting your filters or search terms</p>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.length === 0 ? (
-                                <tr><td colSpan="7" className="admin-table-empty">No orders found.</td></tr>
-                            ) : filtered.map(order => {
-                                const sc = STATUS_CONFIG[order.status] || { label: order.status, cls: 'badge-neutral' };
-                                const isExpanded = expandedOrder === order._id;
-                                return (
-                                    <>
-                                        <tr key={order._id} className={isExpanded ? 'row-expanded' : ''}>
-                                            <td>
-                                                <button
-                                                    className="order-id-btn"
-                                                    onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
-                                                >
-                                                    #{order._id.slice(-6).toUpperCase()}
-                                                    <span>{isExpanded ? ' ▲' : ' ▼'}</span>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <div className="client-cell">
-                                                    <div className="client-avatar">{order.user?.name?.charAt(0) || '?'}</div>
-                                                    <div>
-                                                        <div className="client-name">{order.user?.name || '—'}</div>
-                                                        <div className="client-email">{order.user?.email}</div>
-                                                    </div>
+                        ) : filtered.map(order => {
+                            const sc = STATUS_CONFIG[order.status] || { label: order.status, cls: 'tag-pending' };
+                            const isExpanded = expandedOrder === order._id;
+                            
+                            return (
+                                <>
+                                    <tr key={order._id} className={`ao-row ${isExpanded ? 'expanded' : ''}`}>
+                                        <td className="ao-td">
+                                            <div 
+                                                className="ao-order-id"
+                                                onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
+                                            >
+                                                #{order._id.slice(-8).toUpperCase()}
+                                                <FaInfoCircle style={{ opacity: 0.3 }} />
+                                            </div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div className="ao-user-info">
+                                                <div className="ao-avatar">{order.userId?.name?.charAt(0) || order.user?.name?.charAt(0) || '?'}</div>
+                                                <div>
+                                                    <div className="ao-username">{order.userId?.name || order.user?.name || 'Guest'}</div>
+                                                    <div className="ao-email">{order.userId?.email || order.user?.email}</div>
                                                 </div>
-                                            </td>
-                                            <td className="date-cell">{new Date(order.createdAt).toLocaleDateString('en-GB')}</td>
-                                            <td>{order.products?.length || order.items?.length || 0} items</td>
-                                            <td className="price-cell" style={{ fontWeight: '800', color: 'var(--pat-brown)' }}>{order.totalAmount?.toFixed(2) || order.totalPrice?.toFixed(2)} MAD</td>
-                                            <td><span className={`order-status-badge ${sc.cls}`}>{sc.label}</span></td>
-                                            <td>
-                                                <select
-                                                    className="admin-select-sm"
-                                                    value={order.status}
-                                                    onChange={e => handleStatusChange(order._id, e.target.value)}
-                                                >
-                                                    {STATUS_OPTIONS.map(s => (
-                                                        <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        {isExpanded && (
-                                            <tr key={`${order._id}-detail`} className="order-detail-row">
-                                                <td colSpan="7">
-                                                    <div className="order-detail-panel">
-                                                        <div className="order-detail-section">
-                                                            <strong>📍 Delivery Address:</strong> {order.deliveryAddress || 'N/A'}
+                                            </div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#4B5563' }}>
+                                                <FaClock style={{ marginRight: '6px', opacity: 0.4 }} />
+                                                {new Date(order.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                                            </div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div style={{ fontWeight: 700, color: '#5C4033' }}>
+                                                {(order.products?.length || order.items?.length || 0)} <span style={{fontSize: '0.75rem', color: '#9CA3AF'}}>Items</span>
+                                            </div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <div className="ao-total-val">
+                                                {(order.totalAmount || order.totalPrice || 0).toLocaleString()} <span style={{fontSize: '0.7rem'}}>MAD</span>
+                                            </div>
+                                        </td>
+                                        <td className="ao-td">
+                                            <span className={`ao-status-tag tag-${order.status}`}>
+                                                {order.status === 'delivered' ? <FaCheckCircle /> : <FaHistory />}
+                                                {sc.label}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {isExpanded && (
+                                        <tr key={`${order._id}-detail`}>
+                                            <td colSpan="6" className="ao-detail-cell">
+                                                <div className="ao-detail-content">
+                                                    <div className="ao-detail-section">
+                                                        <h4><FaMapMarkerAlt /> Delivery Logistics</h4>
+                                                        <div style={{ padding: '1rem', background: 'white', borderRadius: '12px', border: '1px solid rgba(139,94,60,0.1)', fontSize: '0.95rem' }}>
+                                                            {order.deliveryAddress || 'Standard Boutique Pickup'}
                                                         </div>
-                                                        <div className="order-detail-section">
-                                                            <strong>🛒 Order Items:</strong>
-                                                            <div className="order-items-grid">
-                                                                {order.items?.map((item, i) => (
-                                                                    <div key={i} className="order-item-chip">
-                                                                        {item.name} × {item.qty} — ${(item.price * item.qty).toFixed(2)}
-                                                                    </div>
-                                                                ))}
+                                                        
+                                                        <div style={{ marginTop: '1.5rem' }}>
+                                                            <h4><FaUser /> Fulfillment Assignment</h4>
+                                                            <div style={{ fontSize: '0.9rem', color: '#4B5563' }}>
+                                                                {order.deliveryId ? `👤 Assigned Delivery ID: ${order.deliveryId.slice(-8)}` : '⌛ Awaiting "Ready" state for assignment'}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                                    <div className="ao-detail-section">
+                                                        <h4><FaBoxOpen /> Full Manifest</h4>
+                                                        <div className="ao-manifest-list">
+                                                            {(order.products || order.items || []).map((item, i) => (
+                                                                <div key={i} className="ao-item-row">
+                                                                    <span>
+                                                                        <span className="ao-item-qty">{item.quantity || item.qty}x</span>
+                                                                        {item.productId?.name || item.name}
+                                                                    </span>
+                                                                    <span style={{fontWeight: 700}}>{((item.price || 0) * (item.quantity || item.qty || 1)).toFixed(2)} MAD</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </>
+                            );
+                        })}
+                    </tbody>
+                </table>
+
+                {/* Platform Policy Alert */}
+                <div style={{ padding: '0 2rem 2rem' }}>
+                    <div className="ao-policy-alert">
+                        <FaExclamationTriangle className="ao-policy-icon" />
+                        <div className="ao-policy-text">
+                            <strong>Platform Governance:</strong> Order status management is decentralized. 
+                            Progress from "Preparing" to "Ready" is handled by Vendors, while "Picked Up" and "Delivered" 
+                            states are managed exclusively by designated Delivery Workers.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -175,3 +224,5 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
+
+

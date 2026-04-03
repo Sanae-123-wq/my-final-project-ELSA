@@ -164,13 +164,13 @@ const DeliveryDashboard = () => {
                     </div>
                     <div style={{ padding: '1.5rem' }}>
                         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                            <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#B08968', lineHeight: '1' }}>{stats.todayDeliveries} <span style={{ fontSize: '1.5rem', color: '#9ca3af' }}>/ 10</span></div>
+                            <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#5C4033', lineHeight: '1' }}>{stats.todayDeliveries} <span style={{ fontSize: '1.5rem', color: '#9ca3af' }}>/ 10</span></div>
                             <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.5rem' }}>deliveries completed today</div>
                         </div>
                         <div className="breakdown-bar-bg" style={{ height: '12px', background: '#F0EBE3' }}>
                             <div 
                                 className="breakdown-bar-fill" 
-                                style={{ width: `${Math.min((stats.todayDeliveries / 10) * 100, 100)}%`, background: 'linear-gradient(90deg, #E6CCB2, #B08968)' }}
+                                style={{ width: `${Math.min((stats.todayDeliveries / 10) * 100, 100)}%`, background: 'linear-gradient(90deg, #E6CCB2, #5C4033)' }}
                             ></div>
                         </div>
                         <p style={{ fontSize: '0.8rem', color: '#9ca3af', textAlign: 'center', marginTop: '1rem' }}>
@@ -186,3 +186,5 @@ const DeliveryDashboard = () => {
 };
 
 export default DeliveryDashboard;
+
+

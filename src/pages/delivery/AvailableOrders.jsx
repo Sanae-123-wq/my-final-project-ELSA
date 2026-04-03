@@ -92,9 +92,9 @@ const AvailableOrders = () => {
                         min="1" max="10" step="1" 
                         value={filterDistance} 
                         onChange={(e) => setFilterDistance(e.target.value)}
-                        style={{ accentColor: '#B08968' }}
+                        style={{ accentColor: '#5C4033' }}
                     />
-                    <span style={{ fontSize: '0.875rem', color: '#7F5539', fontWeight: '700' }}>{filterDistance} km</span>
+                    <span style={{ fontSize: '0.875rem', color: '#5C4033', fontWeight: '700' }}>{filterDistance} km</span>
                 </div>
                 <div className="admin-badge badge-primary" style={{ padding: '0.6rem 1rem' }}>
                     Current Location: <strong>Rabat, Agdal</strong>
@@ -125,7 +125,7 @@ const AvailableOrders = () => {
                                         <td>
                                             <div className="order-id-cell">{order._id}</div>
                                             <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '2px' }}>{order.items} items • {order.total} MAD</div>
-                                            <div style={{ fontSize: '0.72rem', color: '#B08968', marginTop: '2px' }}>⏱ {order.time}</div>
+                                            <div style={{ fontSize: '0.72rem', color: '#5C4033', marginTop: '2px' }}>⏱ {order.time}</div>
                                         </td>
                                         <td>
                                             <div className="client-name">{order.customerName}</div>
@@ -135,7 +135,7 @@ const AvailableOrders = () => {
                                             </div>
                                         </td>
                                         <td>
-                                            <div style={{ fontWeight: '700', color: '#5C3D2E', fontSize: '1.1rem' }}>{order.distance}</div>
+                                            <div style={{ fontWeight: '700', color: '#5C4033', fontSize: '1.1rem' }}>{order.distance}</div>
                                             <div style={{ fontSize: '0.7rem', color: '#9ca3af' }}>from you</div>
                                         </td>
                                         <td>
@@ -166,3 +166,5 @@ const AvailableOrders = () => {
 };
 
 export default AvailableOrders;
+
+

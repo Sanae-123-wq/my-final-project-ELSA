@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { FaUserPlus, FaUsers, FaCloudUploadAlt, FaSearch, FaCheckCircle, FaUserTag, FaEnvelope, FaShieldAlt, FaUtensils, FaBicycle, FaUserShield, FaTimes } from 'react-icons/fa';
+import './AdminUsers.css';
 
 const ROLE_TABS = ['clients', 'vendors', 'delivery'];
-const ROLE_LABELS = { clients: 'Clients', vendors: 'Vendors (Patissiers)', delivery: 'Delivery Workers' };
+const ROLE_LABELS = { clients: 'Clients', vendors: 'Patissiers', delivery: 'Logistics' };
 const ROLE_MAP = { clients: 'client', vendors: 'vendor', delivery: 'delivery' };
-const ROLE_ICONS = { clients: '👥', vendors: '👨‍🍳', delivery: '🚚' };
+const ROLE_ICONS = { clients: <FaUsers />, vendors: <FaUtensils />, delivery: <FaBicycle /> };
 
 const ROLE_BADGE = {
     admin: 'badge-purple',
@@ -70,138 +72,168 @@ const AdminUsers = () => {
         return acc;
     }, {});
 
-    if (loading) return <div className="admin-loading"><div className="admin-spinner"></div><p>Loading users...</p></div>;
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-gold)', borderBottomColor: 'var(--pat-gold)' }}></div>
+            <p className="ml-4 font-bold text-brown">Synchronizing user registry...</p>
+        </div>
+    );
 
     return (
-        <div className="admin-page">
-            <div className="admin-page-header">
-                <div>
-                    <h1 className="admin-page-title">Manage Users</h1>
-                    <p className="admin-page-subtitle">{users.length} total users registered</p>
+        <div className="au-container inner-admin-page">
+            <div className="au-header">
+                <div className="au-title-section">
+                    <h1>User Intelligence</h1>
+                    <p>Managing platform access and professional certifications</p>
                 </div>
-                <button className="admin-btn admin-btn-primary" onClick={() => setShowModal(true)}>
-                    + Create Staff Account
+                <button className="au-btn-create" onClick={() => setShowModal(true)}>
+                    <FaUserPlus /> Provision Staff Account
                 </button>
             </div>
 
             {/* Tabs */}
-            <div className="admin-tabs">
+            <div className="au-tabs thin-scrollbar">
                 {ROLE_TABS.map(tab => (
                     <button
                         key={tab}
-                        className={`admin-tab ${activeTab === tab ? 'active' : ''}`}
+                        className={`au-tab-btn ${activeTab === tab ? 'active' : ''}`}
                         onClick={() => setActiveTab(tab)}
                     >
-                        {ROLE_ICONS[tab]} {ROLE_LABELS[tab]}
-                        <span className="tab-count">{roleCounts[tab]}</span>
+                        {ROLE_ICONS[tab]}
+                        {ROLE_LABELS[tab]}
+                        <span className="au-tab-count">{roleCounts[tab]}</span>
                     </button>
                 ))}
             </div>
 
             {/* Search */}
-            <div className="admin-filters-row" style={{ marginBottom: '1rem' }}>
-                <div className="admin-search-box">
-                    <span>🔍</span>
+            <div style={{ marginBottom: '1.5rem', maxWidth: '500px' }}>
+                <div className="ao-search-wrap">
+                    <FaSearch className="ao-search-icon" />
                     <input
                         type="text"
-                        placeholder={`Search ${ROLE_LABELS[activeTab].toLowerCase()}...`}
+                        placeholder={`Find ${ROLE_LABELS[activeTab].toLowerCase()} by name or email...`}
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="admin-search-input"
+                        className="ao-search-input"
                     />
                 </div>
             </div>
 
-            {/* Users Card */}
-            <div className="admin-card">
-                <div className="admin-table-wrap">
-                    <table className="admin-table admin-table-full">
-                        <thead>
+            {/* Users Table */}
+            <div className="au-card">
+                <table className="au-table">
+                    <thead>
+                        <tr>
+                            <th>Identity Profile</th>
+                            <th>Verification</th>
+                            <th>Access Role</th>
+                            <th>Onboarding</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tabUsers.length === 0 ? (
                             <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <td colSpan="5" style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>
+                                    <div style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>📭</div>
+                                    <h3 style={{ fontWeight: 800, color: '#5C4033' }}>Archive is empty</h3>
+                                    <p>No active accounts found for this classification.</p>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {tabUsers.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" className="admin-table-empty">
-                                        No {ROLE_LABELS[activeTab].toLowerCase()} found.
-                                    </td>
-                                </tr>
-                            ) : tabUsers.map(user => (
-                                <tr key={user._id}>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div className="user-avatar-sm">{user.name?.charAt(0)?.toUpperCase()}</div>
-                                            <span className="user-name-cell">{user.name}</span>
+                        ) : tabUsers.map(user => (
+                            <tr key={user._id} className="au-row">
+                                <td className="au-td">
+                                    <div className="au-user-profile">
+                                        <div className="au-avatar">{user.name?.charAt(0)?.toUpperCase()}</div>
+                                        <div>
+                                            <div className="au-name">{user.name}</div>
+                                            <div className="au-email"><FaEnvelope style={{marginRight: '6px'}} /> {user.email}</div>
                                         </div>
-                                    </td>
-                                    <td className="email-cell">{user.email}</td>
-                                    <td>
-                                        <span className={`admin-badge ${ROLE_BADGE[user.role] || 'badge-neutral'}`}>
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className={`admin-badge ${user.status === 'approved' ? 'badge-success' : 'badge-warning'}`}>
-                                            {user.status || 'approved'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {user.status === 'pending' && (
-                                            <button 
-                                                className="admin-btn-action admin-btn-success" 
-                                                onClick={() => handleApproveUser(user._id)}
-                                                title="Approve User"
-                                            >
-                                                ✅ Approve
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                </td>
+                                <td className="au-td">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', color: '#6B7280' }}>
+                                        <FaCheckCircle style={{ color: user.isVerified || true ? '#10B981' : '#D1D5DB' }} />
+                                        <span>Authorized</span>
+                                    </div>
+                                </td>
+                                <td className="au-td">
+                                    <span style={{ 
+                                        fontWeight: 800, color: '#5C4033', background: 'rgba(139,94,60,0.06)', 
+                                        padding: '0.3rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', textTransform: 'uppercase' 
+                                    }}>
+                                        {user.role}
+                                    </span>
+                                </td>
+                                <td className="au-td">
+                                    <span className={`au-status status-${user.status || 'approved'}`}>
+                                        {user.status === 'pending' ? '⏳ Pending' : '✓ Active'}
+                                    </span>
+                                </td>
+                                <td className="au-td">
+                                    {user.status === 'pending' ? (
+                                        <button 
+                                            className="au-btn-approve" 
+                                            onClick={() => handleApproveUser(user._id)}
+                                        >
+                                            <FaUserShield /> Verify
+                                        </button>
+                                    ) : (
+                                        <div style={{ color: '#D1D5DB', fontSize: '0.85rem', fontWeight: 600 }}>Already Verified</div>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
             {/* Create Staff Modal */}
             {showModal && (
-                <div className="admin-modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="admin-modal admin-modal-sm" onClick={e => e.stopPropagation()}>
-                        <div className="admin-modal-header">
-                            <h2 className="admin-modal-title">👤 Create Staff Account</h2>
-                            <button className="admin-modal-close" onClick={() => setShowModal(false)}>✕</button>
+                <div className="au-modal-overlay">
+                    <div className="au-modal">
+                        <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', cursor: 'pointer' }} onClick={() => setShowModal(false)}>
+                            <FaTimes style={{ color: '#5C4033', opacity: 0.3, fontSize: '1.25rem' }} />
                         </div>
-                        <form onSubmit={handleCreateUser} className="admin-modal-body">
-                            {error && <div className="admin-alert admin-alert-error">{error}</div>}
-                            <div className="form-group-admin">
-                                <label>Full Name *</label>
-                                <input type="text" name="name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="admin-input" />
+                        <div className="au-modal-header">
+                            <h2 className="au-modal-title">Provision Staff</h2>
+                            <p style={{ color: 'rgba(139,94,60,0.6)', marginTop: '0.5rem' }}>Deploy a new authorized account to the platform</p>
+                        </div>
+                        <form onSubmit={handleCreateUser}>
+                            {error && <div style={{ color: '#DC2626', background: '#FEF2F2', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem', fontWeight: 700 }}>⚠️ {error}</div>}
+                            
+                            <div className="au-form-group">
+                                <label>Legal Full Name</label>
+                                <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="au-input" placeholder="e.g. Jean Dupont" />
                             </div>
-                            <div className="form-group-admin">
-                                <label>Email Address *</label>
-                                <input type="email" name="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required className="admin-input" />
+                            
+                            <div className="au-form-group">
+                                <label>Corporate Email</label>
+                                <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required className="au-input" placeholder="staff@elsa-patisserie.com" />
                             </div>
-                            <div className="form-group-admin">
-                                <label>Password *</label>
-                                <input type="password" name="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required minLength="6" className="admin-input" />
+                            
+                            <div className="au-form-group">
+                                <label>Initial Access Token (Password)</label>
+                                <input type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required minLength="6" className="au-input" placeholder="••••••••" />
                             </div>
-                            <div className="form-group-admin">
-                                <label>Role *</label>
-                                <select name="role" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="admin-input">
+                            
+                            <div className="au-form-group">
+                                <label>Functional Classification</label>
+                                <select 
+                                    className="au-input"
+                                    value={formData.role} 
+                                    onChange={e => setFormData({...formData, role: e.target.value})}
+                                >
                                     <option value="vendor">👨‍🍳 Vendor (Patissier)</option>
-                                    <option value="delivery">🚚 Delivery Worker</option>
+                                    <option value="delivery">🚚 Logistics Personnel</option>
                                 </select>
                             </div>
-                            <div className="admin-modal-footer">
-                                <button type="button" className="admin-btn admin-btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="admin-btn admin-btn-primary" disabled={saving}>
-                                    {saving ? 'Creating...' : 'Create Account'}
+
+                            <div className="au-modal-footer">
+                                <button type="button" className="au-btn-cancel" onClick={() => setShowModal(false)}>Discard</button>
+                                <button type="submit" className="au-btn-submit" disabled={saving}>
+                                    {saving ? 'Deploying...' : 'Confirm Provisioning'}
                                 </button>
                             </div>
                         </form>
@@ -213,3 +245,5 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
+
+

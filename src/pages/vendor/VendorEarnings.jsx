@@ -95,7 +95,7 @@ const VendorEarnings = () => {
                         <div className="stat-card-trend trend-neutral">Deducted automatically</div>
                     </div>
                 </div>
-                <div className="admin-stat-card stat-revenue" style={{ background: 'linear-gradient(135deg, #E6CCB2, #B08968)' }}>
+                <div className="admin-stat-card stat-revenue" style={{ background: 'linear-gradient(135deg, #E6CCB2, #5C4033)' }}>
                     <div className="stat-card-left">
                         <div className="stat-card-label" style={{ color: '#FFEEDD' }}>Net Payout</div>
                         <div className="stat-card-value" style={{ color: 'white' }}>{totalNet.toFixed(2)} MAD</div>
@@ -149,3 +149,5 @@ const VendorEarnings = () => {
 };
 
 export default VendorEarnings;
+
+

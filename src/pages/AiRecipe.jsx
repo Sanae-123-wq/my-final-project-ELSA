@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaHistory } from 'react-icons/fa';
 
 const AiRecipe = () => {
     const { t } = useLanguage();
@@ -36,6 +37,9 @@ const AiRecipe = () => {
             <div className="hero" style={{ paddingTop: '0' }}>
                 <h1>AI <span className="highlight">Pastry Chef</span></h1>
                 <p>Describe your dream dessert, and watch the magic happen.</p>
+                <Link to="/recipe-history" className="rh-view-link" style={{ marginTop: '1rem' }}>
+                    <FaHistory /> View Recipe History
+                </Link>
             </div>
 
             <form onSubmit={generateRecipe}>
@@ -67,7 +71,7 @@ const AiRecipe = () => {
             {recipe && (
                 <div className="recipe-result">
                     <h2 className="text-center" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{recipe.name}</h2>
-                    
+
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', color: '#666' }}>
                         {recipe.prepTime && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -149,7 +149,7 @@ const AdminLayout = () => {
 
                     <div className="topbar-right">
                         {/* Notifications */}
-                        <Link to="/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#3D2B1F', position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <Link to="/admin/notifications" className="nav-icon-link" aria-label="Notifications" style={{ color: '#5C4033', position: 'relative', display: 'flex', alignItems: 'center' }}>
                             <FaBell size={20} />
                             {unreadCount > 0 && <span className="badge badge-notifications">{unreadCount}</span>}
                         </Link>
@@ -189,3 +189,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+

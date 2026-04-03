@@ -1,0 +1,308 @@
+/* --- VENDOR ADD PRODUCT PREMIUM CSS --- */
+
+.vap-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: vapFadeIn 0.5s ease-out;
+}
+
+@keyframes vapFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vap-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(92, 64, 51, 0.08);
+}
+
+.vap-title {
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #5C4033;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vap-subtitle {
+  color: rgba(92, 64, 51, 0.7);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.vap-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px -15px rgba(92, 64, 51, 0.08);
+  border: 1px solid rgba(92, 64, 51, 0.08);
+  overflow: hidden;
+}
+
+/* Form Sections */
+.vap-section {
+  padding: 2.5rem;
+  border-bottom: 1px dashed rgba(92, 64, 51, 0.15);
+  background: #ffffff;
+  transition: background 0.3s ease;
+}
+
+.vap-section:last-child {
+  border-bottom: none;
+}
+
+.vap-section:hover {
+  background: #FCFAF8;
+}
+
+.vap-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.vap-section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(217, 119, 6, 0.1);
+  color: #D97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.vap-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #5C4033;
+  letter-spacing: -0.02em;
+}
+
+/* Category Selection Grid */
+.vap-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.vap-category-btn {
+  background: white;
+  border: 2px solid rgba(92, 64, 51, 0.1);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.vap-category-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vap-category-btn:hover {
+  transform: translateY(-4px);
+  border-color: rgba(217, 119, 6, 0.4);
+  box-shadow: 0 10px 20px -10px rgba(217, 119, 6, 0.2);
+}
+
+.vap-category-btn:hover::before {
+  opacity: 1;
+}
+
+.vap-category-btn.selected {
+  border-color: #D97706;
+  background: #FFFBF5;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15);
+}
+
+.vap-category-label {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #5C4033;
+  position: relative;
+  z-index: 1;
+}
+
+.vap-category-hint {
+  font-size: 0.8rem;
+  color: rgba(92, 64, 51, 0.6);
+  line-height: 1.4;
+  position: relative;
+  z-index: 1;
+}
+
+/* Image Drop Zone */
+.vap-dropzone {
+  border: 2px dashed rgba(92, 64, 51, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 248, 240, 0.3);
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.vap-dropzone:hover {
+  border-color: #D97706;
+  background: rgba(217, 119, 6, 0.03);
+}
+
+.vap-dropzone.dragging {
+  border-color: #D97706;
+  background: rgba(217, 119, 6, 0.08);
+  transform: scale(1.02);
+}
+
+.vap-dropzone-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: rgba(92, 64, 51, 0.4);
+  display: block;
+}
+
+.vap-dropzone-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5C4033;
+  margin-bottom: 0.5rem;
+}
+
+.vap-dropzone-subtext {
+  font-size: 0.9rem;
+  color: rgba(92, 64, 51, 0.6);
+  margin-bottom: 1.5rem;
+}
+
+.vap-file-btn {
+  background: #5C4033;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(92, 64, 51, 0.2);
+}
+
+.vap-file-btn:hover {
+  background: #5C4033;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(92, 64, 51, 0.3);
+}
+
+.vap-preview-container {
+  display: inline-block;
+  position: relative;
+  border-radius: 16px;
+  padding: 0.5rem;
+  background: white;
+  box-shadow: 0 10px 25px -5px rgba(92, 64, 51, 0.15);
+  border: 1px solid rgba(92, 64, 51, 0.1);
+}
+
+.vap-preview-img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.vap-preview-remove {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #EF4444;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+  transition: all 0.2s ease;
+}
+
+.vap-preview-remove:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: #DC2626;
+}
+
+/* Actions */
+.vap-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 2rem 2.5rem;
+  background: #FDFBFA;
+  border-top: 1px solid rgba(92, 64, 51, 0.1);
+}
+
+.vap-btn-cancel {
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  font-weight: 700;
+  color: #5C4033;
+  background: white;
+  border: 1px solid rgba(92, 64, 51, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vap-btn-cancel:hover {
+  background: #F9F6F3;
+  border-color: rgba(92, 64, 51, 0.4);
+}
+
+.vap-btn-submit {
+  padding: 1rem 3rem;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: white;
+  background: linear-gradient(135deg, #5C4033 0%, #5C4033 100%);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 20px -8px rgba(92, 64, 51, 0.5);
+}
+
+.vap-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px -10px rgba(92, 64, 51, 0.6);
+  background: linear-gradient(135deg, #5C4033 0%, #5C4033 100%);
+}
+
+.vap-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+

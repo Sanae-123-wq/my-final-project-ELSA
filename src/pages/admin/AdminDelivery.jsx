@@ -70,7 +70,7 @@ const AdminDelivery = () => {
                     const statusClass = status === 'Available' ? 'badge-success' : status === 'On Delivery' ? 'badge-warning' : 'badge-neutral';
                     return (
                         <div key={worker._id} className="vendor-card">
-                            <div className="vendor-card-avatar" style={{ background: 'linear-gradient(135deg, #7F5539, #B08968)' }}>
+                            <div className="vendor-card-avatar" style={{ background: 'linear-gradient(135deg, #5C4033, #5C4033)' }}>
                                 {worker.name?.charAt(0)?.toUpperCase()}
                             </div>
                             <div className="vendor-card-name">{worker.name}</div>
@@ -134,3 +134,5 @@ const AdminDelivery = () => {
 };
 
 export default AdminDelivery;
+
+

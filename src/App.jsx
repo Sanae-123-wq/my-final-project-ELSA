@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
@@ -7,16 +7,21 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AiRecipe from './pages/AiRecipe';
+import RecipeHistory from './pages/RecipeHistory';
 import Stores from './pages/Stores';
 import Favorites from './pages/Favorites';
 import Notifications from './pages/Notifications';
 import Orders from './pages/Orders';
+import AccessDenied from './pages/AccessDenied';
 
 import Footer from './components/Footer';
 import { LanguageProvider } from './context/LanguageContext';
 
+// Protected & Public Route Components
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
+
 // Admin Imports
-import AdminRoute from './components/AdminRoute';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
@@ -29,7 +34,6 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminActivityLog from './pages/admin/AdminActivityLog';
 
 // Delivery Imports
-import DeliveryRoute from './components/DeliveryRoute';
 import DeliveryLayout from './pages/delivery/DeliveryLayout';
 import DeliveryDashboard from './pages/delivery/DeliveryDashboard';
 import AvailableOrders from './pages/delivery/AvailableOrders';
@@ -38,7 +42,6 @@ import DeliveryMap from './pages/delivery/DeliveryMap';
 import DeliveryProfile from './pages/delivery/DeliveryProfile';
 
 // Vendor Imports
-import VendorRoute from './components/VendorRoute';
 import VendorLayout from './pages/vendor/VendorLayout';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import VendorProducts from './pages/vendor/VendorProducts';
@@ -54,9 +57,9 @@ function App() {
         <Routes>
           {/* Admin Routes - no public Navbar/Footer */}
           <Route path="/admin/*" element={
-            <AdminRoute>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminLayout />
-            </AdminRoute>
+            </ProtectedRoute>
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
@@ -67,26 +70,28 @@ function App() {
             <Route path="delivery" element={<AdminDelivery />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="activity" element={<AdminActivityLog />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* Delivery Routes */}
           <Route path="/delivery/*" element={
-            <DeliveryRoute>
+            <ProtectedRoute allowedRoles={['delivery']}>
               <DeliveryLayout />
-            </DeliveryRoute>
+            </ProtectedRoute>
           }>
             <Route index element={<DeliveryDashboard />} />
             <Route path="available" element={<AvailableOrders />} />
             <Route path="active" element={<MyDeliveries />} />
             <Route path="map" element={<DeliveryMap />} />
             <Route path="profile" element={<DeliveryProfile />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* Vendor Routes */}
           <Route path="/vendor/*" element={
-            <VendorRoute>
+            <ProtectedRoute allowedRoles={['vendor']}>
               <VendorLayout />
-            </VendorRoute>
+            </ProtectedRoute>
           }>
             <Route index element={<VendorDashboard />} />
             <Route path="products" element={<VendorProducts />} />
@@ -94,29 +99,42 @@ function App() {
             <Route path="orders" element={<VendorOrders />} />
             <Route path="earnings" element={<VendorEarnings />} />
             <Route path="profile" element={<VendorProfile />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
-          {/* Public Routes */}
+          {/* Access Denied Route */}
+          <Route path="/access-denied" element={<AccessDenied />} />
+
+          {/* Public Routes with restriction for administrative roles */}
           <Route path="/*" element={
-            <div className="min-h-screen bg-secondary/20 flex flex-col font-sans">
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/product/:id" element={<ProductDetails />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/ai-recipe" element={<AiRecipe />} />
-                  <Route path="/stores" element={<Stores />} />
-                  <Route path="/favorites" element={<Favorites />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="/orders" element={<Orders />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
+            <PublicRoute>
+              <div className="min-h-screen bg-secondary/20 flex flex-col font-sans">
+                <Navbar />
+                <main className="flex-grow">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="/product/:id" element={<ProductDetails />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/ai-recipe" element={<AiRecipe />} />
+                    <Route path="/recipe-history" element={<RecipeHistory />} />
+                    <Route path="/stores" element={<Stores />} />
+                    <Route path="/favorites" element={<Favorites />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    
+                    {/* Protected Client-only Routes */}
+                    <Route path="/orders" element={
+                      <ProtectedRoute allowedRoles={['client']}>
+                        <Orders />
+                      </ProtectedRoute>
+                    } />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+            </PublicRoute>
           } />
         </Routes>
       </Router>
