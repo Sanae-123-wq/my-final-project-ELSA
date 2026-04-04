@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema({
     enum: ['Cake', 'Pastry', 'Bread', 'Traditional', 'Cookies', 'Chocolate', 'Healthy', 'Pack']
   },
   stock: { type: Number, default: 0 },
+  discount: { type: Number, default: 0 },
   isNew: { type: Boolean, default: false },
   isAvailable: { type: Boolean, default: true },
   vendorId: { type: String },

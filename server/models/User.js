@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
     city: { type: String }, // vendor
     phone: { type: String }, // vendor / delivery
     description: { type: String }, // vendor
+    image: { type: String }, // vendor (store image)
     vehicleType: { type: String, enum: ['bike', 'scooter', 'car'] } // delivery
 }, { timestamps: true });
 
