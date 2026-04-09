@@ -33,7 +33,10 @@ export const translations = {
             loading: "Loading yummy treats...",
             viewDetails: "View Details",
             addToCart: "Add to Cart",
-            price: "Price"
+            price: "Price",
+            loginRequired: "Login Required",
+            loginMessage: "Join the ELSA community to enjoy exclusive features and artisanal sweets.",
+            maybeLater: "Maybe Later"
         },
         categories: {
             "Pastry": "Pastry",
@@ -119,7 +122,10 @@ export const translations = {
             loading: "Chargement des délices...",
             viewDetails: "Voir Détails",
             addToCart: "Ajouter au Panier",
-            price: "Prix"
+            price: "Prix",
+            loginRequired: "Connexion Requise",
+            loginMessage: "Rejoignez la communauté ELSA pour profiter de fonctionnalités exclusives et de douceurs artisanales.",
+            maybeLater: "Plus Tard"
         },
         categories: {
             "Pastry": "Pâtisserie",
@@ -205,7 +211,10 @@ export const translations = {
             loading: "جارٍ تحميل الحلويات اللذيذة...",
             viewDetails: "عرض التفاصيل",
             addToCart: "أضف إلى السلة",
-            price: "سعر"
+            price: "سعر",
+            loginRequired: "تسجيل الدخول مطلوب",
+            loginMessage: "انضم إلى عائلة إلسا للاستمتاع بميزات حصرية وحلويات حرفية فريدة.",
+            maybeLater: "ربما لاحقاً"
         },
         categories: {
             "Pastry": "معجنات",

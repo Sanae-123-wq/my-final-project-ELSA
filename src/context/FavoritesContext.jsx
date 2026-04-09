@@ -5,7 +5,14 @@ const FavoritesContext = createContext();
 export const FavoritesProvider = ({ children }) => {
     const [favorites, setFavorites] = useState(() => {
         const saved = localStorage.getItem('elsa_favorites');
-        return saved ? JSON.parse(saved) : [];
+        if (!saved) return [];
+        try {
+            const parsed = JSON.parse(saved);
+            // Filter out any non-id values (null, undefined, empty strings)
+            return Array.isArray(parsed) ? parsed.filter(id => !!id) : [];
+        } catch (e) {
+            return [];
+        }
     });
 
     useEffect(() => {
@@ -13,6 +20,7 @@ export const FavoritesProvider = ({ children }) => {
     }, [favorites]);
 
     const toggleFavorite = (productId) => {
+        if (!productId) return;
         setFavorites(prev => {
             if (prev.includes(productId)) {
                 return prev.filter(id => id !== productId);
@@ -22,10 +30,14 @@ export const FavoritesProvider = ({ children }) => {
         });
     };
 
+    const clearOrphans = (validIds) => {
+        setFavorites(prev => prev.filter(id => validIds.includes(id)));
+    };
+
     const isFavorite = (productId) => favorites.includes(productId);
 
     return (
-        <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite }}>
+        <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite, clearOrphans }}>
             {children}
         </FavoritesContext.Provider>
     );

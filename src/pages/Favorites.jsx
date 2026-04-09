@@ -8,7 +8,7 @@ import { FaHeart } from 'react-icons/fa';
 
 const Favorites = () => {
     const { t } = useLanguage();
-    const { favorites } = useContext(FavoritesContext);
+    const { favorites, clearOrphans } = useContext(FavoritesContext);
     const [favProducts, setFavProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -16,17 +16,26 @@ const Favorites = () => {
         const fetchFavProducts = async () => {
             try {
                 const allProducts = await api.fetchProducts();
-                const filtered = allProducts.filter(p => favorites.includes(p._id));
-                setFavProducts(filtered);
+                
+                // Identify which IDs in our favorites actually exist in the DB
+                const validProducts = allProducts.filter(p => favorites.includes(p._id));
+                const validIds = validProducts.map(p => p._id);
+                
+                // If there's a mismatch, clean up the orphaned IDs from our context
+                if (validIds.length !== favorites.length) {
+                    clearOrphans(validIds);
+                }
+
+                setFavProducts(validProducts);
                 setLoading(false);
             } catch (error) {
-                console.error(error);
+                console.error('Failed to fetch favorites:', error);
                 setLoading(false);
             }
         };
 
         fetchFavProducts();
-    }, [favorites]);
+    }, [favorites, clearOrphans]);
 
     return (
         <div className="container py-12">

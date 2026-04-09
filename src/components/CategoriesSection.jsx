@@ -2,6 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
+// Import local category images
+import cakesImg from '../assets/categories profiles/cakes.jpg';
+import cheesecakesImg from '../assets/categories profiles/chessecakes.jpg';
+import chocolatesImg from '../assets/categories profiles/chocolates.jpg';
+import cookiesImg from '../assets/categories profiles/cookies.brownies.jpg';
+import cupcakesImg from '../assets/categories profiles/cupcakes.jpg';
+import donutsImg from '../assets/categories profiles/donuts.jpg';
+import macaronsImg from '../assets/categories profiles/macarons.jpg';
+import moroccanSweetsImg from '../assets/categories profiles/moroccan sweets.jpg';
+import tartsImg from '../assets/categories profiles/tarts.jpg';
+import tiramisuImg from '../assets/categories profiles/tiramisu.jpg';
+import viennoiseriesImg from '../assets/categories profiles/viennoiseries.jpg';
+
 const CategoriesSection = () => {
     const { t } = useLanguage();
 
@@ -11,7 +24,7 @@ const CategoriesSection = () => {
             name: 'Cakes',
             displayName: 'Cakes',
             description: 'Elegant artisanal cakes for every celebration.',
-            image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800',
+            image: cakesImg,
             popular: true
         },
         {
@@ -19,7 +32,7 @@ const CategoriesSection = () => {
             name: 'Cheesecakes',
             displayName: 'Cheesecakes',
             description: 'Rich and creamy cheesecakes in various flavors.',
-            image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&q=80&w=800',
+            image: cheesecakesImg,
             popular: false
         },
         {
@@ -27,7 +40,7 @@ const CategoriesSection = () => {
             name: 'Chocolates',
             displayName: 'Chocolates',
             description: 'Handcrafted chocolates and gourmet candies.',
-            image: 'https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=800',
+            image: chocolatesImg,
             popular: false
         },
         {
@@ -35,7 +48,7 @@ const CategoriesSection = () => {
             name: 'Cookies/Brownies',
             displayName: 'Cookies/Brownies',
             description: 'Crunchy and buttery delights baked to perfection.',
-            image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=800',
+            image: cookiesImg,
             popular: true
         },
         {
@@ -43,7 +56,7 @@ const CategoriesSection = () => {
             name: 'Cupcakes',
             displayName: 'Cupcakes',
             description: 'Sweet little bites of joy in various flavors.',
-            image: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&q=80&w=800',
+            image: cupcakesImg,
             popular: false
         },
         {
@@ -51,7 +64,7 @@ const CategoriesSection = () => {
             name: 'Donuts',
             displayName: 'Donuts',
             description: 'Freshly baked glazed and filled donuts.',
-            image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=800',
+            image: donutsImg,
             popular: true
         },
         {
@@ -59,7 +72,7 @@ const CategoriesSection = () => {
             name: 'Macarons',
             displayName: 'Macarons',
             description: 'Delicate french macarons with rich fillings.',
-            image: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&q=80&w=800',
+            image: macaronsImg,
             popular: true
         },
         {
@@ -67,7 +80,7 @@ const CategoriesSection = () => {
             name: 'Moroccan Sweets',
             displayName: 'Moroccan Sweets',
             description: 'Traditional heritage in every bite.',
-            image: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc2fe3a?auto=format&fit=crop&q=80&w=800',
+            image: moroccanSweetsImg,
             popular: true
         },
         {
@@ -75,7 +88,7 @@ const CategoriesSection = () => {
             name: 'Tarts',
             displayName: 'Tarts',
             description: 'Sweet and buttery tarts filled with fresh ingredients.',
-            image: 'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&q=80&w=800',
+            image: tartsImg,
             popular: false
         },
         {
@@ -83,7 +96,7 @@ const CategoriesSection = () => {
             name: 'Tiramisu',
             displayName: 'Tiramisu',
             description: 'Classic italian coffee-flavored dessert.',
-            image: 'https://images.unsplash.com/photo-1571115177098-24ec42ed204d?auto=format&fit=crop&q=80&w=800',
+            image: tiramisuImg,
             popular: false
         },
         {
@@ -91,7 +104,7 @@ const CategoriesSection = () => {
             name: 'Viennoiseries',
             displayName: 'Viennoiseries',
             description: 'Flaky croissants and puff pastries.',
-            image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=800',
+            image: viennoiseriesImg,
             popular: false
         }
     ];

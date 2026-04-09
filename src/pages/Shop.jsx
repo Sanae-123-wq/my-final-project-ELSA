@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import FavoritesContext from '../context/FavoritesContext';
+import AuthContext from '../context/AuthContext';
 import CartSidebar from '../components/CartSidebar';
 import ProductCard from '../components/ProductCard';
 import ProductFilters from '../components/ProductFilters';
@@ -16,6 +17,7 @@ const Shop = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const { t, language } = useLanguage();
     const { favorites } = useContext(FavoritesContext);
+    const { checkAuth } = useContext(AuthContext);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -182,6 +184,7 @@ const Shop = () => {
                                     type="text"
                                     placeholder={t.shopPage?.searchPlaceholder || 'Search for desserts...'}
                                     value={searchTerm}
+                                    onFocus={() => checkAuth()}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="shop-search-input"
                                 />

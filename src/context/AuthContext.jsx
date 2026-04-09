@@ -6,6 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     useEffect(() => {
         const userInfo = localStorage.getItem('userInfo');
@@ -34,8 +35,16 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const checkAuth = () => {
+        if (!user) {
+            setIsAuthModalOpen(true);
+            return false;
+        }
+        return true;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, checkAuth, isAuthModalOpen, setIsAuthModalOpen }}>
             {children}
         </AuthContext.Provider>
     );

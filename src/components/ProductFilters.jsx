@@ -75,8 +75,8 @@ const ProductFilters = ({
                             className="price-slider"
                         />
                         <div className="price-labels">
-                            <span>$0</span>
-                            <span className="current-price-badge">${filters.maxPrice.toFixed(2)}</span>
+                            <span>0 MAD</span>
+                            <span className="current-price-badge">{filters.maxPrice.toFixed(2)} MAD</span>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
-import { FaChartBar, FaUsers, FaShoppingBag, FaDollarSign, FaBox, FaArrowUp, FaArrowRight, FaCalendarAlt, FaHistory, FaCheckCircle, FaUserShield, FaBicycle, FaUtensils } from 'react-icons/fa';
+import { FaChartBar, FaUsers, FaShoppingBag, FaMoneyBillWave, FaBox, FaArrowUp, FaArrowRight, FaCalendarAlt, FaHistory, FaCheckCircle, FaUserShield, FaBicycle, FaUtensils } from 'react-icons/fa';
 import './AdminDashboard.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
                         <div className="ad-trend trend-up"><FaArrowUp /> 8.4% growth</div>
                     </div>
                     <div className="ad-stat-visual">
-                        <div className="ad-icon-box"><FaDollarSign /></div>
+                        <div className="ad-icon-box"><FaMoneyBillWave /></div>
                         <Sparkline data={[1200, 2100, 1600, 2900, 2100, 3200, 2750, 3600]} color="#D97706" />
                     </div>
                 </div>

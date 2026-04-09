@@ -1,13 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaShoppingCart, FaLock } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
+import AuthContext from '../context/AuthContext';
 import CartContext from '../context/CartContext';
 import FavoritesContext from '../context/FavoritesContext';
 import { resolveImageUrl } from '../utils/imageUrl';
 
 const ProductCard = ({ product }) => {
     const { t, language } = useLanguage();
+    const { user, checkAuth } = useContext(AuthContext);
     const { addToCart } = useContext(CartContext);
     const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
@@ -49,9 +51,12 @@ const ProductCard = ({ product }) => {
                     aria-label={favored ? "Remove from Favorites" : "Add to Favorites"}
                     onClick={(e) => {
                         e.preventDefault();
-                        toggleFavorite(product._id);
+                        if (checkAuth()) {
+                            toggleFavorite(product._id);
+                        }
                     }}
                 >
+                    {!user && <FaLock className="lock-hint" style={{ fontSize: '0.6rem', position: 'absolute', top: '5px', right: '5px', opacity: 0.6 }} />}
                     {favored ? <FaHeart /> : <FaRegHeart />}
                 </button>
 
@@ -100,11 +105,11 @@ const ProductCard = ({ product }) => {
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="price-container">
                             <span className={`price-tag ${hasDiscount ? 'discounted' : ''}`}>
-                                ${honoredPrice}
+                                {honoredPrice} MAD
                             </span>
                             {hasDiscount && (
                                 <span className="original-price">
-                                    ${product.price.toFixed(2)}
+                                    {product.price.toFixed(2)} MAD
                                 </span>
                             )}
                         </div>
@@ -126,7 +131,7 @@ const ProductCard = ({ product }) => {
                         disabled={product.stock === 0}
                         onClick={(e) => {
                             e.preventDefault();
-                            if (product.stock > 0) {
+                            if (product.stock > 0 && checkAuth()) {
                                 addToCart({
                                     ...product,
                                     price: parseFloat(honoredPrice)
@@ -134,7 +139,7 @@ const ProductCard = ({ product }) => {
                             }
                         }}
                     >
-                        <FaShoppingCart size={18} />
+                        {!user ? <FaLock size={12} /> : <FaShoppingCart size={18} />}
                     </button>
                 </div>
             </div>

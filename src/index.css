@@ -190,9 +190,9 @@ html {
 .add-to-cart-box-classic {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  padding: 2rem;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+  padding: 1.2rem;
   background: #fdfaf5;
   border-radius: 20px;
 }
@@ -408,7 +408,8 @@ img {
   left: 50%;
   width: 0;
   height: 2px;
-  background: #5C4033; /* Brown underline instead of orange */
+  background: #5C4033;
+  /* Brown underline instead of orange */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-50%);
 }
@@ -439,7 +440,8 @@ img {
 }
 
 .nav-icon-link:hover {
-  color: #5C4033; /* Default brown hover */
+  color: #5C4033;
+  /* Default brown hover */
   transform: translateY(-3px) scale(1.1);
 }
 
@@ -1228,7 +1230,7 @@ img {
 }
 
 .detail-content h1 {
-  font-size: 3.5rem;
+  font-size: 2.2rem;
   margin-bottom: 0.3rem;
   font-family: 'Playfair Display', serif;
   color: var(--dark-color);
@@ -1277,8 +1279,8 @@ img {
 .qty-btn {
   background: transparent;
   border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
   color: var(--primary-color);
   cursor: pointer;
   transition: var(--transition);
@@ -1290,10 +1292,10 @@ img {
 }
 
 .qty-input {
-  width: 50px;
+  width: 45px;
   text-align: center;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--dark-color);
   outline: none;
@@ -5334,21 +5336,21 @@ select.premium-form-input {
     text-align: center;
     gap: 2rem;
   }
-  
+
   .store-profile-image-container {
     margin: 0 auto;
   }
-  
+
   .store-title {
     font-size: 2.5rem;
   }
-  
+
   .store-meta-info {
     justify-content: center;
     flex-wrap: wrap;
     gap: 1rem;
   }
-  
+
   .store-header-desc {
     margin: 0 auto;
   }
@@ -5359,7 +5361,7 @@ select.premium-form-input {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background-color: #ef4444; 
+  background-color: #ef4444;
   color: white;
   padding: 5px 12px;
   border-radius: 50px;
@@ -5373,7 +5375,7 @@ select.premium-form-input {
 }
 
 /* Stack discount badge under 'New' badge if both exist */
-.product-badge.new + .discount-badge {
+.product-badge.new+.discount-badge {
   top: 3.5rem;
 }
 
@@ -5422,17 +5424,17 @@ select.premium-form-input {
   .stores-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .materials-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .store-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .store-image-wrapper {
     margin: 0 auto;
   }
-}
+}

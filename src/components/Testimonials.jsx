@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { FaStar, FaChevronLeft, FaChevronRight, FaPen } from 'react-icons/fa';
+import AuthContext from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../services/api';
 import ReviewModal from './ReviewModal';
 
 const Testimonials = () => {
     const { t } = useLanguage();
+    const { checkAuth } = useContext(AuthContext);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [liveReviews, setLiveReviews] = useState([]);
@@ -144,7 +146,11 @@ const Testimonials = () => {
                 <div className="testimonials-footer">
                     <button 
                         className="btn-review" 
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => {
+                            if (checkAuth()) {
+                                setIsModalOpen(true);
+                            }
+                        }}
                     >
                         <FaPen style={{ marginRight: '8px', fontSize: '14px' }} /> Leave your review
                     </button>

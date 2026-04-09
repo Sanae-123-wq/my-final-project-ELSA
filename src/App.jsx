@@ -14,6 +14,7 @@ import Favorites from './pages/Favorites';
 import Notifications from './pages/Notifications';
 import Orders from './pages/Orders';
 import AccessDenied from './pages/AccessDenied';
+import AuthModal from './components/AuthModal';
 
 import Footer from './components/Footer';
 import { LanguageProvider } from './context/LanguageContext';
@@ -115,6 +116,7 @@ function App() {
             <PublicRoute>
               <div className="min-h-screen bg-secondary/20 flex flex-col font-sans">
                 <Navbar />
+                <AuthModal />
                 <main className="flex-grow">
                   <Routes>
                     <Route path="/" element={<Home />} />

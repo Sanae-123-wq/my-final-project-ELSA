@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
 import { api } from '../../services/api';
-import { FaCoins, FaBox, FaConciergeBell, FaPlus, FaArrowRight, FaChartLine, FaHistory, FaTools, FaFileInvoiceDollar } from 'react-icons/fa';
+import { FaCoins, FaBox, FaConciergeBell, FaPlus, FaArrowRight, FaChartLine, FaHistory, FaTools, FaWallet } from 'react-icons/fa';
 import './VendorDashboard.css';
 
 const VendorDashboard = () => {
@@ -178,7 +178,7 @@ const VendorDashboard = () => {
                         </Link>
 
                         <Link to="/vendor/earnings" className="vd-action-btn">
-                            <div className="vd-action-icon"><FaFileInvoiceDollar /></div>
+                            <div className="vd-action-icon"><FaWallet /></div>
                             <div className="vd-action-text">
                                 <span className="vd-action-title">Earnings</span>
                                 <span className="vd-action-desc">Financial statements</span>

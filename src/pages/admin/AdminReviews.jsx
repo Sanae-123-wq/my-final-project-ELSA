@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { api } from '../../services/api';
 import AuthContext from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTrashAlt, FaStar, FaSearch, FaFilter, FaQuoteLeft, FaExclamationCircle } from 'react-icons/fa';
+import { FaTrashAlt, FaStar, FaQuoteLeft, FaExclamationCircle } from 'react-icons/fa';
 import './AdminModeration.css';
 
 const AdminReviews = () => {
@@ -43,13 +43,13 @@ const AdminReviews = () => {
     };
 
     const filtered = reviews.filter(rev => 
-        rev.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        rev.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (rev.comment?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (rev.name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     );
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-gold)', borderBottomColor: 'var(--pat-gold)' }}></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderTopColor: 'var(--pat-brown)', borderBottomColor: 'var(--pat-brown)' }}></div>
             <p className="ml-4 font-bold text-brown">Synchronizing reviews...</p>
         </div>
     );
@@ -62,7 +62,7 @@ const AdminReviews = () => {
             <button 
                 onClick={fetchReviews} 
                 className="bg-red-500 px-6 py-2 rounded-xl text-white font-bold hover:bg-orange-600 transition-all shadow-md"
-                style={{ backgroundColor: '#D97706' }}
+                style={{ backgroundColor: '#5C4033' }}
             >
                 Retry Connection
             </button>
@@ -71,27 +71,26 @@ const AdminReviews = () => {
 
     return (
         <div className="admin-reviews-page">
-            <div className="admin-page-header mb-8">
+            <header className="admin-page-header">
                 <div>
                     <h1 className="admin-main-title">Review Moderation</h1>
                     <p className="admin-subtitle">Maintain your brand quality by managing customer feedback</p>
                 </div>
-            </div>
 
-            <div className="admin-controls-grid mb-6">
-                <div className="admin-search-wrapper">
-                    <FaSearch className="admin-search-icon" />
-                    <input 
-                        type="text" 
-                        placeholder="Search reviews or authors..." 
-                        className="admin-search-input"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className="admin-controls-grid">
+                    <div className="admin-search-wrapper">
+                        <input 
+                            type="text" 
+                            placeholder="Search by author or content..." 
+                            className="admin-search-input"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="admin-reviews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+            <div className="admin-reviews-grid">
                 <AnimatePresence>
                     {filtered.map(rev => (
                         <motion.div 
@@ -100,35 +99,41 @@ const AdminReviews = () => {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="admin-review-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between"
+                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                            className="admin-review-card"
                         >
-                            <div>
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-1 text-amber-500">
+                            <FaQuoteLeft className="admin-quote-icon" size={40} />
+                            
+                            <div className="admin-review-content">
+                                <div className="card-header-actions">
+                                    <div className="stars-wrapper">
                                         {[...Array(5)].map((_, i) => (
-                                            <FaStar key={i} size={14} className={i < rev.rating ? 'text-amber-500' : 'text-gray-200'} />
+                                            <FaStar 
+                                                key={i} 
+                                                size={16} 
+                                                className={i < rev.rating ? 'star-active' : 'star-inactive'} 
+                                            />
                                         ))}
                                     </div>
                                     <button 
                                         onClick={() => handleDelete(rev._id)}
-                                        className="text-red-400 hover:text-red-600 transition-colors p-2 bg-red-50 rounded-lg"
-                                        title="Hide Review"
+                                        className="btn-delete-icon"
+                                        title="Hide Review from Public"
                                     >
-                                        <FaTrashAlt size={16} />
+                                        <FaTrashAlt size={14} />
                                     </button>
                                 </div>
                                 
-                                <div className="relative mb-4">
-                                    <FaQuoteLeft className="absolute -left-2 -top-2 text-gray-100" size={24} />
-                                    <p className="text-gray-700 italic relative z-10 pl-4">
-                                        {rev.comment}
-                                    </p>
-                                </div>
+                                <p className="admin-review-text">
+                                    {rev.comment}
+                                </p>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-500">
-                                <span className="font-bold text-gray-800">{rev.name}</span>
-                                <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                            <div className="admin-review-footer">
+                                <span className="admin-review-author">{rev.name}</span>
+                                <span className="admin-review-date">
+                                    {new Date(rev.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                                </span>
                             </div>
                         </motion.div>
                     ))}
@@ -136,9 +141,11 @@ const AdminReviews = () => {
             </div>
 
             {filtered.length === 0 && (
-                <div className="text-center py-20 opacity-40">
-                    <FaStar size={50} className="mx-auto mb-4" />
-                    <p>No reviews matching your search found.</p>
+                <div className="empty-reviews-state">
+                    <div className="empty-icon-wrapper">
+                        <FaStar size={80} />
+                    </div>
+                    <p className="empty-text">No reviews found</p>
                 </div>
             )}
         </div>

@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { FaSearch, FaTimes, FaUtensils, FaBoxOpen, FaBirthdayCake } from 'react-icons/fa';
+import { useContext } from 'react';
+import AuthContext from '../context/AuthContext';
 
 const HomeSearch = () => {
     const { t, language } = useLanguage();
+    const { checkAuth } = useContext(AuthContext);
     const [query, setQuery] = useState('');
     const [allProducts, setAllProducts] = useState([]);
     const [results, setResults] = useState({ products: [], packs: [], recipes: [] });
@@ -74,8 +77,16 @@ const HomeSearch = () => {
                     type="text"
                     placeholder={t.homeSearch.placeholder}
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onFocus={() => query.length > 1 && setIsOpen(true)}
+                    onChange={(e) => {
+                        if (checkAuth()) {
+                            setQuery(e.target.value);
+                        }
+                    }}
+                    onFocus={() => {
+                        if (checkAuth() && query.length > 1) {
+                            setIsOpen(true);
+                        }
+                    }}
                 />
                 {query && (
                     <button className="clear-btn" onClick={clearSearch}>

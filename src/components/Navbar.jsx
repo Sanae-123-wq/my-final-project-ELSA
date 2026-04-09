@@ -10,7 +10,7 @@ import LanguageSelector from './LanguageSelector';
 import { useSocket } from '../context/SocketContext';
 
 const Navbar = () => {
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout, checkAuth } = useContext(AuthContext);
     const { cartItems } = useContext(CartContext);
     const { favorites } = useContext(FavoritesContext);
     const { t } = useLanguage();
@@ -22,6 +22,15 @@ const Navbar = () => {
         logout();
         setIsMenuOpen(false);
         navigate('/login');
+    };
+
+    const handleProtectedLink = (e, path) => {
+        if (!checkAuth()) {
+            e.preventDefault();
+        } else {
+            closeMenu();
+            navigate(path);
+        }
     };
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -68,12 +77,22 @@ const Navbar = () => {
 
                     {isClientOrGuest && (
                         <>
-                            <Link to="/favorites" className="nav-icon-link" aria-label="Favorites">
+                            <Link 
+                                to="/favorites" 
+                                className="nav-icon-link" 
+                                aria-label="Favorites"
+                                onClick={(e) => handleProtectedLink(e, '/favorites')}
+                            >
                                 <FaHeart size={18} />
                                 {favoritesCount > 0 && <span className="badge badge-favorites">{favoritesCount}</span>}
                             </Link>
 
-                            <Link to="/cart" className="nav-icon-link" aria-label="Shopping Cart">
+                            <Link 
+                                to="/cart" 
+                                className="nav-icon-link" 
+                                aria-label="Shopping Cart"
+                                onClick={(e) => handleProtectedLink(e, '/cart')}
+                            >
                                 <FaShoppingCart size={20} />
                                 {cartCount > 0 && <span className="badge">{cartCount}</span>}
                             </Link>
@@ -121,8 +140,8 @@ const Navbar = () => {
                         <Link to="/stores" onClick={closeMenu}>{t.navbar.marketplace}</Link>
                         <Link to="/ai-recipe" onClick={closeMenu}>{t.navbar.aiKitchen}</Link>
                         {user && <Link to="/orders" onClick={closeMenu}>My Orders</Link>}
-                        <Link to="/favorites" onClick={closeMenu}>{t.navbar.favorites}</Link>
-                        <Link to="/cart" onClick={closeMenu}>{t.navbar.cart}</Link>
+                        <Link to="/favorites" onClick={(e) => handleProtectedLink(e, '/favorites')}>{t.navbar.favorites}</Link>
+                        <Link to="/cart" onClick={(e) => handleProtectedLink(e, '/cart')}>{t.navbar.cart}</Link>
                     </>
                 ) : (
                     <>

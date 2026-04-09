@@ -2,8 +2,10 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import CartContext from '../context/CartContext';
+import AuthContext from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { resolveImageUrl } from '../utils/imageUrl';
+import { FaLock } from 'react-icons/fa';
 
 const StarRating = ({ rating, setRating, interactive = false }) => {
     const [hover, setHover] = useState(0);
@@ -37,6 +39,7 @@ const ProductDetails = () => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [qty, setQty] = useState(1);
     const { addToCart } = useContext(CartContext);
+    const { user, checkAuth } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const { t, language } = useLanguage();
 
@@ -91,6 +94,8 @@ const ProductDetails = () => {
     };
 
     const handleAddToCart = () => {
+        if (!checkAuth()) return;
+        
         const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
         addToCart({
             ...product,
@@ -168,12 +173,12 @@ const ProductDetails = () => {
                     <p className="detail-description">{product[`description_${language}`] || product.description}</p>
 
                     <div className="price-container mb-6">
-                        <span className={`detail-price-main ${product.discount > 0 ? 'discounted text-red-500' : ''}`} style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                            ${(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)}
+                        <span className={`detail-price-main ${product.discount > 0 ? 'discounted text-red-500' : ''}`} style={{ fontSize: '2rem', fontWeight: 800 }}>
+                            {(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)} MAD
                         </span>
                         {product.discount > 0 && (
-                            <span className="original-price" style={{ fontSize: '1.25rem', marginLeft: '15px' }}>
-                                ${product.price.toFixed(2)}
+                            <span className="original-price" style={{ fontSize: '1.1rem', marginLeft: '12px' }}>
+                                {product.price.toFixed(2)} MAD
                             </span>
                         )}
                     </div>
@@ -194,7 +199,7 @@ const ProductDetails = () => {
 
                     <div className="add-to-cart-box-classic">
                         <div className={`qty-control ${product.stock === 0 ? 'disabled' : ''}`}>
-                            <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Quantity</span>
+                            <span style={{ fontWeight: 'bold', fontSize: '1rem' }}>Quantity</span>
                             <div className="qty-counter">
                                 <button
                                     onClick={() => setQty(Math.max(1, qty - 1))}
@@ -219,8 +224,9 @@ const ProductDetails = () => {
                             onClick={handleAddToCart}
                             className={`btn-primary ${product.stock === 0 ? 'disabled' : ''}`}
                             disabled={product.stock === 0}
-                            style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem' }}
+                            style={{ width: '100%', padding: '0.8rem 1.5rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
                         >
+                            {!user && <FaLock size={14} />}
                             {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                         </button>
                     </div>

@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { Link } from 'react-router-dom';
 import CartContext from '../context/CartContext';
+import AuthContext from '../context/AuthContext';
 import CartSidebar from '../components/CartSidebar';
 import { FaSearch, FaMapMarkerAlt, FaShoppingCart, FaStar, FaChevronRight } from 'react-icons/fa';
 import { resolveImageUrl } from '../utils/imageUrl';
@@ -10,6 +11,7 @@ import { resolveImageUrl } from '../utils/imageUrl';
 const Stores = () => {
     const { t } = useLanguage();
     const { addToCart } = useContext(CartContext);
+    const { checkAuth } = useContext(AuthContext);
     const [searchTerm, setSearchTerm] = useState('');
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -61,6 +63,7 @@ const Stores = () => {
     );
 
     const handleAddToCart = (item) => {
+        if (!checkAuth()) return;
         addToCart({
             _id: item._id,
             name: item.name,
@@ -94,6 +97,7 @@ const Stores = () => {
                                 placeholder={t.storesPage.searchPlaceholder}
                                 className="search-input"
                                 value={searchTerm}
+                                onFocus={() => checkAuth()}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
@@ -149,7 +153,7 @@ const Stores = () => {
                                                             {product.name}
                                                         </Link>
                                                         <div className="material-footer">
-                                                            <span className="material-price text-sm">${product.price.toFixed(2)}</span>
+                                                            <span className="material-price text-sm">{product.price.toFixed(2)} MAD</span>
                                                             <button
                                                                 onClick={() => handleAddToCart(product)}
                                                                 className="add-material-btn"
