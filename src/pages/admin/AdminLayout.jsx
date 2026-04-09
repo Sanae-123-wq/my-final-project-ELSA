@@ -12,6 +12,8 @@ const NAV_ITEMS = [
     { path: '/admin/users', label: 'Clients', icon: '👥' },
     { path: '/admin/vendors', label: 'Vendors', icon: '👨‍🍳' },
     { path: '/admin/delivery', label: 'Delivery', icon: '🚚' },
+    { path: '/admin/reclamations', label: 'Reclamations', icon: '🎫' },
+    { path: '/admin/reviews', label: 'Reviews', icon: '⭐' },
     { path: '/admin/analytics', label: 'Analytics', icon: '📊' },
     { path: '/admin/activity', label: 'Activity Log', icon: '📋' },
     { path: '/admin/settings', label: 'Settings', icon: '⚙️' },

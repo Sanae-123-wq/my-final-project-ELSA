@@ -3,6 +3,8 @@ import HomeSearch from '../components/HomeSearch';
 import CategoriesSection from '../components/CategoriesSection';
 import HeroSlider from '../components/HeroSlider';
 import Testimonials from '../components/Testimonials';
+import AboutUs from '../components/AboutUs';
+import WhyChooseUs from '../components/WhyChooseUs';
 
 const Home = () => {
     const { t } = useLanguage();
@@ -10,14 +12,20 @@ const Home = () => {
     return (
         <div>
             <HeroSlider />
-
-            <div className="container">
-                <div className="pt-8 pb-4">
-                    <HomeSearch />
+            
+            <section className="search-section">
+                <div className="container">
+                    <div className="pt-8 pb-4">
+                        <HomeSearch />
+                    </div>
                 </div>
+            </section>
 
-                <CategoriesSection />
-            </div>
+            <CategoriesSection />
+
+            <AboutUs />
+            
+            <WhyChooseUs />
 
             <Testimonials />
         </div>

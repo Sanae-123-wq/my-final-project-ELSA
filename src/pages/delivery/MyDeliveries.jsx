@@ -27,7 +27,7 @@ const MyDeliveries = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const realOrders = await res.json();
-            
+
             setDeliveries(realOrders.sort((a, b) => {
                 if (a.status === 'delivered') return 1;
                 if (b.status === 'delivered') return -1;
@@ -49,19 +49,19 @@ const MyDeliveries = () => {
             const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
             const res = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
                 method: 'PUT',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ status: nextStatus })
             });
 
             if (!res.ok) throw new Error('Update failed');
 
-            setDeliveries(deliveries.map(d => 
+            setDeliveries(deliveries.map(d =>
                 d._id === orderId ? { ...d, status: nextStatus } : d
             ));
-            
+
             if (nextStatus === 'delivered') {
                 alert(`Order ${orderId} marked as DELIVERED! Great job! 🎉`);
             }
@@ -126,7 +126,7 @@ const MyDeliveries = () => {
                                             <a href={`tel:${delivery.userId?.phone}`} style={{ fontSize: '0.72rem', color: '#5C4033', textDecoration: 'none', fontWeight: '600', display: 'inline-block', marginTop: '4px' }}>CALL CUSTOMER</a>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ background: '#FAF8F5', border: '1px solid #E6D5C3', borderRadius: '10px', padding: '0.85rem', marginBottom: '1.25rem' }}>
                                         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                             <span style={{ fontSize: '1rem' }}>📍</span>
@@ -145,8 +145,8 @@ const MyDeliveries = () => {
                                     </div>
 
                                     {!isDelivered && (
-                                        <button 
-                                            className={`admin-btn ${flow.actionBtn}`} 
+                                        <button
+                                            className={`admin-btn ${flow.actionBtn}`}
                                             style={{ width: '100%', justifyContent: 'center', padding: '0.8rem' }}
                                             onClick={() => handleUpdateStatus(delivery._id, delivery.status)}
                                             disabled={statusUpdating === delivery._id}

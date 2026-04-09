@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import { FaUser, FaStore, FaMotorcycle, FaArrowLeft, FaCheck } from 'react-icons/fa';
+import { FaUser, FaStore, FaMotorcycle, FaArrowLeft, FaCheck, FaCamera } from 'react-icons/fa';
 import '../auth.css';
 
 const Signup = () => {
@@ -19,6 +19,8 @@ const Signup = () => {
     const [city, setCity] = useState('');
     const [phone, setPhone] = useState('');
     const [description, setDescription] = useState('');
+    const [image, setImage] = useState(null);
+    const [preview, setPreview] = useState(null);
     const [vehicleType, setVehicleType] = useState('bike');
 
     const { user, register, loading: authLoading } = useContext(AuthContext);
@@ -42,12 +44,26 @@ const Signup = () => {
         setError('');
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
     const validateForm = () => {
         if (!name || !email || !password) return "Please fill out all basic fields";
         if (password.length < 6) return "Password must be at least 6 characters";
         
         if (role === 'client' && !address) return "Address is required";
-        if (role === 'vendor' && (!shopName || !city || !phone || !description)) return "Please fill all pastry chef details";
+        if (role === 'vendor') {
+            if (!shopName) return "Store Name is mandatory";
+            if (!city) return "Store Location (City) is mandatory";
+            if (!description) return "Store Description is mandatory";
+            if (!image) return "Store Profile Image is mandatory";
+            if (!phone) return "Phone number is mandatory";
+        }
         if (role === 'delivery' && (!phone || !vehicleType)) return "Please fill all delivery details";
         return null;
     };
@@ -63,13 +79,28 @@ const Signup = () => {
         setLoading(true);
         setError('');
 
-        let extraData = {};
-        if (role === 'client') extraData = { address };
-        if (role === 'vendor') extraData = { shopName, city, phone, description };
-        if (role === 'delivery') extraData = { phone, vehicleType };
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('role', role);
+
+        if (role === 'client') {
+            formData.append('address', address);
+        } else if (role === 'vendor') {
+            formData.append('shopName', shopName);
+            formData.append('city', city);
+            formData.append('phone', phone);
+            formData.append('description', description);
+            formData.append('image', image);
+        } else if (role === 'delivery') {
+            formData.append('phone', phone);
+            formData.append('vehicleType', vehicleType);
+        }
 
         try {
-            await register(name, email, password, role, extraData);
+            // Note: register in AuthContext now accepts FormData
+            await register(formData);
             if (role === 'vendor') navigate('/vendor');
             else if (role === 'delivery') navigate('/delivery');
             else navigate('/');
@@ -157,6 +188,32 @@ const Signup = () => {
                             </button>
 
                             <form onSubmit={handleSubmit}>
+                                {role === 'vendor' && (
+                                    <div className="image-upload-wrapper fade-enter">
+                                        <div className="image-preview-container">
+                                            {preview ? (
+                                                <img src={preview} alt="Store Preview" className="image-preview" />
+                                            ) : (
+                                                <div className="upload-placeholder">
+                                                    <FaCamera size={24} />
+                                                    <span>Store Photo</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <label htmlFor="store-image" className="file-input-label">
+                                            {preview ? 'Change Store Photo' : 'Upload Store Photo'}
+                                        </label>
+                                        <input 
+                                            id="store-image"
+                                            type="file" 
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden-file-input"
+                                        />
+                                        <p className="text-xs text-gray-400 mt-1">* Mandatory Store Image</p>
+                                    </div>
+                                )}
+
                                 <div className="auth-form-row auth-form-group">
                                     <div>
                                         <label className="auth-label">Full Name</label>
@@ -209,46 +266,50 @@ const Signup = () => {
 
                                 {role === 'vendor' && (
                                     <div className="dynamic-section fade-enter">
-                                        <div className="dynamic-section-title">Pastry Chef Details</div>
+                                        <div className="dynamic-section-title">Store Details</div>
                                         <div className="auth-form-row auth-form-group">
                                             <div>
-                                                <label className="auth-label">Shop Name</label>
+                                                <label className="auth-label">Store Name *</label>
                                                 <input
                                                     type="text"
                                                     value={shopName}
                                                     onChange={(e) => setShopName(e.target.value)}
                                                     className="auth-input"
-                                                    placeholder="La Douceur"
+                                                    placeholder="ELSA Bakery"
+                                                    required
                                                 />
                                             </div>
                                             <div>
-                                                <label className="auth-label">City</label>
+                                                <label className="auth-label">Location (City) *</label>
                                                 <input
                                                     type="text"
                                                     value={city}
                                                     onChange={(e) => setCity(e.target.value)}
                                                     className="auth-input"
-                                                    placeholder="Paris"
+                                                    placeholder="Agadir"
+                                                    required
                                                 />
                                             </div>
                                         </div>
                                         <div className="auth-form-group">
-                                            <label className="auth-label">Phone Number</label>
+                                            <label className="auth-label">Phone Number *</label>
                                             <input
                                                 type="tel"
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 className="auth-input"
-                                                placeholder="+1 234 567 890"
+                                                placeholder="+212 6... "
+                                                required
                                             />
                                         </div>
                                         <div className="auth-form-group">
-                                            <label className="auth-label">Short Business Description</label>
+                                            <label className="auth-label">Store Description *</label>
                                             <textarea
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
                                                 className="auth-textarea"
-                                                placeholder="Artisan croissanterie..."
+                                                placeholder="Briefly describe your delicious offerings..."
+                                                required
                                                 rows="2"
                                             ></textarea>
                                         </div>
@@ -290,7 +351,7 @@ const Signup = () => {
                                 )}
 
                                 <button type="submit" disabled={loading} className="auth-submit-btn">
-                                    {loading ? <div className="spinner"></div> : 'Create Account'}
+                                    {loading ? <div className="spinner"></div> : 'Create Store Account'}
                                 </button>
                             </form>
                         </div>

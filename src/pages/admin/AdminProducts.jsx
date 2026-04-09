@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { resolveImageUrl } from '../../utils/imageUrl';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
@@ -11,7 +12,7 @@ const AdminProducts = () => {
     const [formData, setFormData] = useState({
         name: '', name_fr: '', name_ar: '',
         description: '', description_fr: '', description_ar: '',
-        price: '', category: 'Pastry', image: ''
+        price: '', category: 'Cakes', image: ''
     });
     const [saving, setSaving] = useState(false);
 
@@ -26,7 +27,7 @@ const AdminProducts = () => {
 
     const openCreate = () => {
         setCurrentProduct(null);
-        setFormData({ name: '', name_fr: '', name_ar: '', description: '', description_fr: '', description_ar: '', price: '', category: 'Pastry', image: '' });
+        setFormData({ name: '', name_fr: '', name_ar: '', description: '', description_fr: '', description_ar: '', price: '', category: 'Cakes', image: '' });
         setShowModal(true);
     };
 
@@ -59,7 +60,7 @@ const AdminProducts = () => {
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const categories = ['All', 'Pastry', 'Cake', 'Traditional'];
+    const categories = ['All', 'Cakes', 'Cheesecakes', 'Chocolates', 'Cookies/Brownies', 'Cupcakes', 'Donuts', 'Macarons', 'Moroccan Sweets', 'Tarts', 'Tiramisu', 'Viennoiseries'];
 
     const filtered = products.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -124,7 +125,7 @@ const AdminProducts = () => {
                                 <tr key={product._id}>
                                     <td>
                                         <div className="product-cell">
-                                            <img src={product.image} alt={product.name} className="product-thumb" style={{ borderRadius: '12px', border: '1.5px solid var(--pat-beige)' }} />
+                                            <img src={resolveImageUrl(product.image)} alt={product.name} className="product-thumb" style={{ borderRadius: '12px', border: '1.5px solid var(--pat-beige)' }} />
                                             <div>
                                                 <div className="product-cell-name" style={{ fontWeight: '700', color: 'var(--pat-brown)' }}>{product.name}</div>
                                                 <div className="product-cell-desc" style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>{product.description?.slice(0, 50)}...</div>

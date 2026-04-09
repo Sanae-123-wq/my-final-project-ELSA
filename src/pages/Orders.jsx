@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { FaBox, FaClock, FaCheckCircle, FaTruck, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
 import ReclamationModal from '../components/ReclamationModal';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -98,15 +99,15 @@ const Orders = () => {
                                 {order.status !== 'cancelled' && (
                                     <div style={{ marginBottom: '1.5rem' }}>
                                         <div style={{ height: '4px', background: 'var(--pat-beige)', borderRadius: '2px', overflow: 'hidden' }}>
-                                            <div 
-                                                style={{ 
-                                                    height: '100%', 
-                                                    background: 'var(--pat-gold)', 
+                                            <div
+                                                style={{
+                                                    height: '100%',
+                                                    background: 'var(--pat-gold)',
                                                     transition: 'width 1s ease',
-                                                    width: order.status === 'delivered' ? '100%' : 
-                                                           order.status === 'picked' ? '75%' : 
-                                                           order.status === 'ready' ? '50%' : 
-                                                           order.status === 'preparing' ? '25%' : '10%' 
+                                                    width: order.status === 'delivered' ? '100%' :
+                                                        order.status === 'picked' ? '75%' :
+                                                            order.status === 'ready' ? '50%' :
+                                                                order.status === 'preparing' ? '25%' : '10%'
                                                 }}
                                             ></div>
                                         </div>
@@ -126,7 +127,7 @@ const Orders = () => {
 
                                 <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem' }}>
                                     {canReport(order.status) && (
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 setSelectedOrder(order);
                                                 setIsModalOpen(true);
@@ -138,7 +139,7 @@ const Orders = () => {
                                             Report
                                         </button>
                                     )}
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             setSelectedOrderDetails(order);
                                             setIsDetailsModalOpen(true);
@@ -156,7 +157,7 @@ const Orders = () => {
                             <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🥐</div>
                             <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--pat-brown)' }}>No orders found</h2>
                             <p style={{ color: 'var(--text-light)', marginBottom: '2rem' }}>Your cookie jar is empty... for now!</p>
-                            <button onClick={() => window.location.href='/shop'} className="btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
+                            <button onClick={() => window.location.href = '/shop'} className="btn-primary" style={{ padding: '0.8rem 2.5rem' }}>
                                 Start Shopping
                             </button>
                         </div>
@@ -164,8 +165,8 @@ const Orders = () => {
                 </AnimatePresence>
             </div>
 
-            <ReclamationModal 
-                isOpen={isModalOpen} 
+            <ReclamationModal
+                isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 orderId={selectedOrder?._id}
                 orderNumber={selectedOrder?._id?.toString()?.slice(-6)?.toUpperCase()}
@@ -174,17 +175,17 @@ const Orders = () => {
             {/* Premium Details Modal */}
             <AnimatePresence>
                 {isDetailsModalOpen && selectedOrderDetails && (
-                    <motion.div 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
-                        exit={{ opacity: 0 }} 
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         className="premium-modal-overlay"
                         onClick={() => setIsDetailsModalOpen(false)}
                     >
-                        <motion.div 
-                            initial={{ y: 50, opacity: 0 }} 
-                            animate={{ y: 0, opacity: 1 }} 
-                            exit={{ y: 50, opacity: 0 }} 
+                        <motion.div
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 50, opacity: 0 }}
                             className="premium-modal-content"
                             onClick={(e) => e.stopPropagation()}
                         >
@@ -206,7 +207,7 @@ const Orders = () => {
                                     {selectedOrderDetails.products.map((item, i) => (
                                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             {item.productId?.image && (
-                                                <img src={item.productId.image} alt={item.productId.name} style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' }} />
+                                                <img src={resolveImageUrl(item.productId.image)} alt={item.productId.name} style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' }} />
                                             )}
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontWeight: '700', color: 'var(--pat-brown)' }}>{item.productId?.name || 'Deleted Product'}</div>

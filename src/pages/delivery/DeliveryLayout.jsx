@@ -33,7 +33,7 @@ const DeliveryLayout = () => {
 
     if (user?.status === 'pending') {
         return (
-            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#faeece', flexDirection: 'column', gap: '20px' }}>
+            <div className="admin-shell" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--pat-cream)', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ fontSize: '4rem' }}>⏳</div>
                 <h2 style={{ color: '#5C4033', fontFamily: 'Playfair Display, serif' }}>Account Under Review</h2>
                 <p style={{ color: '#8B7355' }}>Your Courier portal is restricted until an administrator verifies your application.</p>

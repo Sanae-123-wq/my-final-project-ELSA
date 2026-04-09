@@ -1,3 +1,5 @@
+import { resolveImageUrl } from '../utils/imageUrl.js';
+
 // Activity log - local in-memory log (no backend endpoint yet)
 let activityLog = [
     { action: 'Admin logged in', type: 'login', time: '2 min ago', by: 'ELSA Admin' },
@@ -13,25 +15,57 @@ const addToLog = (action, type, by = 'ELSA Admin') => {
 // Simulate network delay (legacy, kept for compatibility)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Dynamic API URL for environment compatibility (handles localhost vs IP)
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
+const fetchWithAuth = async (url, options = {}) => {
+    const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...options.headers,
+    };
+    const response = await fetch(`${API_BASE}${url}`, { ...options, headers });
+    if (!response.ok) {
+        // Log deep error for diagnostics
+        console.error(`[API Error] ${response.status} ${response.statusText} on ${url}`);
+        throw new Error(`API Error: ${response.status}`);
+    }
+    return await response.json();
+};
+
 export const api = {
     // --- Activity Log ---
     getActivityLog: () => [...activityLog],
 
     // --- Products ---
-    fetchProducts: async () => {
-        const response = await fetch('http://localhost:5000/api/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
-        const data = await response.json();
+    fetchProducts: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        const url = `/products${query ? `?${query}` : ''}`;
+        const data = await fetchWithAuth(url, { method: 'GET', headers: {} });
         // Ensure images have full URL if they are relative
-        return data.map(p => ({
-            ...p,
-            image: p.image?.startsWith('http') ? p.image : `http://localhost:5000${p.image}`
-        }));
+        return data.map(p => {
+            try {
+                return {
+                    ...p,
+                    image: resolveImageUrl(p.image)
+                };
+            } catch (err) {
+                console.error('Error resolving image for product:', p._id, err);
+                return { ...p, image: p.image || '' };
+            }
+        });
     },
 
     fetchStores: async () => {
         const response = await fetch('http://localhost:5000/api/stores');
         if (!response.ok) throw new Error('Failed to fetch stores');
+        return await response.json();
+    },
+
+    fetchStoreById: async (id) => {
+        const response = await fetch(`http://localhost:5000/api/stores/${id}`);
+        if (!response.ok) throw new Error('Store not found');
         return await response.json();
     },
 
@@ -41,7 +75,7 @@ export const api = {
         const p = await response.json();
         return {
             ...p,
-            image: p.image?.startsWith('http') ? p.image : `http://localhost:5000${p.image}`
+            image: resolveImageUrl(p.image)
         };
     },
 
@@ -49,7 +83,7 @@ export const api = {
         const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch('http://localhost:5000/api/products', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${token}`
             },
             body: formData
@@ -62,7 +96,7 @@ export const api = {
         const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch(`http://localhost:5000/api/products/${id}`, {
             method: 'PUT',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${token}`
             },
             body: formData
@@ -75,7 +109,7 @@ export const api = {
         const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch(`http://localhost:5000/api/products/${id}`, {
             method: 'DELETE',
-            headers: { 
+            headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
@@ -100,16 +134,29 @@ export const api = {
     },
 
     register: async (name, email, password, role = 'client', extraData = {}) => {
+        let body;
+        let headers = {};
+
+        if (name instanceof FormData) {
+            body = name;
+            // Fetch will automatically set Multipart/Form-Data boundary
+        } else {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify({ name, email, password, role, ...extraData });
+        }
+
         const response = await fetch('http://localhost:5000/api/auth/signup', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role, ...extraData })
+            headers: headers,
+            body: body
         });
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Registration failed');
         }
-        return await response.json();
+        const data = await response.json();
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        return data;
     },
 
     fetchUsers: async () => {
@@ -117,7 +164,22 @@ export const api = {
         if (!response.ok) throw new Error('Failed to fetch users');
         return await response.json();
     },
-    
+
+    deleteVendor: async (id) => {
+        const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
+        const response = await fetch(`http://localhost:5000/api/admins/vendors/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete vendor');
+        }
+        return await response.json();
+    },
+
     approveUser: async (id) => {
         const response = await fetch(`http://localhost:5000/api/admins/approve-user/${id}`, {
             method: 'PATCH',
@@ -135,7 +197,7 @@ export const api = {
         const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch('http://localhost:5000/api/orders', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
@@ -158,7 +220,7 @@ export const api = {
         const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
         const response = await fetch(`http://localhost:5000/api/orders/${id}`, {
             method: 'PUT',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
@@ -216,5 +278,27 @@ export const api = {
         const response = await fetch('http://localhost:5000/api/reviews');
         if (!response.ok) throw new Error('Failed to fetch reviews');
         return await response.json();
+    },
+
+    // --- Admin Moderation (Reclamations & Reviews) ---
+    fetchReclamations: async () => {
+        return await fetchWithAuth('/reclamations');
+    },
+
+    replyToReclamation: async (id, adminReply) => {
+        return await fetchWithAuth(`/reclamations/${id}/reply`, {
+            method: 'PATCH',
+            body: JSON.stringify({ adminReply })
+        });
+    },
+
+    fetchAdminReviews: async () => {
+        return await fetchWithAuth('/admins/reviews');
+    },
+
+    softDeleteReview: async (id) => {
+        return await fetchWithAuth(`/admins/reviews/${id}/soft-delete`, {
+            method: 'PATCH'
+        });
     }
 };

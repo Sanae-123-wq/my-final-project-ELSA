@@ -17,7 +17,7 @@ const ReclamationModal = ({ isOpen, onClose, onSuccess, orderId, orderNumber }) 
             const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
             const res = await fetch('http://localhost:5000/api/reclamations', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
@@ -66,7 +66,7 @@ const ReclamationModal = ({ isOpen, onClose, onSuccess, orderId, orderNumber }) 
 
                     <div className="reclamation-body">
                         {success ? (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.5 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="reclamation-success"

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
+import { FaTrash, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 const AdminVendors = () => {
     const [vendors, setVendors] = useState([]);
@@ -41,6 +42,20 @@ const AdminVendors = () => {
             await api.approveUser(id);
             loadVendors();
         } catch (err) { alert(err.message); }
+    };
+
+    const handleDelete = async (id, name) => {
+        if (!window.confirm(`Are you sure you want to delete "${name}"? This will also remove ALL their products from the store.`)) return;
+        
+        try {
+            await api.deleteVendor(id);
+            // Instant UI update
+            setVendors(prev => prev.filter(v => v._id !== id));
+            alert('Vendor and their products deleted successfully');
+        } catch (err) {
+            console.error(err);
+            alert(err.message || 'Failed to delete vendor');
+        }
     };
 
     const filtered = vendors.filter(v =>
@@ -85,9 +100,16 @@ const AdminVendors = () => {
                             </span>
                             {vendor.status === 'pending' && (
                                 <button className="admin-btn-action admin-btn-success" onClick={() => handleApprove(vendor._id)}>
-                                    ✅ Approve Chef
+                                    <FaCheckCircle /> Approve Chef
                                 </button>
                             )}
+                            <button 
+                                className="admin-btn-action admin-btn-danger" 
+                                style={{ backgroundColor: '#fee2e2', color: '#dc2626', border: 'none', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                                onClick={() => handleDelete(vendor._id, vendor.name)}
+                            >
+                                <FaTrash size={12} /> Delete Vendor
+                            </button>
                         </div>
                     </div>
                 ))}

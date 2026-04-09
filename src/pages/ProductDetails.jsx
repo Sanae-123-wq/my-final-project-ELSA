@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import CartContext from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const StarRating = ({ rating, setRating, interactive = false }) => {
     const [hover, setHover] = useState(0);
@@ -90,7 +91,11 @@ const ProductDetails = () => {
     };
 
     const handleAddToCart = () => {
-        addToCart(product, Number(qty));
+        const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
+        addToCart({
+            ...product,
+            price: discountedPrice
+        }, Number(qty));
         navigate('/cart');
     };
 
@@ -108,7 +113,8 @@ const ProductDetails = () => {
         </div>
     );
 
-    const images = product.images || [product.image];
+    const rawImages = product.images?.length ? product.images : [product.image];
+    const images = rawImages.map(resolveImageUrl);
 
     return (
         <div className="container" style={{ paddingBottom: '4rem' }}>
@@ -153,12 +159,24 @@ const ProductDetails = () => {
                 </div>
 
                 <div className="detail-content">
-                    <span className="category">{t.categories && t.categories[product.category] ? t.categories[product.category] : product.category}</span>
+                    <div className="flex items-center gap-4 mb-2">
+                        <span className="category">{t.categories && t.categories[product.category] ? t.categories[product.category] : product.category}</span>
+                        {product.discount > 0 && <span className="discount-badge" style={{ position: 'static' }}>-{product.discount}% OFF</span>}
+                    </div>
                     <h1>{product[`name_${language}`] || product.name}</h1>
 
                     <p className="detail-description">{product[`description_${language}`] || product.description}</p>
 
-                    <p className="detail-price-main">${product.price.toFixed(2)}</p>
+                    <div className="price-container mb-6">
+                        <span className={`detail-price-main ${product.discount > 0 ? 'discounted text-red-500' : ''}`} style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+                            ${(product.price * (1 - (product.discount || 0) / 100)).toFixed(2)}
+                        </span>
+                        {product.discount > 0 && (
+                            <span className="original-price" style={{ fontSize: '1.25rem', marginLeft: '15px' }}>
+                                ${product.price.toFixed(2)}
+                            </span>
+                        )}
+                    </div>
 
                     <div className="product-detail-rating">
                         <StarRating rating={product.rating || 5} />
@@ -224,9 +242,9 @@ const ProductDetails = () => {
                     <div className="related-products-scroll">
                         {relatedProducts.map(p => (
                             <Link to={`/product/${p._id}`} key={p._id} className="related-product-card">
-                                <img src={p.image} alt={p[`name_${language}`] || p.name} className="related-product-image" />
+                                <img src={resolveImageUrl(p.image)} alt={p[`name_${language}`] || p.name} className="related-product-image" />
                                 <h3>{p[`name_${language}`] || p.name}</h3>
-                                <p>${p.price.toFixed(2)}</p>
+                                <p>{p.price.toFixed(2)} MAD</p>
                             </Link>
                         ))}
                     </div>

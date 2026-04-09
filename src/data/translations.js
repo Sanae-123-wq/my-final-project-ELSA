@@ -55,13 +55,15 @@ export const translations = {
             macaronPack: "Macaron Pack"
         },
         storesPage: {
-            title: "Baking ",
-            titleHighlight: "Essentials",
-            subtitle: "Everything you need to bake like a pro: curated packs and professional partner stores.",
-            searchPlaceholder: "search for desserts",
-            materialsSold: "Materials & Ingredients Sold:",
-            noMaterialsFound: "No materials found matching your search.",
+            title: "Sweets ",
+            titleHighlight: "Stores",
+            subtitle: "Discover the best sweets stores near you:",
+            searchPlaceholder: "Search for sweets stores...",
+            materialsSold: "Available Products:",
+            availableProducts: "Available Products",
+            noMaterialsFound: "No stores found matching your criteria.",
             allStores: "All Stores",
+            viewStore: "View Store",
             featuredPacks: "Featured Ingredients Packs"
         },
         homeSearch: {
@@ -139,13 +141,15 @@ export const translations = {
             macaronPack: "Pack Macaron"
         },
         storesPage: {
-            title: "Essentiels de ",
-            titleHighlight: "Pâtisserie",
-            subtitle: "Tout ce dont vous avez besoin pour cuisiner comme un pro : packs sélectionnés et boutiques partenaires.",
-            searchPlaceholder: "rechercher des desserts",
-            materialsSold: "Matériel et Ingrédients Vendus :",
-            noMaterialsFound: "Aucun matériel trouvé correspondant à votre recherche.",
-            allStores: "Toutes les Boutiques",
+            title: "Magasins de ",
+            titleHighlight: "Douceurs",
+            subtitle: "Découvrez les meilleurs magasins de douceurs près de chez vous :",
+            searchPlaceholder: "Rechercher des magasins de douceurs...",
+            materialsSold: "Produits Disponibles :",
+            availableProducts: "Produits Disponibles",
+            noMaterialsFound: "Aucun magasin trouvé correspondant à vos critères.",
+            allStores: "Tous les Magasins",
+            viewStore: "Voir le Magasin",
             featuredPacks: "Packs d'Ingrédients Vedettes"
         },
         homeSearch: {
@@ -223,13 +227,15 @@ export const translations = {
             macaronPack: "باقة الماكرون"
         },
         storesPage: {
-            title: "أساسيات ",
-            titleHighlight: "الخبز",
-            subtitle: "كل ما تحتاجه للخبز كالمحترفين: باقات مختارة ومتاجر شركاء احترافية.",
-            searchPlaceholder: "ابحث عن الحلويات",
-            materialsSold: "المواد والمكونات المتوفرة:",
-            noMaterialsFound: "لم يتم العثور على مواد تطابق بحثك.",
-            allStores: "جميع المتاجر",
+            title: "محلات ",
+            titleHighlight: "الحلويات",
+            subtitle: "اكتشف أفضل محلات الحلويات القريبة منك:",
+            searchPlaceholder: "ابحث عن محلات الحلويات...",
+            materialsSold: "المنتجات المتوفرة:",
+            availableProducts: "المنتجات المتوفرة",
+            noMaterialsFound: "لم يتم العثور على محلات تطابق بحثك.",
+            allStores: "جميع المحلات",
+            viewStore: "عرض المتجر",
             featuredPacks: "باقات المكونات المميزة"
         },
         homeSearch: {

@@ -4,6 +4,7 @@ import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import CartContext from '../context/CartContext';
 import FavoritesContext from '../context/FavoritesContext';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const ProductCard = ({ product }) => {
     const { t, language } = useLanguage();
@@ -15,7 +16,8 @@ const ProductCard = ({ product }) => {
     const [touchStart, setTouchStart] = useState(0);
 
     const favored = isFavorite(product._id);
-    const images = product.images || [product.image];
+    const rawImages = product.images?.length ? product.images : [product.image];
+    const images = rawImages.map(resolveImageUrl);
 
     const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
 
@@ -30,6 +32,9 @@ const ProductCard = ({ product }) => {
         }
     };
 
+    const honoredPrice = (product.price * (1 - (product.discount || 0) / 100)).toFixed(2);
+    const hasDiscount = product.discount > 0;
+
     return (
         <div className="product-card">
             <div
@@ -38,6 +43,7 @@ const ProductCard = ({ product }) => {
                 onTouchEnd={handleTouchEnd}
             >
                 {product.isNew && <div className="product-badge new">New</div>}
+                {hasDiscount && <div className="discount-badge">-{product.discount}%</div>}
                 <button
                     className={`product-wishlist ${favored ? 'active' : ''}`}
                     aria-label={favored ? "Remove from Favorites" : "Add to Favorites"}
@@ -92,11 +98,18 @@ const ProductCard = ({ product }) => {
 
                 <div className="product-bottom">
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div className="price-tag">
-                            ${product.price ? product.price.toFixed(2) : '0.00'}
+                        <div className="price-container">
+                            <span className={`price-tag ${hasDiscount ? 'discounted' : ''}`}>
+                                ${honoredPrice}
+                            </span>
+                            {hasDiscount && (
+                                <span className="original-price">
+                                    ${product.price.toFixed(2)}
+                                </span>
+                            )}
                         </div>
 
-                        <div className="stock-status-inline" style={{ marginTop: '4px' }}>
+                        <div className="stock-status-inline" style={{ marginTop: '0' }}>
                             {product.stock === 0 ? (
                                 <span className="stock-msg out">Out of Stock</span>
                             ) : product.stock <= 10 ? (
@@ -113,7 +126,12 @@ const ProductCard = ({ product }) => {
                         disabled={product.stock === 0}
                         onClick={(e) => {
                             e.preventDefault();
-                            if (product.stock > 0) addToCart(product, 1);
+                            if (product.stock > 0) {
+                                addToCart({
+                                    ...product,
+                                    price: parseFloat(honoredPrice)
+                                }, 1);
+                            }
                         }}
                     >
                         <FaShoppingCart size={18} />

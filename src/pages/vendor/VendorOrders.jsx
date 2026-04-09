@@ -22,7 +22,7 @@ const VendorOrders = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
-            
+
             // Map the data to include display-friendly fields
             const mappedOrders = data.map(order => ({
                 ...order,
@@ -35,7 +35,7 @@ const VendorOrders = () => {
                 })),
                 totalForVendor: order.totalAmount // In a real app, this would be vendor's share
             }));
-            
+
             setOrders(mappedOrders);
         } catch (err) {
             console.error('Error fetching vendor orders:', err);
@@ -49,7 +49,7 @@ const VendorOrders = () => {
             const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
             const res = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
                 method: 'PUT',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
@@ -71,8 +71,8 @@ const VendorOrders = () => {
         return <span className={`order-status-badge ${statusClass}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
     };
 
-    const filteredOrders = orders.filter(o => 
-        o._id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredOrders = orders.filter(o =>
+        o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         o.customerName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -91,10 +91,10 @@ const VendorOrders = () => {
                 </div>
                 <div className="vo-search-bar">
                     <FaSearch className="vo-search-icon" />
-                    <input 
-                        type="text" 
-                        placeholder="Search by ID or Customer..." 
-                        className="vo-search-input" 
+                    <input
+                        type="text"
+                        placeholder="Search by ID or Customer..."
+                        className="vo-search-input"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -167,16 +167,16 @@ const VendorOrders = () => {
                                 {/* Actions */}
                                 <div>
                                     {order.status === 'pending' && (
-                                        <button 
-                                            className="vo-btn vo-btn-primary" 
+                                        <button
+                                            className="vo-btn vo-btn-primary"
                                             onClick={() => handleUpdateStatus(order._id, 'preparing')}
                                         >
                                             <FaClock /> Start Prep
                                         </button>
                                     )}
                                     {order.status === 'preparing' && (
-                                        <button 
-                                            className="vo-btn vo-btn-gold" 
+                                        <button
+                                            className="vo-btn vo-btn-gold"
                                             onClick={() => handleUpdateStatus(order._id, 'ready')}
                                         >
                                             <FaCheckCircle /> Mark Ready

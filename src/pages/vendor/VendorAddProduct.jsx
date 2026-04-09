@@ -6,26 +6,32 @@ import './VendorAddProduct.css';
 
 // ─── Aligned with Home page CategoriesSection + Product.js enum ──────────────
 const CATEGORIES = [
-    { value: 'Cake', label: '🎂 Cake', hint: 'Birthday, wedding, layer cakes' },
-    { value: 'Pastry', label: '🥐 Pastry', hint: 'Croissants, puff pastry, viennoiseries' },
-    { value: 'Bread', label: '🍞 Bread', hint: 'Baguettes, loaves, brioche' },
-    { value: 'Traditional', label: '🍡 Traditional', hint: 'Maamoul, chebakia, Moroccan sweets' },
-    { value: 'Cookies', label: '🍪 Cookies', hint: 'Shortbread, biscuits, macarons' },
-    { value: 'Chocolate', label: '🍫 Chocolate', hint: 'Truffles, ganache, pralines' },
-    { value: 'Healthy', label: '🥗 Healthy', hint: 'Sugar-free, vegan, gluten-free' },
-    { value: 'Pack', label: '📦 Gift Pack', hint: 'Event boxes, gift sets, assortments' },
+    { value: 'Cakes', label: '🎂 Cakes', hint: 'Elegant artisanal cakes and gateaux' },
+    { value: 'Cheesecakes', label: '🍰 Cheesecakes', hint: 'Rich and creamy flavors' },
+    { value: 'Chocolates', label: '🍫 Chocolates', hint: 'Handcrafted gourmet truffles and pralines' },
+    { value: 'Cookies/Brownies', label: '🍪 Cookies/Brownies', hint: 'Buttery delights and fudgy brownies' },
+    { value: 'Cupcakes', label: '🧁 Cupcakes', hint: 'Sweet little bites of joy' },
+    { value: 'Donuts', label: '🍩 Donuts', hint: 'Freshly baked glazed and filled donuts' },
+    { value: 'Macarons', label: '🍬 Macarons', hint: 'Delicate French macarons' },
+    { value: 'Moroccan Sweets', label: '🇲🇦 Moroccan Sweets', hint: 'Traditional heritage in every bite' },
+    { value: 'Tarts', label: '🥧 Tarts', hint: 'Buttery fruit and cream tarts' },
+    { value: 'Tiramisu', label: '☕ Tiramisu', hint: 'Classic Italian coffee dessert' },
+    { value: 'Viennoiseries', label: '🥐 Viennoiseries', hint: 'Flaky croissants and puff pastries' },
 ];
 
 // ─── Category auto-suggest based on name/description keywords ────────────────
 const CATEGORY_KEYWORDS = {
-    Cake: ['cake', 'birthday', 'wedding', 'layer', 'gateau', 'anniversary', 'celebration'],
-    Pastry: ['croissant', 'pastry', 'puff', 'brioche', 'viennoiserie', 'tart', 'quiche', 'eclair'],
-    Bread: ['bread', 'baguette', 'loaf', 'pain', 'sourdough', 'roll', 'miche'],
-    Traditional: ['moroccan', 'traditional', 'maamoul', 'chebakia', 'briouate', 'ghriba', 'cornes', 'kaab'],
-    Cookies: ['cookie', 'biscuit', 'shortbread', 'macaron', 'sable', 'biscotti', 'cracker'],
-    Chocolate: ['chocolate', 'truffle', 'ganache', 'praline', 'bonbon', 'fudge', 'cocoa'],
-    Healthy: ['vegan', 'healthy', 'gluten', 'sugar-free', 'organic', 'keto', 'protein'],
-    Pack: ['box', 'pack', 'gift', 'event', 'assortment', 'set', 'bundle'],
+    Cakes: ['cake', 'birthday', 'wedding', 'layer', 'gateau', 'anniversary', 'celebration'],
+    Cheesecakes: ['cheesecake', 'cheese cake', 'creamy', 'basque', 'philadelphia'],
+    Chocolates: ['chocolate', 'truffle', 'ganache', 'praline', 'bonbon', 'fudge', 'cocoa', 'dark', 'milk'],
+    'Cookies/Brownies': ['cookie', 'biscuit', 'shortbread', 'brownie', 'fudgy', 'bronie', 'sable', 'biscotti'],
+    Cupcakes: ['cupcake', 'muffin', 'frosting', 'topped'],
+    Donuts: ['donut', 'doughnut', 'glazed', 'beignet'],
+    Macarons: ['macaron', 'macaroon', 'french', 'ganache', 'almond'],
+    'Moroccan Sweets': ['moroccan', 'traditional', 'maamoul', 'chebakia', 'briouate', 'ghriba', 'cornes', 'kaab', 'fekkhas', 'pastilla'],
+    Tarts: ['tart', 'tatin', 'quiche', 'pie', 'shortcrust'],
+    Tiramisu: ['tiramisu', 'coffee', 'mascarpone', 'ladyfingers'],
+    Viennoiseries: ['croissant', 'pastry', 'puff', 'brioche', 'viennoiserie', 'pain au chocolat', 'chausson'],
 };
 
 const suggestCategory = (name, description) => {
@@ -48,9 +54,9 @@ const VendorAddProduct = () => {
 
     const [formData, setFormData] = useState({
         name: '', name_fr: '', name_ar: '',
-        price: '', stock: '1',
+        price: '', stock: '1', discount: '0',
         isNew: false,
-        category: 'Pastry',
+        category: 'Cakes',
         description: '', description_fr: '', description_ar: '',
     });
 
@@ -158,6 +164,14 @@ const VendorAddProduct = () => {
                                 <label>Stock / Quantity *</label>
                                 <input type="number" min="0" className="premium-form-input"
                                     name="stock" value={formData.stock} onChange={handleChange} required placeholder="e.g. 20" />
+                            </div>
+                            <div className="premium-form-group">
+                                <label>Discount (%)</label>
+                                <input type="number" min="0" max="100" className="premium-form-input"
+                                    name="discount" value={formData.discount} onChange={handleChange} placeholder="e.g. 10 (Optional)" />
+                                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '4px' }}>
+                                    Reduction from the original price
+                                </div>
                             </div>
                             <div className="premium-form-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
                                 <label style={{ marginBottom: '0.75rem' }}>Product Badge</label>

@@ -1,0 +1,170 @@
+/* Admin Moderation Styling - High End */
+
+.admin-reclamations-container,
+.admin-reviews-page {
+    padding: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.25rem;
+    color: #5C4033;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.admin-subtitle {
+    color: #8B5E3C;
+    opacity: 0.7;
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+/* Table Enhancements */
+.reclamations-table-wrapper {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(92, 64, 51, 0.05);
+    border: 1px solid rgba(139, 94, 60, 0.08);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 1rem;
+    color: #8B5E3C;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.admin-table tbody tr {
+    background: #FFFAF8;
+    transition: all 0.3s ease;
+}
+
+.admin-table tbody tr:hover {
+    transform: scale(1.005);
+    background: #FFF5F2;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.05);
+}
+
+.admin-table td {
+    padding: 1.25rem 1rem;
+    border-top: 1px solid rgba(139, 94, 60, 0.03);
+    border-bottom: 1px solid rgba(139, 94, 60, 0.03);
+}
+
+.admin-table td:first-child { border-left: 1px solid rgba(139, 94, 60, 0.03); border-radius: 1rem 0 0 1rem; }
+.admin-table td:last-child { border-right: 1px solid rgba(139, 94, 60, 0.03); border-radius: 0 1rem 1rem 0; }
+
+/* Status Badges */
+.admin-status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.badge-pending { background: #FEF3C7; color: #D97706; }
+.badge-answered { background: #D1FAE5; color: #059669; }
+.badge-resolved { background: #DBEAFE; color: #2563EB; }
+
+/* Review Cards */
+.admin-review-card {
+    background: white;
+    border: 1px solid rgba(139, 94, 60, 0.1);
+    box-shadow: 0 4px 20px rgba(92, 64, 51, 0.04);
+}
+
+.admin-review-card:hover {
+    border-color: #D97706;
+}
+
+/* Modal Styling */
+.admin-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(92, 64, 51, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.admin-modal {
+    background: white;
+    border-radius: 2rem;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    color: #5C4033;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+}
+
+.admin-textarea {
+    width: 100%;
+    background: #FFFAF8;
+    border: 2px solid rgba(139, 94, 60, 0.1);
+    border-radius: 1rem;
+    padding: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.admin-textarea:focus {
+    outline: none;
+    border-color: #D97706;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    background: #D97706;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #B45309;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #F3F4F6;
+    color: #374151;
+    padding: 0.75rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 800;
+    transition: all 0.3s ease;
+}

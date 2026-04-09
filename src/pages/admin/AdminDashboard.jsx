@@ -15,17 +15,17 @@ const PremiumBarChart = ({ data, color = '#D97706' }) => {
                 const height = (d.value / max) * 100;
                 return (
                     <div key={i} className="ad-chart-bar-wrap">
-                        <div 
-                            className="ad-chart-bar" 
-                            style={{ 
-                                height: `${height}%`, 
+                        <div
+                            className="ad-chart-bar"
+                            style={{
+                                height: `${height}%`,
                                 background: `linear-gradient(to top, ${color}, ${color}CC)`,
                                 boxShadow: i % 2 === 0 ? '0 4px 15px rgba(217,119,6,0.1)' : 'none'
                             }}
                             title={`${d.label}: ${d.value}`}
                         >
                             <div style={{ position: 'absolute', top: '-25px', left: '50%', transform: 'translateX(-50%)', fontSize: '0.7rem', fontWeight: 800, color: '#5C4033' }}>
-                                {d.value > 1000 ? `${(d.value/1000).toFixed(1)}k` : d.value}
+                                {d.value > 1000 ? `${(d.value / 1000).toFixed(1)}k` : d.value}
                             </div>
                         </div>
                         <div className="ad-chart-label">{d.label}</div>
@@ -101,10 +101,10 @@ const AdminDashboard = () => {
     }, []);
 
     const statusConfig = {
-        pending:   { label: 'Pending',   cls: 'status-pending' },
+        pending: { label: 'Pending', cls: 'status-pending' },
         preparing: { label: 'Preparing', cls: 'status-preparing' },
-        ready:     { label: 'Ready',     cls: 'status-ready' },
-        picked:    { label: 'Picked Up', cls: 'status-picked' },
+        ready: { label: 'Ready', cls: 'status-ready' },
+        picked: { label: 'Picked Up', cls: 'status-picked' },
         delivered: { label: 'Delivered', cls: 'status-delivered' },
     };
 
@@ -132,12 +132,12 @@ const AdminDashboard = () => {
                 <div className="ad-stat-card stat-rev">
                     <div className="ad-stat-content">
                         <h4>Platform Revenue</h4>
-                        <div className="ad-stat-value">{Number(stats.revenue).toLocaleString()} <span style={{fontSize: '1rem'}}>MAD</span></div>
+                        <div className="ad-stat-value">{Number(stats.revenue).toLocaleString()} <span style={{ fontSize: '1rem' }}>MAD</span></div>
                         <div className="ad-trend trend-up"><FaArrowUp /> 8.4% growth</div>
                     </div>
                     <div className="ad-stat-visual">
                         <div className="ad-icon-box"><FaDollarSign /></div>
-                        <Sparkline data={[1200,2100,1600,2900,2100,3200,2750,3600]} color="#D97706" />
+                        <Sparkline data={[1200, 2100, 1600, 2900, 2100, 3200, 2750, 3600]} color="#D97706" />
                     </div>
                 </div>
 
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="ad-stat-visual">
                         <div className="ad-icon-box"><FaShoppingBag /></div>
-                        <Sparkline data={[3,7,5,11,8,14,10,16]} color="#16A34A" />
+                        <Sparkline data={[3, 7, 5, 11, 8, 14, 10, 16]} color="#16A34A" />
                     </div>
                 </div>
 
@@ -161,7 +161,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="ad-stat-visual">
                         <div className="ad-icon-box"><FaUsers /></div>
-                        <Sparkline data={[1,2,2,3,3,4,4,5]} color="#2563EB" />
+                        <Sparkline data={[1, 2, 2, 3, 3, 4, 4, 5]} color="#2563EB" />
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="ad-stat-visual">
                         <div className="ad-icon-box"><FaBox /></div>
-                        <Sparkline data={[12,12,13,14,14,15,15,15]} color="#DC2626" />
+                        <Sparkline data={[12, 12, 13, 14, 14, 15, 15, 15]} color="#DC2626" />
                     </div>
                 </div>
             </div>
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
                             </div>
                         ))}
                     </div>
-                    
+
                     <div className="ad-actions-grid">
                         <Link to="/admin/users" className="ad-action-card">
                             <FaUserShield className="ad-action-btn-icon" />
@@ -295,5 +295,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-

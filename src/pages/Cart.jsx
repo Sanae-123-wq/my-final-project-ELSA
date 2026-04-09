@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import CartContext from '../context/CartContext';
 import AuthContext from '../context/AuthContext';
 import { api } from '../services/api';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const Cart = () => {
     const { cartItems, removeFromCart, clearCart } = useContext(CartContext);
@@ -51,7 +52,7 @@ const Cart = () => {
                     <div className="cart-items">
                         {cartItems.map((item) => (
                             <div key={item._id} className="cart-item">
-                                <img src={item.image} alt={item.name} className="cart-thumb" />
+                                <img src={resolveImageUrl(item.image)} alt={item.name} className="cart-thumb" />
                                 <div style={{ flexGrow: 1 }}>
                                     <Link to={`/product/${item._id}`} style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary-dark)' }}>
                                         {item.name}

@@ -20,12 +20,13 @@ const Shop = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const initialCategory = queryParams.get('category');
+    const initialStoreId = queryParams.get('storeId');
 
     // Filter state
     const [filters, setFilters] = useState({
         categories: initialCategory ? [initialCategory] : [],
         maxPrice: 100,
-        storeId: '',
+        storeId: initialStoreId || '',
         isNew: false,
         isPopular: false,
         favoritesOnly: false
@@ -33,9 +34,14 @@ const Shop = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
+                // Fetch products specifically for the selected category if it exists
+                const productParams = initialCategory ? { category: initialCategory } : {};
+                if (initialStoreId) productParams.storeId = initialStoreId;
+                
                 const [productsData, storesData] = await Promise.all([
-                    api.fetchProducts(),
+                    api.fetchProducts(productParams),
                     api.fetchStores()
                 ]);
                 
@@ -44,7 +50,12 @@ const Shop = () => {
 
                 if (productsData.length > 0) {
                     const max = Math.max(...productsData.map(p => p.price || 0));
-                    setFilters(prev => ({ ...prev, maxPrice: max }));
+                    setFilters(prev => ({ 
+                        ...prev, 
+                        maxPrice: max,
+                        categories: initialCategory ? [initialCategory] : prev.categories,
+                        storeId: initialStoreId || prev.storeId
+                    }));
                 }
 
                 setLoading(false);
@@ -55,7 +66,7 @@ const Shop = () => {
         };
 
         fetchData();
-    }, []);
+    }, [initialCategory, initialStoreId]); // Depend on initialCategory and initialStoreId to refetch
 
     // Derived data for filters
     const allCategories = useMemo(() => {

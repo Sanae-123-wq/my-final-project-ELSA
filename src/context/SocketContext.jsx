@@ -25,7 +25,7 @@ export const SocketProvider = ({ children }) => {
             newSocket.on('notification', (data) => {
                 setNotifications(prev => [data, ...prev]);
                 setUnreadCount(prev => prev + 1);
-                
+
                 // Optional: Browser notification or toast
                 if (Notification.permission === 'granted') {
                     new Notification('ELSA Patisserie', { body: data.message });

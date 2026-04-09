@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import AiRecipe from './pages/AiRecipe';
 import RecipeHistory from './pages/RecipeHistory';
 import Stores from './pages/Stores';
+import StoreProfile from './pages/StoreProfile';
 import Favorites from './pages/Favorites';
 import Notifications from './pages/Notifications';
 import Orders from './pages/Orders';
@@ -32,6 +33,8 @@ import AdminVendors from './pages/admin/AdminVendors';
 import AdminDelivery from './pages/admin/AdminDelivery';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminActivityLog from './pages/admin/AdminActivityLog';
+import AdminReclamations from './pages/admin/AdminReclamations';
+import AdminReviews from './pages/admin/AdminReviews';
 
 // Delivery Imports
 import DeliveryLayout from './pages/delivery/DeliveryLayout';
@@ -70,6 +73,8 @@ function App() {
             <Route path="delivery" element={<AdminDelivery />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="activity" element={<AdminActivityLog />} />
+            <Route path="reclamations" element={<AdminReclamations />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="notifications" element={<Notifications />} />
           </Route>
 
@@ -121,9 +126,10 @@ function App() {
                     <Route path="/ai-recipe" element={<AiRecipe />} />
                     <Route path="/recipe-history" element={<RecipeHistory />} />
                     <Route path="/stores" element={<Stores />} />
+                    <Route path="/store/:id" element={<StoreProfile />} />
                     <Route path="/favorites" element={<Favorites />} />
                     <Route path="/notifications" element={<Notifications />} />
-                    
+
                     {/* Protected Client-only Routes */}
                     <Route path="/orders" element={
                       <ProtectedRoute allowedRoles={['client']}>
