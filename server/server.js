@@ -47,10 +47,13 @@ const vendorUploadDir = path.join(__dirname, 'uploads/vendors');
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve client assets (product images seeded from local files)
+app.use('/assets', express.static(path.join(__dirname, '../client/src/assets')));
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
 app.use('/api/ai', aiRoutes);
@@ -72,3 +75,5 @@ app.get('/', (req, res) => {
 server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
+
+ 

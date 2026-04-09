@@ -2,11 +2,14 @@ import mongoose from 'mongoose';
 
 const reclamationSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
   message: { type: String, required: true },
+  adminReply: { type: String },
   status: { 
     type: String, 
-    enum: ['pending', 'resolved'], 
+    enum: ['pending', 'answered', 'resolved'], 
     default: 'pending' 
   },
 }, { timestamps: true });

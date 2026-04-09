@@ -2,6 +2,7 @@ import express from 'express';
 import Reclamation from '../models/Reclamation.js';
 import Order from '../models/Order.js';
 import Notification from '../models/Notification.js';
+import User from '../models/User.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { sendNotification } from '../socket.js';
 
@@ -30,6 +31,19 @@ router.post('/', protect, async (req, res) => {
 
     await reclamation.save();
     
+    // Notify all Admins
+    const admins = await User.find({ role: 'admin' });
+    for (const adminUser of admins) {
+      const adminNotif = new Notification({
+        userId: adminUser._id,
+        message: `New reclamation from ${req.user.name}: "${message.substring(0, 50)}..."`,
+        type: 'reclamation_submitted',
+        relatedId: reclamation._id
+      });
+      await adminNotif.save();
+      sendNotification(adminUser._id.toString(), adminNotif);
+    }
+    
     res.status(201).json({ message: 'Reclamation submitted successfully' });
   } catch (err) {
     if (err.code === 11000) {
@@ -52,26 +66,34 @@ router.get('/', protect, admin, async (req, res) => {
   }
 });
 
-// PATCH resolve reclamation
-router.patch('/:id/resolve', protect, admin, async (req, res) => {
+// PATCH reply to reclamation (Admin only)
+router.patch('/:id/reply', protect, admin, async (req, res) => {
   try {
+    const { adminReply } = req.body;
+    console.log(`[Reclamation Reply] RecID: ${req.params.id}, Reply length: ${adminReply?.length}`);
+    
     const reclamation = await Reclamation.findById(req.params.id);
     if (!reclamation) return res.status(404).json({ message: 'Reclamation not found' });
 
-    reclamation.status = 'resolved';
+    reclamation.adminReply = adminReply;
+    reclamation.status = 'answered';
     await reclamation.save();
 
-    // Notify user
-    const notification = new Notification({
-      userId: reclamation.userId,
-      message: `Your reclamation for order #${reclamation.orderId.toString().slice(-6).toUpperCase()} has been resolved.`,
-      type: 'info'
-    });
-    await notification.save();
-    sendNotification(reclamation.userId.toString(), notification);
+    // Notify user (Safely)
+    if (reclamation.userId) {
+      const notification = new Notification({
+        userId: reclamation.userId,
+        message: `Admin has replied to your reclamation: "${adminReply.substring(0, 50)}..."`,
+        type: 'reclamation_answered',
+        relatedId: reclamation._id
+      });
+      await notification.save();
+      sendNotification(reclamation.userId.toString(), notification);
+    }
 
-    res.json({ message: 'Reclamation resolved and user notified.' });
+    res.json({ message: 'Reply sent and user notified.', reclamation });
   } catch (err) {
+    console.error(`[Reclamation Reply Error]: ${err.message}`);
     res.status(400).json({ message: err.message });
   }
 });

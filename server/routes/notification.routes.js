@@ -16,6 +16,16 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// GET unread count
+router.get('/unread-count', protect, async (req, res) => {
+  try {
+    const count = await Notification.countDocuments({ userId: req.user._id, isRead: false });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // PATCH mark as read
 router.patch('/:id/read', protect, async (req, res) => {
   try {

@@ -41,7 +41,7 @@ export const createReview = async (req, res) => {
 export const getPublicReviews = async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
-      const reviews = await Review.find().sort({ createdAt: -1 }).limit(10);
+      const reviews = await Review.find({ deletedAt: null }).sort({ createdAt: -1 }).limit(10);
       return res.status(200).json(reviews);
     } else {
       console.warn('⚠️ MongoDB is offline. Fetching from local memory.');

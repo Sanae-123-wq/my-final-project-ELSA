@@ -1,8 +1,17 @@
 import express from 'express';
-import Admin from '../models/Admin.js';
 import User from '../models/User.js';
+import Admin from '../models/Admin.js';
+import Product from '../models/Product.js';
+import Store from '../models/Store.js';
+import Review from '../models/Review.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// GET status for debugging
+router.get('/verify-admin', protect, admin, (req, res) => {
+  res.json({ success: true, user: req.user });
+});
 
 // GET all admins (no passwords)
 router.get('/', async (req, res) => {
@@ -12,6 +21,35 @@ router.get('/', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// GET all active reviews for moderation (MOVED UP for precedence)
+router.get('/reviews', protect, admin, async (req, res) => {
+    try {
+      const reviews = await Review.find({ 
+        $or: [
+          { deletedAt: null },
+          { deletedAt: { $exists: false } }
+        ]
+      }).sort({ createdAt: -1 });
+      res.json(reviews);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+  
+// PATCH soft-delete/hide review (Admin only) (MOVED UP for precedence)
+router.patch('/reviews/:id/soft-delete', protect, admin, async (req, res) => {
+    try {
+      const review = await Review.findById(req.params.id);
+      if (!review) return res.status(404).json({ message: 'Review not found' });
+  
+      review.deletedAt = new Date();
+      await review.save();
+      res.json({ message: 'Review hidden successfully (soft-deleted)' });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
 });
 
 // GET all users (clients, vendors, delivery)
@@ -99,5 +137,41 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+// DELETE vendor (safely remove vendor and their products)
+router.delete('/vendors/:id', async (req, res) => {
+  try {
+    const vendor = await User.findById(req.params.id);
+    
+    if (!vendor || vendor.role !== 'vendor') {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    // 1. Delete all products belonging to this vendor
+    // Search by vendorId (string) or storeId (ObjectId) if applicable
+    await Product.deleteMany({ 
+      $or: [
+        { vendorId: vendor._id.toString() },
+        { storeId: vendor._id }
+      ]
+    });
+
+    // 2. Delete any matching records in the legacy Store collection
+    // Match by name or shopName to handle redundancy
+    await Store.deleteMany({ 
+      name: { $regex: new RegExp(`^${vendor.shopName || vendor.name}$`, 'i') } 
+    });
+
+    // 3. Delete the vendor user
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Vendor and associated products deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Re-locating reviews routes above parameterized routes for precedence in a future edit
+// (Actually just removing them here to move them up)
 
 export default router;

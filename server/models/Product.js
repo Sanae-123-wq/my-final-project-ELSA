@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Cake', 'Pastry', 'Bread', 'Traditional', 'Cookies', 'Chocolate', 'Healthy', 'Pack']
+    enum: ['Cakes', 'Cheesecakes', 'Chocolates', 'Cookies/Brownies', 'Cupcakes', 'Donuts', 'Macarons', 'Moroccan Sweets', 'Tarts', 'Tiramisu', 'Viennoiseries', 'Bread', 'Healthy', 'Pack']
   },
   stock: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
