@@ -35,18 +35,25 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, 'uploads/products');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Ensure uploads directories exist
+const productUploadDir = path.join(__dirname, 'uploads/products');
+const vendorUploadDir = path.join(__dirname, 'uploads/vendors');
+
+[productUploadDir, vendorUploadDir].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+});
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve client assets (product images seeded from local files)
+app.use('/assets', express.static(path.join(__dirname, '../client/src/assets')));
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
 app.use('/api/ai', aiRoutes);
@@ -68,3 +75,5 @@ app.get('/', (req, res) => {
 server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
+
+ 

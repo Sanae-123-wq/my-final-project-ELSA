@@ -6,7 +6,7 @@ const notificationSchema = new mongoose.Schema({
   message: { type: String, required: true },
   type: { 
     type: String, 
-    enum: ['preparing', 'ready', 'picked', 'delivered', 'reclamation', 'info'],
+    enum: ['preparing', 'ready', 'picked', 'delivered', 'reclamation_submitted', 'reclamation_answered', 'info'],
     required: true 
   },
   isRead: { type: Boolean, default: false },

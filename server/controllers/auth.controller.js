@@ -20,6 +20,19 @@ export const signupUser = async (req, res) => {
         const assignedRole = role || 'client';
         const assignedStatus = (assignedRole === 'client') ? 'approved' : 'pending';
 
+        // ─── Vendor Validation & Data ───
+        if (assignedRole === 'vendor') {
+            const { shopName, description, city } = extraData;
+            const image = req.file ? `/uploads/vendors/${req.file.filename}` : null;
+
+            if (!shopName || !description || !city || !image) {
+                return res.status(400).json({ 
+                    message: 'All store fields (Name, Description, Location, and Image) are mandatory for vendors.' 
+                });
+            }
+            extraData.image = image;
+        }
+
         const user = await User.create({
             name,
             email,
