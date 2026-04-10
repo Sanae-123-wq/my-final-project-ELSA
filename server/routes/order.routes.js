@@ -103,6 +103,19 @@ router.get('/vendor-orders', protect, async (req, res) => {
   }
 });
 
+// GET available orders (Ready for pickup but unassigned)
+router.get('/available', protect, async (req, res) => {
+  try {
+    const orders = await Order.find({ status: 'ready', deliveryId: null })
+      .populate('userId', 'name phone address')
+      .populate('products.productId', 'name price image')
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET one order
 router.get('/:id', async (req, res) => {
   try {
@@ -183,24 +196,7 @@ router.put('/:id', protect, async (req, res) => {
 
     let updates = { ...req.body };
 
-    // Automatic delivery assignment when order becomes ready
-    if (newStatus === 'ready' && oldOrder.status !== 'ready') {
-      console.log(`[ASSIGNMENT] Order is becoming ready. Checking delivery assignment...`);
-      if (!oldOrder.deliveryId) {
-        // Find most recently created delivery worker so local testing isn't random
-        const deliveryWorkers = await User.find({ role: { $in: ['delivery', 'Delivery'] } }).sort({ createdAt: -1 });
-        console.log(`[ASSIGNMENT] Found ${deliveryWorkers.length} delivery workers in DB.`);
-        if (deliveryWorkers.length > 0) {
-          const designatedWorker = deliveryWorkers[0]; // Assign to newest delivery account reliably
-          updates.deliveryId = designatedWorker._id;
-          console.log(`[ASSIGNMENT SUCCESS] Assigned Order ${req.params.id} to Delivery User ${designatedWorker.email} (ID: ${designatedWorker._id})`);
-        } else {
-          console.warn(`[ASSIGNMENT FAILURE] No delivery users found in system!`);
-        }
-      } else {
-          console.log(`[ASSIGNMENT] Order was already assigned to delivery ID: ${oldOrder.deliveryId}`);
-      }
-    }
+    // [MODIFIED] Auto-assignment removed here to support manual "Accept Order" flow.
 
     const updated = await Order.findByIdAndUpdate(
       req.params.id,
@@ -272,6 +268,35 @@ router.put('/:id', protect, async (req, res) => {
     console.error('Order Update Error:', err);
     res.status(400).json({ message: err.message });
   }
+});
+
+// PATCH accept order (Delivery worker claims an available order)
+router.patch('/:id/accept', protect, async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        
+        const userRole = req.user.role?.toLowerCase() || '';
+        if (userRole !== 'delivery') {
+            return res.status(403).json({ message: 'Only delivery workers can accept orders' });
+        }
+
+        if (order.deliveryId) {
+            return res.status(400).json({ message: 'Order has already been assigned or accepted' });
+        }
+
+        if (order.status !== 'ready') {
+            return res.status(400).json({ message: 'Order is not ready for pickup' });
+        }
+
+        order.deliveryId = req.user._id;
+        await order.save();
+
+        // Notify client and vendor if needed (optional here since status didn't change, but good for real-time)
+        res.json({ message: 'Order accepted successfully', order });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // DELETE order

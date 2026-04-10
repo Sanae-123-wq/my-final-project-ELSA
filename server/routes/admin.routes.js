@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Admin from '../models/Admin.js';
 import Product from '../models/Product.js';
 import Store from '../models/Store.js';
+import Order from '../models/Order.js';
 import Review from '../models/Review.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -169,6 +170,33 @@ router.delete('/vendors/:id', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// DELETE delivery worker (safely re-pool active orders)
+router.delete('/delivery/:id', protect, admin, async (req, res) => {
+    try {
+        const worker = await User.findById(req.params.id);
+        
+        if (!worker || worker.role !== 'delivery') {
+            return res.status(404).json({ message: 'Delivery worker not found' });
+        }
+
+        // 1. Reset deliveryId to null for all uncompleted orders
+        await Order.updateMany(
+            { 
+                deliveryId: req.params.id, 
+                status: { $nin: ['delivered', 'cancelled'] } 
+            },
+            { $unset: { deliveryId: "" } } // This will make them "Available" in the new pool
+        );
+
+        // 2. Delete the delivery worker
+        await User.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'Delivery worker deleted and active orders returned to pool' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // Re-locating reviews routes above parameterized routes for precedence in a future edit

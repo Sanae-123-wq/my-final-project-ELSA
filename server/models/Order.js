@@ -10,6 +10,7 @@ const orderSchema = new mongoose.Schema({
     },
   ],
   totalAmount: { type: Number, required: true },
+  paymentMethod: { type: String, enum: ['card', 'cod'], default: 'cod' },
   deliveryId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,

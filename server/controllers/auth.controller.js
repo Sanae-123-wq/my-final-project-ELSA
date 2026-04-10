@@ -10,11 +10,18 @@ const generateToken = (id) => {
 // @access  Public
 export const signupUser = async (req, res) => {
     try {
-        const { name, email, password, role, ...extraData } = req.body;
+        const { name, email, password, role, cin, ...extraData } = req.body;
 
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: 'User already exists' });
+        }
+
+        if (cin) {
+            const cinExists = await User.findOne({ cin });
+            if (cinExists) {
+                return res.status(400).json({ message: 'A user with this CIN already exists' });
+            }
         }
 
         const assignedRole = role || 'client';
@@ -36,6 +43,7 @@ export const signupUser = async (req, res) => {
         const user = await User.create({
             name,
             email,
+            cin,
             password,
             role: assignedRole,
             status: assignedStatus,

@@ -7,14 +7,25 @@ export const protect = async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
             token = req.headers.authorization.split(' ')[1];
-            console.log(`[Protect Middleware] Verifying token for ID decoding...`);
+            console.log(`[Protect Middleware] Verifying token...`);
+            
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'elsasecret99');
             req.user = await User.findById(decoded.id).select('-password');
-            if (!req.user) console.log(`[Protect Middleware] User not found for ID: ${decoded.id}`);
+            
+            if (!req.user) {
+                console.warn(`[Protect Middleware] User not found in DB for ID: ${decoded.id}`);
+                return res.status(401).json({ message: 'Not authorized, user no longer exists' });
+            }
+            
             next();
         } catch (error) {
-            console.error(`[Protect Middleware Error]: ${error.message}`);
-            res.status(401).json({ message: 'Not authorized, token failed' });
+            console.error(`[Protect Middleware Error]: ${error.name} - ${error.message}`);
+            
+            let message = 'Not authorized, token failed';
+            if (error.name === 'TokenExpiredError') message = 'Session expired, please login again';
+            if (error.name === 'JsonWebTokenError') message = 'Invalid token session';
+            
+            res.status(401).json({ message });
         }
     }
 
