@@ -82,7 +82,7 @@ async function seed() {
                     vendorId: vendor._id.toString(),
                     storeId: vendor._id,
                     stock: Math.floor(Math.random() * 50) + 5,
-                    isNew: Math.random() > 0.8,
+                    isNewProduct: Math.random() > 0.8,
                     isPopular: Math.random() > 0.8,
                     approvalStatus: 'approved',
                     rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0

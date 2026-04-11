@@ -78,7 +78,7 @@ const seedAllCategories = async () => {
                         storeId: randomStore._id,
                         vendorId: 'vendor_id_auto_gen',
                         stock: Math.floor(Math.random() * 20) + 5,
-                        isNew: Math.random() > 0.7,
+                        isNewProduct: Math.random() > 0.7,
                         isAvailable: true,
                         rating: getRandomFloat(4, 5),
                         numReviews: Math.floor(Math.random() * 50),

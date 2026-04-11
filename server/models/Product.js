@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema({
   },
   stock: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
-  isNew: { type: Boolean, default: false },
+  isNewProduct: { type: Boolean, default: false },
   isAvailable: { type: Boolean, default: true },
   vendorId: { type: String },
   storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
