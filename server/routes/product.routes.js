@@ -24,8 +24,8 @@ router.get('/', async (req, res) => {
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
     if (req.query.storeId) filter.storeId = req.query.storeId;
-    
-    const products = await Product.find(filter);
+
+    const products = await Product.find(filter).populate('storeId').populate('vendorId');
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 // GET one product
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate('storeId').populate('vendorId');
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (err) {

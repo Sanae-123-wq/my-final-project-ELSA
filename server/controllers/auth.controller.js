@@ -33,8 +33,8 @@ export const signupUser = async (req, res) => {
             const image = req.file ? `/uploads/vendors/${req.file.filename}` : null;
 
             if (!shopName || !description || !city || !image) {
-                return res.status(400).json({ 
-                    message: 'All store fields (Name, Description, Location, and Image) are mandatory for vendors.' 
+                return res.status(400).json({
+                    message: 'All store fields (Name, Description, Location, and Image) are mandatory for vendors.'
                 });
             }
             extraData.image = image;

@@ -12,13 +12,13 @@ const router = express.Router();
 // ─── Notification messages per status ────────────────────────────────────────
 const CLIENT_MESSAGES = {
   preparing: '👨‍🍳 Your order is being prepared with love!',
-  ready:     '🎉 Your order is ready! The delivery team will pick it up soon.',
-  picked:    '🚚 Your order is on its way! Sit tight.',
+  ready: '🎉 Your order is ready! The delivery team will pick it up soon.',
+  picked: '🚚 Your order is on its way! Sit tight.',
   delivered: '📦 Your order has been delivered. Enjoy your treats!',
 };
 
 const VENDOR_MESSAGES = {
-  picked:    '🛵 Your product is being delivered to the customer.',
+  picked: '🛵 Your product is being delivered to the customer.',
   delivered: '✅ Your product was delivered successfully!',
 };
 
@@ -164,21 +164,21 @@ router.put('/:id', protect, async (req, res) => {
     // RBAC Authorization Enforcement
     if (userRole === 'vendor' || userRole === 'patissier') {
       const ownsProducts = oldOrder.products.some(p => {
-         if (!p.productId) return false;
-         // Handle populated vendor object or raw string/ObjectId
-         const vId = p.productId.vendorId?._id || p.productId.vendorId;
-         return vId && vId.toString() === req.user._id.toString();
+        if (!p.productId) return false;
+        // Handle populated vendor object or raw string/ObjectId
+        const vId = p.productId.vendorId?._id || p.productId.vendorId;
+        return vId && vId.toString() === req.user._id.toString();
       });
       console.log(`[RBAC Vendor Check] ownsProducts: ${ownsProducts}. Order ID: ${req.params.id}`);
-      
+
       if (!ownsProducts) {
-          console.warn(`[RBAC Failed] Vendor ${req.user.email} attempted to update order they don't own.`);
-          return res.status(403).json({ message: 'Not authorized to update this order' });
+        console.warn(`[RBAC Failed] Vendor ${req.user.email} attempted to update order they don't own.`);
+        return res.status(403).json({ message: 'Not authorized to update this order' });
       }
       // Vendors should only progress up to 'ready'
       if (['picked', 'delivered'].includes(newStatus)) {
-         console.warn(`[RBAC Failed] Vendor attempted to mark as ${newStatus}. Forbidden.`);
-         return res.status(403).json({ message: 'Vendors cannot mark orders as picked or delivered' });
+        console.warn(`[RBAC Failed] Vendor attempted to mark as ${newStatus}. Forbidden.`);
+        return res.status(403).json({ message: 'Vendors cannot mark orders as picked or delivered' });
       }
     } else if (userRole === 'delivery') {
       if (!oldOrder.deliveryId || oldOrder.deliveryId.toString() !== req.user._id.toString()) {
@@ -227,8 +227,8 @@ router.put('/:id', protect, async (req, res) => {
         ...new Set(
           updated.products
             .map(p => {
-               const vId = p.productId?.vendorId?._id || p.productId?.vendorId;
-               return vId ? vId.toString() : null;
+              const vId = p.productId?.vendorId?._id || p.productId?.vendorId;
+              return vId ? vId.toString() : null;
             })
             .filter(Boolean)
         ),
@@ -247,19 +247,19 @@ router.put('/:id', protect, async (req, res) => {
 
     // 3. Notify ASSIGNED DELIVERY WORKER when order is ready for pickup
     if (newStatus === 'ready' && DELIVERY_MESSAGES[newStatus] && updated.deliveryId) {
-        console.log(`[NOTIFY] Emitting 'ready' pickup alert to Delivery Worker (ID: ${updated.deliveryId})`);
-        await createAndSendNotification(
-          updated.deliveryId,
-          orderId,
-          DELIVERY_MESSAGES[newStatus],
-          newStatus
-        );
-        // Dispatch direct socket event to refresh Delivery dashboard in real-time
-        sendNotification(updated.deliveryId.toString(), { 
-            type: 'assigned', 
-            orderId: updated._id, 
-            message: 'Refresh Dashboard' 
-        });
+      console.log(`[NOTIFY] Emitting 'ready' pickup alert to Delivery Worker (ID: ${updated.deliveryId})`);
+      await createAndSendNotification(
+        updated.deliveryId,
+        orderId,
+        DELIVERY_MESSAGES[newStatus],
+        newStatus
+      );
+      // Dispatch direct socket event to refresh Delivery dashboard in real-time
+      sendNotification(updated.deliveryId.toString(), {
+        type: 'assigned',
+        orderId: updated._id,
+        message: 'Refresh Dashboard'
+      });
     }
 
     console.log(`[ORDER UPDATE SUCCESS] Order successfully updated to ${updated.status}.`);
@@ -272,31 +272,31 @@ router.put('/:id', protect, async (req, res) => {
 
 // PATCH accept order (Delivery worker claims an available order)
 router.patch('/:id/accept', protect, async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
-        if (!order) return res.status(404).json({ message: 'Order not found' });
-        
-        const userRole = req.user.role?.toLowerCase() || '';
-        if (userRole !== 'delivery') {
-            return res.status(403).json({ message: 'Only delivery workers can accept orders' });
-        }
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-        if (order.deliveryId) {
-            return res.status(400).json({ message: 'Order has already been assigned or accepted' });
-        }
-
-        if (order.status !== 'ready') {
-            return res.status(400).json({ message: 'Order is not ready for pickup' });
-        }
-
-        order.deliveryId = req.user._id;
-        await order.save();
-
-        // Notify client and vendor if needed (optional here since status didn't change, but good for real-time)
-        res.json({ message: 'Order accepted successfully', order });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    const userRole = req.user.role?.toLowerCase() || '';
+    if (userRole !== 'delivery') {
+      return res.status(403).json({ message: 'Only delivery workers can accept orders' });
     }
+
+    if (order.deliveryId) {
+      return res.status(400).json({ message: 'Order has already been assigned or accepted' });
+    }
+
+    if (order.status !== 'ready') {
+      return res.status(400).json({ message: 'Order is not ready for pickup' });
+    }
+
+    order.deliveryId = req.user._id;
+    await order.save();
+
+    // Notify client and vendor if needed (optional here since status didn't change, but good for real-time)
+    res.json({ message: 'Order accepted successfully', order });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // DELETE order

@@ -18,8 +18,8 @@ const productSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   isNewProduct: { type: Boolean, default: false },
   isAvailable: { type: Boolean, default: true },
-  vendorId: { type: String },
-  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
   approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' },
 

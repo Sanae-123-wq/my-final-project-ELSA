@@ -26,31 +26,31 @@ router.get('/', async (req, res) => {
 
 // GET all active reviews for moderation (MOVED UP for precedence)
 router.get('/reviews', protect, admin, async (req, res) => {
-    try {
-      const reviews = await Review.find({ 
-        $or: [
-          { deletedAt: null },
-          { deletedAt: { $exists: false } }
-        ]
-      }).sort({ createdAt: -1 });
-      res.json(reviews);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  });
-  
+  try {
+    const reviews = await Review.find({
+      $or: [
+        { deletedAt: null },
+        { deletedAt: { $exists: false } }
+      ]
+    }).sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // PATCH soft-delete/hide review (Admin only) (MOVED UP for precedence)
 router.patch('/reviews/:id/soft-delete', protect, admin, async (req, res) => {
-    try {
-      const review = await Review.findById(req.params.id);
-      if (!review) return res.status(404).json({ message: 'Review not found' });
-  
-      review.deletedAt = new Date();
-      await review.save();
-      res.json({ message: 'Review hidden successfully (soft-deleted)' });
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+
+    review.deletedAt = new Date();
+    await review.save();
+    res.json({ message: 'Review hidden successfully (soft-deleted)' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 });
 
 // GET all users (clients, vendors, delivery)
@@ -118,10 +118,10 @@ router.patch('/approve-user/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    
+
     user.status = 'approved';
     await user.save();
-    
+
     res.json({ message: 'User approved successfully', user });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -143,14 +143,14 @@ router.delete('/:id', async (req, res) => {
 router.delete('/vendors/:id', async (req, res) => {
   try {
     const vendor = await User.findById(req.params.id);
-    
+
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
     // 1. Delete all products belonging to this vendor
     // Search by vendorId (string) or storeId (ObjectId) if applicable
-    await Product.deleteMany({ 
+    await Product.deleteMany({
       $or: [
         { vendorId: vendor._id.toString() },
         { storeId: vendor._id }
@@ -159,8 +159,8 @@ router.delete('/vendors/:id', async (req, res) => {
 
     // 2. Delete any matching records in the legacy Store collection
     // Match by name or shopName to handle redundancy
-    await Store.deleteMany({ 
-      name: { $regex: new RegExp(`^${vendor.shopName || vendor.name}$`, 'i') } 
+    await Store.deleteMany({
+      name: { $regex: new RegExp(`^${vendor.shopName || vendor.name}$`, 'i') }
     });
 
     // 3. Delete the vendor user
@@ -174,29 +174,29 @@ router.delete('/vendors/:id', async (req, res) => {
 
 // DELETE delivery worker (safely re-pool active orders)
 router.delete('/delivery/:id', protect, admin, async (req, res) => {
-    try {
-        const worker = await User.findById(req.params.id);
-        
-        if (!worker || worker.role !== 'delivery') {
-            return res.status(404).json({ message: 'Delivery worker not found' });
-        }
+  try {
+    const worker = await User.findById(req.params.id);
 
-        // 1. Reset deliveryId to null for all uncompleted orders
-        await Order.updateMany(
-            { 
-                deliveryId: req.params.id, 
-                status: { $nin: ['delivered', 'cancelled'] } 
-            },
-            { $unset: { deliveryId: "" } } // This will make them "Available" in the new pool
-        );
-
-        // 2. Delete the delivery worker
-        await User.findByIdAndDelete(req.params.id);
-
-        res.json({ message: 'Delivery worker deleted and active orders returned to pool' });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    if (!worker || worker.role !== 'delivery') {
+      return res.status(404).json({ message: 'Delivery worker not found' });
     }
+
+    // 1. Reset deliveryId to null for all uncompleted orders
+    await Order.updateMany(
+      {
+        deliveryId: req.params.id,
+        status: { $nin: ['delivered', 'cancelled'] }
+      },
+      { $unset: { deliveryId: "" } } // This will make them "Available" in the new pool
+    );
+
+    // 2. Delete the delivery worker
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Delivery worker deleted and active orders returned to pool' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Re-locating reviews routes above parameterized routes for precedence in a future edit

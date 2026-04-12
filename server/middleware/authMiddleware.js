@@ -8,23 +8,23 @@ export const protect = async (req, res, next) => {
         try {
             token = req.headers.authorization.split(' ')[1];
             console.log(`[Protect Middleware] Verifying token...`);
-            
+
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'elsasecret99');
             req.user = await User.findById(decoded.id).select('-password');
-            
+
             if (!req.user) {
                 console.warn(`[Protect Middleware] User not found in DB for ID: ${decoded.id}`);
                 return res.status(401).json({ message: 'Not authorized, user no longer exists' });
             }
-            
+
             next();
         } catch (error) {
             console.error(`[Protect Middleware Error]: ${error.name} - ${error.message}`);
-            
+
             let message = 'Not authorized, token failed';
             if (error.name === 'TokenExpiredError') message = 'Session expired, please login again';
             if (error.name === 'JsonWebTokenError') message = 'Invalid token session';
-            
+
             res.status(401).json({ message });
         }
     }

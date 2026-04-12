@@ -18,8 +18,8 @@ router.post('/', protect, async (req, res) => {
 
     // Validation: Only allowed for picked or delivered
     if (!['picked', 'delivered'].includes(order.status)) {
-      return res.status(400).json({ 
-        message: 'Reclamations are only allowed for orders that are picked up or delivered.' 
+      return res.status(400).json({
+        message: 'Reclamations are only allowed for orders that are picked up or delivered.'
       });
     }
 
@@ -30,7 +30,7 @@ router.post('/', protect, async (req, res) => {
     });
 
     await reclamation.save();
-    
+
     // Notify all Admins
     const admins = await User.find({ role: 'admin' });
     for (const adminUser of admins) {
@@ -43,7 +43,7 @@ router.post('/', protect, async (req, res) => {
       await adminNotif.save();
       sendNotification(adminUser._id.toString(), adminNotif);
     }
-    
+
     res.status(201).json({ message: 'Reclamation submitted successfully' });
   } catch (err) {
     if (err.code === 11000) {
@@ -71,7 +71,7 @@ router.patch('/:id/reply', protect, admin, async (req, res) => {
   try {
     const { adminReply } = req.body;
     console.log(`[Reclamation Reply] RecID: ${req.params.id}, Reply length: ${adminReply?.length}`);
-    
+
     const reclamation = await Reclamation.findById(req.params.id);
     if (!reclamation) return res.status(404).json({ message: 'Reclamation not found' });
 
