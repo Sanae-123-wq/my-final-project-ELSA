@@ -15,11 +15,13 @@ const CLIENT_MESSAGES = {
   ready: '🎉 Your order is ready! The delivery team will pick it up soon.',
   picked: '🚚 Your order is on its way! Sit tight.',
   delivered: '📦 Your order has been delivered. Enjoy your treats!',
+  cancelled: '❌ Your order has been cancelled.',
 };
 
 const VENDOR_MESSAGES = {
   picked: '🛵 Your product is being delivered to the customer.',
   delivered: '✅ Your product was delivered successfully!',
+  cancelled: '❌ An order containing your product was cancelled.',
 };
 
 const DELIVERY_MESSAGES = {
@@ -94,10 +96,41 @@ router.get('/vendor-orders', protect, async (req, res) => {
       'products.productId': { $in: productIds }
     })
       .populate('products.productId', 'name price vendorId')
-      .populate('userId', 'name email')
+      .populate('userId', 'name email phone address')
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    const vendorId = req.user._id.toString();
+    const vendorOrders = [];
+
+    for (const order of orders) {
+      const myProducts = order.products.filter(p => {
+        const vId = p.productId?.vendorId?._id || p.productId?.vendorId;
+        return vId && vId.toString() === vendorId;
+      });
+
+      if (myProducts.length > 0) {
+        const myTotal = myProducts.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        
+        let myStatus = 'pending';
+        // if order is already completely picked/delivered/cancelled, inherit that main status.
+        if (['picked', 'delivered', 'cancelled'].includes(order.status)) {
+          myStatus = order.status;
+        } else if (myProducts.every(p => p.status === 'ready')) {
+          myStatus = 'ready';
+        } else if (myProducts.some(p => p.status === 'preparing')) {
+          myStatus = 'preparing';
+        }
+
+        vendorOrders.push({
+          ...order.toObject(),
+          products: myProducts,
+          totalAmount: myTotal,
+          status: myStatus
+        });
+      }
+    }
+
+    res.json(vendorOrders);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -138,7 +171,17 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({ message: 'Missing order details.' });
     }
 
-    const order = new Order({ userId, products, totalAmount });
+    // Auto-assign to delivery named "mimi"
+    const mimi = await User.findOne({ role: 'delivery', name: { $regex: /^mimi$/i } });
+    const deliveryId = mimi ? mimi._id : null;
+
+    const order = new Order({
+      userId,
+      products,
+      totalAmount,
+      deliveryFee: 20,
+      deliveryId
+    });
     const saved = await order.save();
 
     res.status(201).json({
@@ -161,68 +204,89 @@ router.put('/:id', protect, async (req, res) => {
 
     console.log(`\n[ORDER UPDATE] User ${req.user.email} (Role: ${userRole}) attempting to update Order ${req.params.id} to status: ${newStatus}`);
 
+    let updated;
+    let mainStatusChanged = false;
+    let finalStatus = oldOrder.status;
+
     // RBAC Authorization Enforcement
     if (userRole === 'vendor' || userRole === 'patissier') {
-      const ownsProducts = oldOrder.products.some(p => {
-        if (!p.productId) return false;
-        // Handle populated vendor object or raw string/ObjectId
-        const vId = p.productId.vendorId?._id || p.productId.vendorId;
-        return vId && vId.toString() === req.user._id.toString();
-      });
-      console.log(`[RBAC Vendor Check] ownsProducts: ${ownsProducts}. Order ID: ${req.params.id}`);
+      const vendorId = req.user._id.toString();
+      let isOwningProducts = false;
 
-      if (!ownsProducts) {
-        console.warn(`[RBAC Failed] Vendor ${req.user.email} attempted to update order they don't own.`);
+      // Update status for this vendor's products
+      oldOrder.products.forEach(p => {
+        const vId = p.productId?.vendorId?._id || p.productId?.vendorId;
+        if (vId && vId.toString() === vendorId) {
+          isOwningProducts = true;
+          if (['pending', 'preparing', 'ready'].includes(newStatus)) {
+             p.status = newStatus;
+          }
+        }
+      });
+
+      if (!isOwningProducts) {
         return res.status(403).json({ message: 'Not authorized to update this order' });
       }
-      // Vendors should only progress up to 'ready'
-      if (['picked', 'delivered'].includes(newStatus)) {
-        console.warn(`[RBAC Failed] Vendor attempted to mark as ${newStatus}. Forbidden.`);
-        return res.status(403).json({ message: 'Vendors cannot mark orders as picked or delivered' });
+
+      // Compute overarching main order status
+      const allReady = oldOrder.products.every(p => p.status === 'ready');
+      const anyPreparing = oldOrder.products.some(p => p.status === 'preparing');
+
+      let mainStatus = oldOrder.status;
+      if (allReady) {
+         mainStatus = 'ready';
+      } else if (anyPreparing || newStatus === 'preparing') {
+         mainStatus = 'preparing';
       }
-    } else if (userRole === 'delivery') {
-      if (!oldOrder.deliveryId || oldOrder.deliveryId.toString() !== req.user._id.toString()) {
-        console.warn(`[RBAC Failed] Delivery user ${req.user.email} not assigned to this order.`);
-        return res.status(403).json({ message: 'Not assigned to this delivery' });
+      
+      mainStatusChanged = mainStatus !== oldOrder.status;
+      finalStatus = mainStatus;
+      oldOrder.status = mainStatus;
+      oldOrder.markModified('products');
+      await oldOrder.save();
+      updated = await Order.findById(req.params.id).populate('products.productId', 'vendorId name');
+
+    } else {
+      if (userRole === 'delivery') {
+        if (!oldOrder.deliveryId || oldOrder.deliveryId.toString() !== req.user._id.toString()) return res.status(403).json({ message: 'Not assigned to this delivery' });
+        if (newStatus !== 'picked' && newStatus !== 'delivered') return res.status(403).json({ message: 'Delivery can only mark as picked or delivered' });
+      } else if (userRole === 'admin') {
+        return res.status(403).json({ message: 'Admins cannot update order statuses.' });
+      } else if (userRole === 'client') {
+        if (oldOrder.userId.toString() !== req.user._id.toString()) return res.status(403).json({ message: 'Not authorized' });
+        if (newStatus !== 'cancelled') return res.status(403).json({ message: 'Clients can only cancel' });
+        if (oldOrder.status !== 'pending') return res.status(400).json({ message: 'Can only cancel pending orders' });
       }
-      if (newStatus !== 'picked' && newStatus !== 'delivered') {
-        console.warn(`[RBAC Failed] Delivery attempted to mark as ${newStatus}. Forbidden.`);
-        return res.status(403).json({ message: 'Delivery can only mark as picked or delivered' });
-      }
-    } else if (userRole === 'admin') {
-      console.warn(`[RBAC Failed] Admin ${req.user.email} attempted to update order status. Forbidden by policy.`);
-      return res.status(403).json({ message: 'Admins are not allowed to update order statuses. This must be handled by the vendor or delivery staff.' });
+
+      mainStatusChanged = newStatus !== oldOrder.status;
+      finalStatus = newStatus;
+      const updates = { ...req.body };
+      updated = await Order.findByIdAndUpdate(
+        req.params.id,
+        { $set: updates },
+        { new: true, runValidators: true }
+      ).populate('products.productId', 'vendorId name');
     }
 
-    let updates = { ...req.body };
-
-    // [MODIFIED] Auto-assignment removed here to support manual "Accept Order" flow.
-
-    const updated = await Order.findByIdAndUpdate(
-      req.params.id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).populate('products.productId', 'vendorId name');
-
-    if (!newStatus || newStatus === oldOrder.status) {
+    if (!newStatus || !mainStatusChanged) {
       return res.json(updated);
     }
 
     const orderId = updated._id;
 
     // 1. Notify CLIENT
-    if (CLIENT_MESSAGES[newStatus]) {
-      console.log(`[NOTIFY] Emitting '${newStatus}' update to Client (ID: ${updated.userId})`);
+    if (CLIENT_MESSAGES[finalStatus]) {
+      console.log(`[NOTIFY] Emitting '${finalStatus}' update to Client (ID: ${updated.userId})`);
       await createAndSendNotification(
         updated.userId,
         orderId,
-        CLIENT_MESSAGES[newStatus],
-        newStatus
+        CLIENT_MESSAGES[finalStatus],
+        finalStatus
       );
     }
 
     // 2. Notify VENDOR(S)
-    if (VENDOR_MESSAGES[newStatus]) {
+    if (VENDOR_MESSAGES[finalStatus]) {
       const vendorIds = [
         ...new Set(
           updated.products
@@ -235,18 +299,18 @@ router.put('/:id', protect, async (req, res) => {
       ];
 
       for (const vendorId of vendorIds) {
-        console.log(`[NOTIFY] Emitting '${newStatus}' update to Vendor (ID: ${vendorId})`);
+        console.log(`[NOTIFY] Emitting '${finalStatus}' update to Vendor (ID: ${vendorId})`);
         await createAndSendNotification(
           vendorId,
           orderId,
-          VENDOR_MESSAGES[newStatus],
-          newStatus
+          VENDOR_MESSAGES[finalStatus],
+          finalStatus
         );
       }
     }
 
     // 3. Notify ASSIGNED DELIVERY WORKER when order is ready for pickup
-    if (newStatus === 'ready' && DELIVERY_MESSAGES[newStatus] && updated.deliveryId) {
+    if (finalStatus === 'ready' && DELIVERY_MESSAGES[finalStatus] && updated.deliveryId) {
       console.log(`[NOTIFY] Emitting 'ready' pickup alert to Delivery Worker (ID: ${updated.deliveryId})`);
       await createAndSendNotification(
         updated.deliveryId,
